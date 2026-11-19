@@ -1,0 +1,5 @@
+app:
+  seed:
+    enabled: true
+  security:
+    expose-dev-tokens: true

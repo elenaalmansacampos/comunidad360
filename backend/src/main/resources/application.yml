@@ -1,0 +1,100 @@
+spring:
+  application:
+    name: comunidad360
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/comunidad360}
+    username: ${SPRING_DATASOURCE_USERNAME:comunidad360}
+    password: ${SPRING_DATASOURCE_PASSWORD:comunidad360_local}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  messages:
+    basename: messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  mail:
+    host: ${SPRING_MAIL_HOST:localhost}
+    port: ${SPRING_MAIL_PORT:1025}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${SPRING_MAIL_SMTP_AUTH:false}
+      mail.smtp.starttls.enable: ${SPRING_MAIL_STARTTLS:false}
+
+server:
+  port: ${APP_PORT:8080}
+  forward-headers-strategy: framework
+  error:
+    include-message: never
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  default-language: ${APP_DEFAULT_LANGUAGE:es}
+  supported-languages: es,ca
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://localhost:13000}
+  security:
+    jwt-secret: ${APP_SECURITY_JWT_SECRET:dev-only-change-me-0123456789-abcdefghijklmnopqrstuvwxyz}
+    access-token-ttl-seconds: ${APP_SECURITY_ACCESS_TOKEN_TTL_SECONDS:900}
+    refresh-token-ttl-days: ${APP_SECURITY_REFRESH_TOKEN_TTL_DAYS:30}
+    cookie-secure: ${APP_SECURITY_COOKIE_SECURE:false}
+    cookie-same-site: ${APP_SECURITY_COOKIE_SAME_SITE:Lax}
+    expose-dev-tokens: ${APP_SECURITY_EXPOSE_DEV_TOKENS:false}
+  rate-limit:
+    enabled: ${APP_RATE_LIMIT_ENABLED:true}
+    auth-per-minute: ${APP_RATE_LIMIT_AUTH_PER_MINUTE:30}
+  mail:
+    enabled: ${APP_MAIL_ENABLED:false}
+    from: ${APP_MAIL_FROM:no-reply@comunidad360.local}
+    from-name: ${APP_MAIL_FROM_NAME:Comunidad 360}
+  storage:
+    type: ${APP_STORAGE_TYPE:local}
+    local-path: ${APP_STORAGE_LOCAL_PATH:./data/uploads}
+    max-incident-photo-bytes: ${APP_STORAGE_MAX_INCIDENT_PHOTO_BYTES:5242880}
+    max-document-bytes: ${APP_STORAGE_MAX_DOCUMENT_BYTES:26214400}
+    s3:
+      endpoint: ${APP_STORAGE_S3_ENDPOINT:http://localhost:9090}
+      public-endpoint: ${APP_STORAGE_S3_PUBLIC_ENDPOINT:}
+      region: ${APP_STORAGE_S3_REGION:us-east-1}
+      bucket: ${APP_STORAGE_S3_BUCKET:comunidad360-documents}
+      access-key: ${APP_STORAGE_S3_ACCESS_KEY:test}
+      secret-key: ${APP_STORAGE_S3_SECRET_KEY:test}
+      path-style: ${APP_STORAGE_S3_PATH_STYLE:true}
+      signed-url-ttl-seconds: ${APP_STORAGE_SIGNED_URL_TTL_SECONDS:300}
+      create-bucket: ${APP_STORAGE_S3_CREATE_BUCKET:false}
+  bank:
+    import-max-rows: ${APP_BANK_IMPORT_MAX_ROWS:10000}
+  structure:
+    coefficient-tolerance: ${APP_STRUCTURE_COEFFICIENT_TOLERANCE:0.0001}
+  seed:
+    enabled: ${APP_SEED_ENABLED:false}
+    admin-email: ${APP_SEED_ADMIN_EMAIL:admin@comunidad360.local}
+    admin-password: ${APP_SEED_ADMIN_PASSWORD:Admin1234!}
+    community-name: ${APP_SEED_COMMUNITY_NAME:Comunidad Demo}

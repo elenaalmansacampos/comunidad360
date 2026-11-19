@@ -1,0 +1,31 @@
+spring:
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  messages:
+    basename: messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+app:
+  supported-languages: es,ca
+  security:
+    jwt-secret: test-only-secret-0123456789-abcdefghijklmnopqrstuvwxyz
+    access-token-ttl-seconds: 900
+    refresh-token-ttl-days: 30
+    cookie-secure: false
+    cookie-same-site: Lax
+    expose-dev-tokens: true
+  seed:
+    enabled: false
+  storage:
+    type: local
+    local-path: ${java.io.tmpdir}/comunidad360-test-storage
+    max-incident-photo-bytes: 5242880
+    max-document-bytes: 26214400
+  rate-limit:
+    enabled: false
+    auth-per-minute: 1000

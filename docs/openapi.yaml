@@ -1,0 +1,3078 @@
+openapi: 3.1.0
+info:
+  title: COMUNIDAD 360 API
+  version: 0.1.0
+  description: >
+    Contrato inicial del núcleo del MVP. Es una propuesta de FASE 1 y no un
+    contrato definitivo. Los endpoints de banca CSV, chat, proveedores,
+    auditoría e IA se añadirán en una versión posterior. La implementación
+    actual de finanzas (FASE 3.3), banca (FASE 3.4), incidencias (FASE 3.5),
+    documentos (FASE 3.6), reuniones/notificaciones (FASE 3.7),
+    dashboard/informes (FASE 3.8) y MVP+ (FASE 3.9) puede variar respecto a
+    este borrador; consulta docs/API.md y los documentos de fase.
+  contact:
+    name: COMUNIDAD 360
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Proprietary
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Desarrollo local
+tags:
+  - name: Auth
+    description: Autenticación, sesiones e invitaciones
+  - name: Me
+    description: Perfil y preferencias del usuario
+  - name: Communities
+    description: Comunidades y dashboard
+  - name: Structure
+    description: Edificios, unidades y elementos comunes
+  - name: Members
+    description: Membresías, propietarios e inquilinos
+  - name: Finance
+    description: Ejercicios, cuotas, cargos, pagos y facturas
+  - name: Incidents
+    description: Incidencias y seguimiento
+  - name: Documents
+    description: Documentos y descargas
+  - name: Meetings
+    description: Reuniones y asistencia
+  - name: Voting
+    description: Votaciones consultivas (MVP+)
+  - name: Notifications
+    description: Notificaciones y preferencias
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Iniciar sesión
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Sesión creada
+          headers:
+            Set-Cookie:
+              description: Cookie de refresh HttpOnly
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      operationId: refreshSession
+      summary: Renovar access token
+      security:
+        - refreshCookie: []
+      responses:
+        "200":
+          description: Token renovado
+          headers:
+            Set-Cookie:
+              description: Nuevo refresh token rotado
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      summary: Cerrar sesión actual
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /auth/logout-all:
+    post:
+      tags: [Auth]
+      operationId: logoutAll
+      summary: Cerrar todas las sesiones
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /auth/password/forgot:
+    post:
+      tags: [Auth]
+      operationId: requestPasswordReset
+      summary: Solicitar recuperación de contraseña
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        "202":
+          description: Solicitud aceptada con respuesta genérica
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /auth/password/reset:
+    post:
+      tags: [Auth]
+      operationId: resetPassword
+      summary: Restablecer contraseña con token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, newPassword]
+              properties:
+                token:
+                  type: string
+                newPassword:
+                  type: string
+                  minLength: 12
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /auth/email/verify:
+    post:
+      tags: [Auth]
+      operationId: verifyEmail
+      summary: Verificar email
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /auth/invitations/accept:
+    post:
+      tags: [Auth]
+      operationId: acceptInvitation
+      summary: Aceptar invitación y crear o vincular cuenta
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptInvitationRequest"
+      responses:
+        "201":
+          description: Cuenta creada o membresía vinculada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "410":
+          description: Invitación caducada o ya utilizada
+
+  /me:
+    get:
+      tags: [Me]
+      operationId: getMe
+      summary: Obtener perfil y membresías
+      responses:
+        "200":
+          description: Perfil del usuario
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    patch:
+      tags: [Me]
+      operationId: updateMe
+      summary: Actualizar perfil
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                  maxLength: 200
+      responses:
+        "200":
+          description: Perfil actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /me/language:
+    put:
+      tags: [Me]
+      operationId: updateLanguage
+      summary: Cambiar idioma preferido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [language]
+              properties:
+                language:
+                  $ref: "#/components/schemas/Language"
+      responses:
+        "200":
+          description: Idioma actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /me/notification-preferences:
+    get:
+      tags: [Notifications]
+      operationId: getNotificationPreferences
+      summary: Obtener preferencias de notificación
+      responses:
+        "200":
+          description: Preferencias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NotificationPreference"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    put:
+      tags: [Notifications]
+      operationId: updateNotificationPreferences
+      summary: Actualizar preferencias de notificación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/NotificationPreference"
+      responses:
+        "200":
+          description: Preferencias actualizadas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NotificationPreference"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /communities:
+    get:
+      tags: [Communities]
+      operationId: listMyCommunities
+      summary: Listar comunidades del usuario
+      responses:
+        "200":
+          description: Comunidades accesibles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommunitySummary"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [Communities]
+      operationId: createCommunity
+      summary: Crear comunidad (solo SUPER_ADMIN)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommunityRequest"
+      responses:
+        "201":
+          description: Comunidad creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+    get:
+      tags: [Communities]
+      operationId: getCommunity
+      summary: Obtener comunidad
+      responses:
+        "200":
+          description: Comunidad
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Communities]
+      operationId: updateCommunity
+      summary: Actualizar configuración
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCommunityRequest"
+      responses:
+        "200":
+          description: Comunidad actualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Community"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/dashboard:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+    get:
+      tags: [Communities]
+      operationId: getDashboard
+      summary: Obtener resumen del dashboard según rol
+      responses:
+        "200":
+          description: Datos del dashboard
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/buildings:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+    get:
+      tags: [Structure]
+      operationId: listBuildings
+      summary: Listar edificios
+      responses:
+        "200":
+          description: Edificios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Building"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Structure]
+      operationId: createBuilding
+      summary: Crear edificio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBuildingRequest"
+      responses:
+        "201":
+          description: Edificio creado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Building"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/buildings/{buildingId}:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: buildingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Structure]
+      operationId: getBuilding
+      summary: Obtener edificio
+      responses:
+        "200":
+          description: Edificio
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Building"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Structure]
+      operationId: updateBuilding
+      summary: Actualizar edificio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBuildingRequest"
+      responses:
+        "200":
+          description: Edificio actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Building"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    delete:
+      tags: [Structure]
+      operationId: archiveBuilding
+      summary: Archivar edificio sin unidades activas
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /communities/{communityId}/units:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - $ref: "#/components/parameters/Page"
+      - $ref: "#/components/parameters/Size"
+      - $ref: "#/components/parameters/Sort"
+    get:
+      tags: [Structure]
+      operationId: listUnits
+      summary: Listar unidades
+      parameters:
+        - name: buildingId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: type
+          in: query
+          schema:
+            $ref: "#/components/schemas/UnitType"
+        - name: q
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Unidades paginadas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnitPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Structure]
+      operationId: createUnit
+      summary: Crear unidad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUnitRequest"
+      responses:
+        "201":
+          description: Unidad creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Unit"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/units/{unitId}:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: unitId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Structure]
+      operationId: getUnit
+      summary: Obtener unidad
+      responses:
+        "200":
+          description: Unidad
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Unit"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Structure]
+      operationId: updateUnit
+      summary: Actualizar unidad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUnitRequest"
+      responses:
+        "200":
+          description: Unidad actualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Unit"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+    delete:
+      tags: [Structure]
+      operationId: archiveUnit
+      summary: Archivar unidad
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /communities/{communityId}/units/{unitId}/ownerships:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: unitId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Members]
+      operationId: listOwnerships
+      summary: Listar titularidad de una unidad
+      responses:
+        "200":
+          description: Titularidades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ownership"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Members]
+      operationId: createOwnership
+      summary: Alta de titularidad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOwnershipRequest"
+      responses:
+        "201":
+          description: Titularidad creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ownership"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/units/{unitId}/ownerships/{ownershipId}:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: unitId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: ownershipId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags: [Members]
+      operationId: updateOwnership
+      summary: Actualizar titularidad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateOwnershipRequest"
+      responses:
+        "200":
+          description: Titularidad actualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ownership"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      tags: [Members]
+      operationId: endOwnership
+      summary: Finalizar titularidad conservando histórico
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/units/{unitId}/tenancies:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: unitId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Members]
+      operationId: listTenancies
+      summary: Listar alquileres de una unidad
+      responses:
+        "200":
+          description: Alquileres
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tenancy"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Members]
+      operationId: createTenancy
+      summary: Autorizar inquilino
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTenancyRequest"
+      responses:
+        "201":
+          description: Inquilino autorizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenancy"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/members:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+    get:
+      tags: [Members]
+      operationId: listMembers
+      summary: Listar membresías
+      responses:
+        "200":
+          description: Membresías
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Membership"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/invitations:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+    get:
+      tags: [Members]
+      operationId: listInvitations
+      summary: Listar invitaciones
+      responses:
+        "200":
+          description: Invitaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Invitation"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Members]
+      operationId: createInvitation
+      summary: Invitar a una persona
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateInvitationRequest"
+      responses:
+        "201":
+          description: Invitación creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invitation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/units/{unitId}/tenancies/{tenancyId}:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: unitId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: tenancyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags: [Members]
+      operationId: updateTenancy
+      summary: Actualizar alquiler
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTenancyRequest"
+      responses:
+        "200":
+          description: Alquiler actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenancy"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      tags: [Members]
+      operationId: revokeTenancy
+      summary: Revocar alquiler conservando histórico
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/common-elements:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+    get:
+      tags: [Structure]
+      operationId: listCommonElements
+      summary: Listar elementos comunes
+      responses:
+        "200":
+          description: Elementos comunes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommonElement"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Structure]
+      operationId: createCommonElement
+      summary: Crear elemento común
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommonElementRequest"
+      responses:
+        "201":
+          description: Elemento común creado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommonElement"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/common-elements/{elementId}:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: elementId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Structure]
+      operationId: getCommonElement
+      summary: Obtener elemento común
+      responses:
+        "200":
+          description: Elemento común
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommonElement"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Structure]
+      operationId: updateCommonElement
+      summary: Actualizar elemento común
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCommonElementRequest"
+      responses:
+        "200":
+          description: Elemento común actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommonElement"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    delete:
+      tags: [Structure]
+      operationId: archiveCommonElement
+      summary: Archivar elemento común
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/structure/summary:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+    get:
+      tags: [Structure]
+      operationId: getStructureSummary
+      summary: Obtener resumen y validación de coeficientes
+      responses:
+        "200":
+          description: Resumen de estructura
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StructureSummary"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/finance/summary:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+    get:
+      tags: [Finance]
+      operationId: getFinanceSummary
+      summary: Obtener resumen financiero
+      parameters:
+        - name: fiscalYearId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Resumen financiero
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinanceSummary"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/finance/assessments:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+    get:
+      tags: [Finance]
+      operationId: listAssessments
+      summary: Listar cuotas y derramas
+      responses:
+        "200":
+          description: Cuotas y derramas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Assessment"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Finance]
+      operationId: createAssessment
+      summary: Crear cuota o derrama
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAssessmentRequest"
+      responses:
+        "201":
+          description: Cuota o derrama creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assessment"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /communities/{communityId}/finance/assessments/{assessmentId}/issue:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: assessmentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags: [Finance]
+      operationId: issueAssessment
+      summary: Emitir cargos de una cuota o derrama
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Cuota emitida
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assessment"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /communities/{communityId}/finance/charges:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - $ref: "#/components/parameters/Page"
+      - $ref: "#/components/parameters/Size"
+    get:
+      tags: [Finance]
+      operationId: listCharges
+      summary: Listar cargos
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: ["PENDING", "PARTIAL", "PAID", "CANCELLED"]
+        - name: unitId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Cargos paginados
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChargePage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/finance/payments:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - $ref: "#/components/parameters/Page"
+      - $ref: "#/components/parameters/Size"
+    get:
+      tags: [Finance]
+      operationId: listPayments
+      summary: Listar pagos
+      responses:
+        "200":
+          description: Pagos paginados
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Finance]
+      operationId: createPayment
+      summary: Registrar pago
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+      responses:
+        "201":
+          description: Pago registrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /communities/{communityId}/finance/invoices:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - $ref: "#/components/parameters/Page"
+      - $ref: "#/components/parameters/Size"
+    get:
+      tags: [Finance]
+      operationId: listInvoices
+      summary: Listar facturas
+      responses:
+        "200":
+          description: Facturas paginadas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvoicePage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Finance]
+      operationId: createInvoice
+      summary: Registrar factura
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateInvoiceRequest"
+      responses:
+        "201":
+          description: Factura registrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /communities/{communityId}/incidents:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - $ref: "#/components/parameters/Page"
+      - $ref: "#/components/parameters/Size"
+    get:
+      tags: [Incidents]
+      operationId: listIncidents
+      summary: Listar incidencias visibles
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/IncidentStatus"
+        - name: priority
+          in: query
+          schema:
+            $ref: "#/components/schemas/IncidentPriority"
+        - name: assignedToMe
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Incidencias paginadas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IncidentPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Incidents]
+      operationId: createIncident
+      summary: Crear incidencia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateIncidentRequest"
+      responses:
+        "201":
+          description: Incidencia creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /communities/{communityId}/incidents/{incidentId}:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: incidentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Incidents]
+      operationId: getIncident
+      summary: Obtener incidencia
+      responses:
+        "200":
+          description: Incidencia
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IncidentDetail"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Incidents]
+      operationId: updateIncident
+      summary: Actualizar incidencia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateIncidentRequest"
+      responses:
+        "200":
+          description: Incidencia actualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/incidents/{incidentId}/comments:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: incidentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags: [Incidents]
+      operationId: addIncidentComment
+      summary: Añadir comentario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body:
+                  type: string
+                  maxLength: 5000
+                internal:
+                  type: boolean
+                  default: false
+      responses:
+        "201":
+          description: Comentario creado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IncidentComment"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/documents:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - $ref: "#/components/parameters/Page"
+      - $ref: "#/components/parameters/Size"
+    get:
+      tags: [Documents]
+      operationId: listDocuments
+      summary: Listar documentos visibles
+      parameters:
+        - name: category
+          in: query
+          schema:
+            $ref: "#/components/schemas/DocumentCategory"
+        - name: q
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Documentos paginados
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Documents]
+      operationId: createDocument
+      summary: Subir documento
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, title, category, visibility]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                title:
+                  type: string
+                  maxLength: 300
+                description:
+                  type: string
+                category:
+                  $ref: "#/components/schemas/DocumentCategory"
+                visibility:
+                  $ref: "#/components/schemas/DocumentVisibility"
+      responses:
+        "201":
+          description: Documento creado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "413":
+          description: Archivo demasiado grande
+
+  /communities/{communityId}/documents/{documentId}:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: documentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Documents]
+      operationId: getDocument
+      summary: Obtener metadatos de documento
+      responses:
+        "200":
+          description: Documento
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Documents]
+      operationId: updateDocument
+      summary: Actualizar metadatos o visibilidad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDocumentRequest"
+      responses:
+        "200":
+          description: Documento actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/documents/{documentId}/download-url:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: documentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Documents]
+      operationId: createDocumentDownloadUrl
+      summary: Obtener URL firmada de descarga
+      responses:
+        "200":
+          description: URL firmada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DownloadUrl"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: Documento pendiente de análisis o infectado
+
+  /communities/{communityId}/meetings:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+    get:
+      tags: [Meetings]
+      operationId: listMeetings
+      summary: Listar reuniones
+      responses:
+        "200":
+          description: Reuniones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Meeting"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Meetings]
+      operationId: createMeeting
+      summary: Crear convocatoria
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMeetingRequest"
+      responses:
+        "201":
+          description: Reunión creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meeting"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /communities/{communityId}/meetings/{meetingId}:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: meetingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Meetings]
+      operationId: getMeeting
+      summary: Obtener reunión
+      responses:
+        "200":
+          description: Reunión
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Meetings]
+      operationId: updateMeeting
+      summary: Actualizar reunión
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMeetingRequest"
+      responses:
+        "200":
+          description: Reunión actualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meeting"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /communities/{communityId}/votings:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+    get:
+      tags: [Voting]
+      operationId: listVotings
+      summary: Listar votaciones (MVP+)
+      responses:
+        "200":
+          description: Votaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Voting"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Voting]
+      operationId: createVoting
+      summary: Crear votación consultiva (MVP+)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVotingRequest"
+      responses:
+        "201":
+          description: Votación creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Voting"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /communities/{communityId}/votings/{votingId}/votes:
+    parameters:
+      - $ref: "#/components/parameters/CommunityId"
+      - name: votingId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags: [Voting]
+      operationId: castVote
+      summary: Emitir voto consultivo (MVP+)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CastVoteRequest"
+      responses:
+        "201":
+          description: Voto registrado
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /notifications:
+    get:
+      tags: [Notifications]
+      operationId: listNotifications
+      summary: Listar notificaciones propias
+      parameters:
+        - name: unreadOnly
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Notificaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /notifications/{notificationId}/read:
+    parameters:
+      - name: notificationId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags: [Notifications]
+      operationId: markNotificationRead
+      summary: Marcar notificación como leída
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    refreshCookie:
+      type: apiKey
+      in: cookie
+      name: comunidad360_refresh
+
+  parameters:
+    CommunityId:
+      name: communityId
+      in: path
+      required: true
+      description: Identificador de la comunidad. El backend valida la membresía.
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Sort:
+      name: sort
+      in: query
+      schema:
+        type: string
+        example: createdAt,desc
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    NoContent:
+      description: Operación completada sin contenido
+    BadRequest:
+      description: Validación de entrada incorrecta
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Unauthorized:
+      description: No autenticado o token inválido
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Forbidden:
+      description: Sin permiso o fuera de la comunidad
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    NotFound:
+      description: Recurso no encontrado o no visible
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Conflict:
+      description: Conflicto de versión, duplicado o idempotencia
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    UnprocessableEntity:
+      description: Regla de negocio incumplida
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    TooManyRequests:
+      description: Límite de peticiones superado
+      headers:
+        Retry-After:
+          description: Segundos de espera recomendados
+          schema:
+            type: integer
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+
+  schemas:
+    Problem:
+      type: object
+      required: [type, title, status, code, messageKey, traceId]
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        code:
+          type: string
+        messageKey:
+          type: string
+        params:
+          type: object
+          additionalProperties: true
+        traceId:
+          type: string
+
+    Money:
+      type: string
+      pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+      example: "1234.56"
+      description: Importe decimal como string para evitar pérdida de precisión.
+
+    Percentage:
+      type: string
+      pattern: "^-?[0-9]+(\\.[0-9]{1,6})?$"
+      example: "12.345678"
+
+    Language:
+      type: string
+      enum: ["es", "ca"]
+      description: Idioma preferido. La arquitectura permite añadir más códigos.
+
+    UnitType:
+      type: string
+      enum: ["VIVIENDA", "LOCAL", "GARAJE", "TRASTERO", "ELEMENTO_COMUN"]
+
+    Role:
+      type: string
+      enum: ["SUPER_ADMIN", "COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY", "TREASURER", "OWNER", "TENANT", "PROVIDER"]
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    TokenResponse:
+      type: object
+      required: [accessToken, tokenType, expiresIn]
+      properties:
+        accessToken:
+          type: string
+        tokenType:
+          type: string
+          enum: ["Bearer"]
+        expiresIn:
+          type: integer
+          example: 900
+
+    AcceptInvitationRequest:
+      type: object
+      required: [token, fullName, password]
+      properties:
+        token:
+          type: string
+        fullName:
+          type: string
+          maxLength: 200
+        password:
+          type: string
+          minLength: 12
+
+    User:
+      type: object
+      required: [id, email, fullName, preferredLanguage, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        fullName:
+          type: string
+        preferredLanguage:
+          $ref: "#/components/schemas/Language"
+        status:
+          type: string
+          enum: ["PENDING_VERIFICATION", "ACTIVE", "SUSPENDED", "DISABLED"]
+        emailVerifiedAt:
+          type: string
+          format: date-time
+
+    UserProfile:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          properties:
+            memberships:
+              type: array
+              items:
+                $ref: "#/components/schemas/CommunitySummary"
+
+    CommunitySummary:
+      type: object
+      required: [id, name, roles, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Role"
+        status:
+          type: string
+          enum: ["ACTIVE", "SUSPENDED", "ARCHIVED"]
+
+    Community:
+      type: object
+      required: [id, name, timezone, defaultLanguage, currency, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        province:
+          type: string
+        postalCode:
+          type: string
+        timezone:
+          type: string
+          example: Europe/Madrid
+        defaultLanguage:
+          $ref: "#/components/schemas/Language"
+        currency:
+          type: string
+          enum: ["EUR"]
+        status:
+          type: string
+          enum: ["ACTIVE", "SUSPENDED", "ARCHIVED"]
+
+    CreateCommunityRequest:
+      type: object
+      required: [name, timezone, defaultLanguage, currency]
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        taxId:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        province:
+          type: string
+        postalCode:
+          type: string
+        timezone:
+          type: string
+          default: Europe/Madrid
+        defaultLanguage:
+          $ref: "#/components/schemas/Language"
+        currency:
+          type: string
+          enum: ["EUR"]
+
+    UpdateCommunityRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        taxId:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        province:
+          type: string
+        postalCode:
+          type: string
+        timezone:
+          type: string
+        defaultLanguage:
+          $ref: "#/components/schemas/Language"
+        version:
+          type: integer
+
+    Dashboard:
+      type: object
+      properties:
+        community:
+          $ref: "#/components/schemas/CommunitySummary"
+        finance:
+          $ref: "#/components/schemas/FinanceSummary"
+        openIncidents:
+          type: integer
+        upcomingMeetings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Meeting"
+        recentNotifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notification"
+
+    Building:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        postalCode:
+          type: string
+        floors:
+          type: integer
+        notes:
+          type: string
+        archivedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+
+    CreateBuildingRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        address:
+          type: string
+        city:
+          type: string
+        postalCode:
+          type: string
+        floors:
+          type: integer
+        notes:
+          type: string
+
+    UpdateBuildingRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        postalCode:
+          type: string
+        floors:
+          type: integer
+        notes:
+          type: string
+        version:
+          type: integer
+
+    Unit:
+      type: object
+      required: [id, code, type, coefficient, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        buildingId:
+          type: string
+          format: uuid
+        buildingName:
+          type: string
+        code:
+          type: string
+        type:
+          $ref: "#/components/schemas/UnitType"
+        floor:
+          type: string
+        door:
+          type: string
+        builtArea:
+          type: number
+          format: float
+        coefficient:
+          $ref: "#/components/schemas/Percentage"
+        status:
+          type: string
+          enum: ["ACTIVE", "INACTIVE"]
+        archivedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+
+    UnitPage:
+      type: object
+      required: [content, page, size, totalElements, totalPages]
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/Unit"
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    CreateUnitRequest:
+      type: object
+      required: [code, type, coefficient]
+      properties:
+        buildingId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 50
+        type:
+          $ref: "#/components/schemas/UnitType"
+        floor:
+          type: string
+        door:
+          type: string
+        builtArea:
+          type: number
+        coefficient:
+          $ref: "#/components/schemas/Percentage"
+
+    UpdateUnitRequest:
+      type: object
+      properties:
+        code:
+          type: string
+        type:
+          $ref: "#/components/schemas/UnitType"
+        floor:
+          type: string
+        door:
+          type: string
+        builtArea:
+          type: number
+        coefficient:
+          $ref: "#/components/schemas/Percentage"
+        version:
+          type: integer
+
+    OwnershipType:
+      type: string
+      enum: ["OWNER", "CO_OWNER", "USUFRUCTUARY", "NAKED_OWNER"]
+
+    Ownership:
+      type: object
+      required: [id, userId, ownershipType, sharePercentage, validFrom, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        email:
+          type: string
+        ownershipType:
+          $ref: "#/components/schemas/OwnershipType"
+        sharePercentage:
+          $ref: "#/components/schemas/Percentage"
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+        active:
+          type: boolean
+        version:
+          type: integer
+
+    CreateOwnershipRequest:
+      type: object
+      required: [userId, ownershipType, sharePercentage, validFrom]
+      properties:
+        userId:
+          type: string
+          format: uuid
+        ownershipType:
+          $ref: "#/components/schemas/OwnershipType"
+        sharePercentage:
+          $ref: "#/components/schemas/Percentage"
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+
+    UpdateOwnershipRequest:
+      type: object
+      properties:
+        ownershipType:
+          $ref: "#/components/schemas/OwnershipType"
+        sharePercentage:
+          $ref: "#/components/schemas/Percentage"
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+        version:
+          type: integer
+
+    TenancyStatus:
+      type: string
+      enum: ["ACTIVE", "ENDED", "REVOKED"]
+
+    Tenancy:
+      type: object
+      required: [id, userId, validFrom, status, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        email:
+          type: string
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+        status:
+          $ref: "#/components/schemas/TenancyStatus"
+        active:
+          type: boolean
+        version:
+          type: integer
+
+    CreateTenancyRequest:
+      type: object
+      required: [userId, validFrom]
+      properties:
+        userId:
+          type: string
+          format: uuid
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+
+    UpdateTenancyRequest:
+      type: object
+      properties:
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+        status:
+          $ref: "#/components/schemas/TenancyStatus"
+        version:
+          type: integer
+
+    CommonElement:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        buildingId:
+          type: string
+          format: uuid
+        buildingName:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        archivedAt:
+          type: string
+          format: date-time
+
+    CreateCommonElementRequest:
+      type: object
+      required: [name]
+      properties:
+        buildingId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        type:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          maxLength: 2000
+
+    UpdateCommonElementRequest:
+      type: object
+      properties:
+        buildingId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+
+    StructureSummary:
+      type: object
+      required: [coefficientSum, tolerance, valid, totalUnits, activeUnits, buildings, commonElements]
+      properties:
+        coefficientSum:
+          $ref: "#/components/schemas/Percentage"
+        tolerance:
+          $ref: "#/components/schemas/Percentage"
+        valid:
+          type: boolean
+        totalUnits:
+          type: integer
+        activeUnits:
+          type: integer
+        buildings:
+          type: integer
+        commonElements:
+          type: integer
+
+    Membership:
+      type: object
+      required: [id, userId, fullName, status, roles]
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        email:
+          type: string
+        status:
+          type: string
+          enum: ["INVITED", "ACTIVE", "SUSPENDED", "REMOVED"]
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Role"
+        joinedAt:
+          type: string
+          format: date-time
+
+    Invitation:
+      type: object
+      required: [id, email, role, expiresAt, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          $ref: "#/components/schemas/Role"
+        expiresAt:
+          type: string
+          format: date-time
+        acceptedAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: ["PENDING", "ACCEPTED", "EXPIRED", "REVOKED"]
+
+    CreateInvitationRequest:
+      type: object
+      required: [email, role]
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          $ref: "#/components/schemas/Role"
+
+    FinanceSummary:
+      type: object
+      required: [currency, balance, pendingCharges, income, expense]
+      properties:
+        fiscalYear:
+          type: integer
+        currency:
+          type: string
+          enum: ["EUR"]
+        balance:
+          $ref: "#/components/schemas/Money"
+        pendingCharges:
+          $ref: "#/components/schemas/Money"
+        income:
+          $ref: "#/components/schemas/Money"
+        expense:
+          $ref: "#/components/schemas/Money"
+
+    Assessment:
+      type: object
+      required: [id, concept, type, periodStart, periodEnd, dueDate, totalAmount, allocationMethod, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        concept:
+          type: string
+        type:
+          type: string
+          enum: ["ORDINARY", "EXTRAORDINARY"]
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        totalAmount:
+          $ref: "#/components/schemas/Money"
+        allocationMethod:
+          type: string
+          enum: ["COEFFICIENT", "EQUAL", "CUSTOM"]
+        status:
+          type: string
+          enum: ["DRAFT", "ISSUED", "CLOSED", "CANCELLED"]
+        chargesCount:
+          type: integer
+
+    CreateAssessmentRequest:
+      type: object
+      required: [concept, type, periodStart, periodEnd, dueDate, totalAmount, allocationMethod, fiscalYearId]
+      properties:
+        fiscalYearId:
+          type: string
+          format: uuid
+        concept:
+          type: string
+          maxLength: 200
+        type:
+          type: string
+          enum: ["ORDINARY", "EXTRAORDINARY"]
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        totalAmount:
+          $ref: "#/components/schemas/Money"
+        allocationMethod:
+          type: string
+          enum: ["COEFFICIENT", "EQUAL", "CUSTOM"]
+
+    Charge:
+      type: object
+      required: [id, unitId, unitCode, amount, paidAmount, status, dueDate]
+      properties:
+        id:
+          type: string
+          format: uuid
+        unitId:
+          type: string
+          format: uuid
+        unitCode:
+          type: string
+        amount:
+          $ref: "#/components/schemas/Money"
+        paidAmount:
+          $ref: "#/components/schemas/Money"
+        status:
+          type: string
+          enum: ["PENDING", "PARTIAL", "PAID", "CANCELLED"]
+        dueDate:
+          type: string
+          format: date
+
+    ChargePage:
+      type: object
+      required: [content, page, size, totalElements, totalPages]
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/Charge"
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    Payment:
+      type: object
+      required: [id, amount, paymentDate, method, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        unitId:
+          type: string
+          format: uuid
+        assessmentChargeId:
+          type: string
+          format: uuid
+        invoiceId:
+          type: string
+          format: uuid
+        amount:
+          $ref: "#/components/schemas/Money"
+        paymentDate:
+          type: string
+          format: date
+        method:
+          type: string
+          enum: ["BANK_TRANSFER", "CASH", "CARD", "OTHER"]
+        reference:
+          type: string
+        status:
+          type: string
+          enum: ["REGISTERED", "RECONCILED", "CANCELLED"]
+
+    PaymentPage:
+      type: object
+      required: [content, page, size, totalElements, totalPages]
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/Payment"
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    CreatePaymentRequest:
+      type: object
+      required: [amount, paymentDate, method]
+      properties:
+        unitId:
+          type: string
+          format: uuid
+        assessmentChargeId:
+          type: string
+          format: uuid
+        invoiceId:
+          type: string
+          format: uuid
+        amount:
+          $ref: "#/components/schemas/Money"
+        paymentDate:
+          type: string
+          format: date
+        method:
+          type: string
+          enum: ["BANK_TRANSFER", "CASH", "CARD", "OTHER"]
+        reference:
+          type: string
+
+    Invoice:
+      type: object
+      required: [id, number, issueDate, subtotal, taxAmount, total, currency, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        providerId:
+          type: string
+          format: uuid
+        providerName:
+          type: string
+        number:
+          type: string
+        issueDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        subtotal:
+          $ref: "#/components/schemas/Money"
+        taxAmount:
+          $ref: "#/components/schemas/Money"
+        total:
+          $ref: "#/components/schemas/Money"
+        currency:
+          type: string
+          enum: ["EUR"]
+        status:
+          type: string
+          enum: ["DRAFT", "REGISTERED", "PAID", "CANCELLED"]
+        documentId:
+          type: string
+          format: uuid
+
+    InvoicePage:
+      type: object
+      required: [content, page, size, totalElements, totalPages]
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/Invoice"
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    CreateInvoiceRequest:
+      type: object
+      required: [number, issueDate, subtotal, taxAmount, total, fiscalYearId]
+      properties:
+        fiscalYearId:
+          type: string
+          format: uuid
+        providerId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        issueDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        subtotal:
+          $ref: "#/components/schemas/Money"
+        taxAmount:
+          $ref: "#/components/schemas/Money"
+        total:
+          $ref: "#/components/schemas/Money"
+
+    IncidentPriority:
+      type: string
+      enum: ["LOW", "MEDIUM", "HIGH", "URGENT"]
+
+    IncidentStatus:
+      type: string
+      enum: ["OPEN", "IN_PROGRESS", "WAITING_PROVIDER", "RESOLVED", "CLOSED", "CANCELLED"]
+
+    Incident:
+      type: object
+      required: [id, title, category, priority, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        priority:
+          $ref: "#/components/schemas/IncidentPriority"
+        status:
+          $ref: "#/components/schemas/IncidentStatus"
+        buildingId:
+          type: string
+          format: uuid
+        unitId:
+          type: string
+          format: uuid
+        reportedByUserId:
+          type: string
+          format: uuid
+        assignedToUserId:
+          type: string
+          format: uuid
+        providerId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    IncidentDetail:
+      allOf:
+        - $ref: "#/components/schemas/Incident"
+        - type: object
+          properties:
+            comments:
+              type: array
+              items:
+                $ref: "#/components/schemas/IncidentComment"
+            attachments:
+              type: array
+              items:
+                $ref: "#/components/schemas/Attachment"
+
+    IncidentComment:
+      type: object
+      required: [id, body, authorName, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        body:
+          type: string
+        authorName:
+          type: string
+        internal:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    Attachment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        fileName:
+          type: string
+        mimeType:
+          type: string
+        sizeBytes:
+          type: integer
+        scanStatus:
+          type: string
+          enum: ["PENDING", "CLEAN", "INFECTED", "ERROR"]
+
+    IncidentPage:
+      type: object
+      required: [content, page, size, totalElements, totalPages]
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/Incident"
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    CreateIncidentRequest:
+      type: object
+      required: [title, description, category, priority]
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 10000
+        category:
+          type: string
+        priority:
+          $ref: "#/components/schemas/IncidentPriority"
+        buildingId:
+          type: string
+          format: uuid
+        unitId:
+          type: string
+          format: uuid
+
+    UpdateIncidentRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        priority:
+          $ref: "#/components/schemas/IncidentPriority"
+        status:
+          $ref: "#/components/schemas/IncidentStatus"
+        assignedToUserId:
+          type: string
+          format: uuid
+        providerId:
+          type: string
+          format: uuid
+        version:
+          type: integer
+
+    DocumentCategory:
+      type: string
+      enum: ["ACTA", "ESTATUTO", "CONTRATO", "FACTURA", "PRESUPUESTO", "INFORME", "CERTIFICADO", "OTRO"]
+
+    DocumentVisibility:
+      type: string
+      enum: ["COMMUNITY", "BOARD", "OWNERS", "ROLE", "PRIVATE"]
+
+    Document:
+      type: object
+      required: [id, category, title, visibility, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        category:
+          $ref: "#/components/schemas/DocumentCategory"
+        title:
+          type: string
+        description:
+          type: string
+        visibility:
+          $ref: "#/components/schemas/DocumentVisibility"
+        status:
+          type: string
+          enum: ["DRAFT", "ACTIVE", "ARCHIVED"]
+        currentVersionNumber:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    DocumentPage:
+      type: object
+      required: [content, page, size, totalElements, totalPages]
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/Document"
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    UpdateDocumentRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        visibility:
+          $ref: "#/components/schemas/DocumentVisibility"
+        version:
+          type: integer
+
+    DownloadUrl:
+      type: object
+      required: [url, expiresAt]
+      properties:
+        url:
+          type: string
+          format: uri
+        expiresAt:
+          type: string
+          format: date-time
+
+    Meeting:
+      type: object
+      required: [id, title, type, scheduledStart, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        type:
+          type: string
+          enum: ["ORDINARY", "EXTRAORDINARY"]
+        scheduledStart:
+          type: string
+          format: date-time
+        scheduledEnd:
+          type: string
+          format: date-time
+        location:
+          type: string
+        status:
+          type: string
+          enum: ["DRAFT", "CONVENED", "HELD", "CANCELLED"]
+        minutesDocumentId:
+          type: string
+          format: uuid
+
+    MeetingDetail:
+      allOf:
+        - $ref: "#/components/schemas/Meeting"
+        - type: object
+          properties:
+            agenda:
+              type: array
+              items:
+                $ref: "#/components/schemas/AgendaItem"
+            attendance:
+              $ref: "#/components/schemas/AttendanceSummary"
+
+    AgendaItem:
+      type: object
+      required: [id, position, title]
+      properties:
+        id:
+          type: string
+          format: uuid
+        position:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+
+    AttendanceSummary:
+      type: object
+      properties:
+        present:
+          type: integer
+        represented:
+          type: integer
+        absent:
+          type: integer
+        coefficientPresent:
+          $ref: "#/components/schemas/Percentage"
+
+    CreateMeetingRequest:
+      type: object
+      required: [title, type, scheduledStart]
+      properties:
+        title:
+          type: string
+          maxLength: 300
+        type:
+          type: string
+          enum: ["ORDINARY", "EXTRAORDINARY"]
+        scheduledStart:
+          type: string
+          format: date-time
+        scheduledEnd:
+          type: string
+          format: date-time
+        location:
+          type: string
+        agenda:
+          type: array
+          items:
+            type: object
+            required: [title]
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+
+    UpdateMeetingRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        scheduledStart:
+          type: string
+          format: date-time
+        scheduledEnd:
+          type: string
+          format: date-time
+        location:
+          type: string
+        status:
+          type: string
+          enum: ["DRAFT", "CONVENED", "HELD", "CANCELLED"]
+        version:
+          type: integer
+
+    Voting:
+      type: object
+      required: [id, title, type, status, legalNotice]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: ["CONSULTIVE", "FORMAL"]
+        status:
+          type: string
+          enum: ["DRAFT", "SCHEDULED", "OPEN", "CLOSED", "CANCELLED"]
+        opensAt:
+          type: string
+          format: date-time
+        closesAt:
+          type: string
+          format: date-time
+        legalNotice:
+          type: string
+          description: Aviso de que la votación consultiva no constituye por sí sola un acuerdo jurídicamente válido.
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/VotingOption"
+
+    VotingOption:
+      type: object
+      required: [id, label]
+      properties:
+        id:
+          type: string
+          format: uuid
+        label:
+          type: string
+
+    CreateVotingRequest:
+      type: object
+      required: [title, type, opensAt, closesAt, options]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: ["CONSULTIVE"]
+        opensAt:
+          type: string
+          format: date-time
+        closesAt:
+          type: string
+          format: date-time
+        options:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [label]
+            properties:
+              label:
+                type: string
+
+    CastVoteRequest:
+      type: object
+      required: [optionId]
+      properties:
+        optionId:
+          type: string
+          format: uuid
+
+    Notification:
+      type: object
+      required: [id, type, category, templateKey, locale, channel, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+        category:
+          type: string
+        templateKey:
+          type: string
+        params:
+          type: object
+          additionalProperties: true
+        locale:
+          $ref: "#/components/schemas/Language"
+        channel:
+          type: string
+          enum: ["IN_APP", "EMAIL", "PUSH"]
+        status:
+          type: string
+          enum: ["PENDING", "SENT", "FAILED", "READ"]
+        readAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    NotificationPreference:
+      type: object
+      required: [category, channel, enabled]
+      properties:
+        category:
+          type: string
+        channel:
+          type: string
+          enum: ["IN_APP", "EMAIL", "PUSH"]
+        enabled:
+          type: boolean

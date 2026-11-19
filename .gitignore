@@ -1,0 +1,33 @@
+# Entorno
+.env
+.env.*
+!.env.example
+
+# Backend
+backend/target/
+backend/data/
+backend/.mvn/wrapper/maven-wrapper.jar
+*.class
+*.log
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+frontend/*.tsbuildinfo
+*.tsbuildinfo
+frontend/playwright-report/
+frontend/test-results/
+
+# IDE / sistema
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+
+# Backups locales
+backups/
