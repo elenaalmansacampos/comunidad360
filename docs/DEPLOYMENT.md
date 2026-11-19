@@ -111,6 +111,7 @@ Reglas:
 Mínimo:
 
 - `/actuator/health` para liveness/readiness.
+- `/actuator/prometheus` para métricas; no exponerlo públicamente, solo a la red de monitorización.
 - Alertas de errores 5xx, latencia y saturación.
 - Logs centralizados con `X-Trace-Id`.
 - Alertas de fallos de email y S3.

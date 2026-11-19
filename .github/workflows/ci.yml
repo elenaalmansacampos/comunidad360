@@ -23,7 +23,9 @@ jobs:
           java-version: "21"
           cache: maven
       - name: Tests
-        run: mvn -B verify
+        env:
+          DOCKER_API_VERSION: "1.43"
+        run: mvn -B verify -DargLine="-Dapi.version=1.43"
 
   frontend:
     name: Frontend

@@ -25,6 +25,8 @@ La validación técnica automatizable está en verde:
 | Carga local | 0 peticiones fallidas en health y dashboard |
 | Cabeceras de seguridad | CSP, Permissions-Policy, X-Frame-Options y Referrer-Policy activas |
 | Rate limiting de autenticación | Activo y probado |
+| Rate limiting perimetral | Nginx: 30 r/s por IP con burst |
+| Métricas | Endpoint Prometheus disponible |
 
 No se declara todavía un go/no-go de piloto: faltan validación legal, prueba con usuarios reales,
 revisión manual de accesibilidad, endurecimiento de producción y backup programado/cifrado.
@@ -120,16 +122,17 @@ producción.
 
 | Prueba | Peticiones | Concurrencia | Fallos | Throughput | Latencia media |
 | --- | --- | --- | --- | --- | --- |
-| `GET /actuator/health` | 300 | 10 | 0 | ≈640 req/s | ≈15,6 ms |
-| `GET /dashboard` autenticado | 200 | 5 | 0 | ≈100 req/s | ≈50 ms |
+| `GET /actuator/health` | 300 | 10 | 0 | ≈481 req/s | ≈20,8 ms |
+| `GET /dashboard` autenticado | 200 | 5 | 0 | ≈87 req/s | ≈57 ms |
 
 Comando reproducible:
 
 ```bash
-ab -q -n 300 -c 10 http://127.0.0.1:18080/actuator/health
-ab -q -n 200 -c 5 -H "Authorization: Bearer $TOKEN" \
-  "http://127.0.0.1:18080/api/v1/communities/$CID/dashboard"
+scripts/load-test.sh
 ```
+
+También se validó el rate limiting perimetral de Nginx: 30 r/s por IP con burst 60 y respuesta
+`429 RATE_LIMITED`. Las métricas Prometheus están en `/actuator/prometheus` y requieren autenticación.
 
 Pendiente: prueba con datos realistas, concurrencia de escritura, límites de conexión y observabilidad.
 
