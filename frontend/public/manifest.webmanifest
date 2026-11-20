@@ -1,0 +1,19 @@
+{
+  "name": "COMUNIDAD 360",
+  "short_name": "Comunidad 360",
+  "description": "Gestión de comunidades de propietarios",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f6f8fa",
+  "theme_color": "#0a2342",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -352,6 +352,15 @@ select {
   flex-direction: column;
 }
 
+.demo-banner {
+  padding: 0.45rem 1rem;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+}
+
 .app-header {
   position: sticky;
   top: 0;
@@ -476,6 +485,58 @@ select {
 .mobile-nav__item--active {
   color: var(--color-navy-900);
   background: var(--color-gray-50);
+}
+
+.mobile-nav__item--button {
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.mobile-more__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  border: 0;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.mobile-more {
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: calc(64px + env(safe-area-inset-bottom));
+  z-index: 21;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 0.9rem;
+}
+
+.mobile-more__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.mobile-more__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.mobile-more__grid a {
+  display: block;
+  padding: 0.7rem;
+  border-radius: var(--radius-md);
+  background: var(--color-gray-50);
+  color: var(--color-gray-900);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .page {
@@ -1170,7 +1231,9 @@ select {
     display: block;
   }
 
-  .mobile-nav {
+  .mobile-nav,
+  .mobile-more,
+  .mobile-more__backdrop {
     display: none;
   }
 
@@ -1212,6 +1275,76 @@ select {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+  }
+}
+
+@media (max-width: 639px) {
+  .app-header {
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .app-header__left,
+  .app-header__right {
+    gap: 0.45rem;
+  }
+
+  .app-header__user {
+    display: none;
+  }
+
+  .brand {
+    font-size: 0.85rem;
+  }
+
+  .app-content {
+    padding: 0.9rem;
+    padding-bottom: 96px;
+  }
+
+  .page-header {
+    flex-wrap: wrap;
+  }
+
+  .page-header__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .page-header h1 {
+    font-size: 1.55rem;
+    overflow-wrap: anywhere;
+  }
+
+  .filter-bar .field {
+    min-width: 100%;
+  }
+
+  .table td {
+    overflow-wrap: anywhere;
+  }
+
+  .evolution-card {
+    overflow-x: auto;
+  }
+
+  .evolution-chart {
+    min-width: 34rem;
+  }
+
+  .chat-composer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chat-composer .btn {
+    width: 100%;
+  }
+
+  .mobile-more__grid {
+    grid-template-columns: 1fr;
+    max-height: 50vh;
+    overflow-y: auto;
   }
 }
 

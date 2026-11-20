@@ -7,6 +7,7 @@ import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { PasswordInput } from "../components/PasswordInput";
 import { useAuthStore } from "../features/auth/authStore";
+import { demoEnabled } from "../services/demoApi";
 
 export function LoginPage() {
   const { t } = useTranslation();
@@ -41,6 +42,7 @@ export function LoginPage() {
       <h1>{t("auth.login.title")}</h1>
       <p className="auth-card__subtitle">{t("auth.login.subtitle")}</p>
 
+      {demoEnabled ? <Alert variant="info">{t("demo.credentials")}</Alert> : null}
       {error ? <Alert variant="error">{error}</Alert> : null}
 
       <form className="form-stack" onSubmit={handleSubmit}>

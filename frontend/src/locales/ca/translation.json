@@ -615,6 +615,10 @@
       "MEETING_MINUTES": "Acta disponible: {{title}}"
     }
   },
+  "demo": {
+    "banner": "Mode demo amb dades d'exemple. L'aplicació real requereix backend i autenticació.",
+    "credentials": "Demo: admin@comunidad360.local / Admin1234!"
+  },
   "providers": {
     "title": "Proveïdors",
     "subtitle": "Directori de proveïdors i contactes de la comunitat",

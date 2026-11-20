@@ -1,4 +1,5 @@
 import type { Problem, TokenResponse } from "../types/api";
+import { demoEnabled, demoRequest } from "./demoApi";
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api/v1").replace(/\/$/, "");
 
@@ -34,6 +35,9 @@ interface RequestOptions extends Omit<RequestInit, "body"> {
 
 async function request<T>(path: string, options: RequestOptions = {}, retry = true): Promise<T> {
   const { body: rawBody, ...rest } = options;
+  if (demoEnabled) {
+    return demoRequest<T>(path, rest.method ?? "GET");
+  }
   const headers = new Headers(rest.headers);
   if (accessToken) {
     headers.set("Authorization", `Bearer ${accessToken}`);
@@ -89,6 +93,10 @@ async function request<T>(path: string, options: RequestOptions = {}, retry = tr
 }
 
 export async function refreshAccessToken(): Promise<boolean> {
+  if (demoEnabled) {
+    accessToken = "demo-token";
+    return true;
+  }
   const response = await fetch(`${API_BASE}/auth/refresh`, {
     method: "POST",
     credentials: "include",
@@ -103,6 +111,9 @@ export async function refreshAccessToken(): Promise<boolean> {
 }
 
 export async function downloadFile(path: string, retry = true): Promise<Blob> {
+  if (demoEnabled) {
+    return new Blob(["Comunidad 360 demo"], { type: "application/pdf" });
+  }
   const headers = new Headers();
   if (accessToken) {
     headers.set("Authorization", `Bearer ${accessToken}`);

@@ -38,6 +38,9 @@ const queryClient = new QueryClient({
   },
 });
 
+const baseUrl = import.meta.env.BASE_URL;
+const basename = baseUrl === "/" ? undefined : baseUrl.replace(/\/$/, "");
+
 export function App() {
   const bootstrapped = useRef(false);
 
@@ -51,7 +54,7 @@ export function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename={basename}>
         <Routes>
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LoginPage />} />
