@@ -13,6 +13,9 @@ import com.comunidad360.incidents.dto.IncidentDetailResponse;
 import com.comunidad360.incidents.dto.IncidentHistoryResponse;
 import com.comunidad360.incidents.dto.IncidentResponse;
 import com.comunidad360.incidents.dto.UpdateIncidentRequest;
+import com.comunidad360.malware.MalwareScanner;
+import com.comunidad360.malware.ScanResult;
+import com.comunidad360.malware.ScanStatus;
 import com.comunidad360.membership.Membership;
 import com.comunidad360.membership.MembershipRepository;
 import com.comunidad360.membership.MembershipStatus;
@@ -64,6 +67,7 @@ public class IncidentService {
     private final StorageService storageService;
     private final AuditService auditService;
     private final AppProperties properties;
+    private final MalwareScanner malwareScanner;
 
     public IncidentService(IncidentRepository incidentRepository,
                            IncidentCommentRepository commentRepository,
@@ -77,7 +81,8 @@ public class IncidentService {
                            CommonElementRepository commonElementRepository,
                            StorageService storageService,
                            AuditService auditService,
-                           AppProperties properties) {
+                           AppProperties properties,
+                           MalwareScanner malwareScanner) {
         this.incidentRepository = incidentRepository;
         this.commentRepository = commentRepository;
         this.historyRepository = historyRepository;
@@ -91,6 +96,7 @@ public class IncidentService {
         this.storageService = storageService;
         this.auditService = auditService;
         this.properties = properties;
+        this.malwareScanner = malwareScanner;
     }
 
     @Transactional(readOnly = true)
@@ -278,6 +284,13 @@ public class IncidentService {
             case "webp" -> "image/webp";
             default -> "application/octet-stream";
         };
+        ScanResult scan = malwareScanner.scan(content);
+        if (scan.status() == ScanStatus.INFECTED) {
+            throw BusinessException.unprocessable("ATTACHMENT_INFECTED", "errors.incident.attachmentInfected");
+        }
+        if (scan.status() == ScanStatus.ERROR) {
+            throw BusinessException.unprocessable("ATTACHMENT_SCAN_ERROR", "errors.incident.attachmentScanError");
+        }
         String storageKey = storageService.store(content, extension, mimeType);
         Instant now = Instant.now();
         IncidentAttachment attachment = new IncidentAttachment(

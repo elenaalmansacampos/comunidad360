@@ -29,3 +29,5 @@ app:
   rate-limit:
     enabled: false
     auth-per-minute: 1000
+  malware-scan:
+    enabled: false

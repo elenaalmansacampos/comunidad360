@@ -17,6 +17,7 @@ public class AppProperties {
     private Bank bank = new Bank();
     private Mail mail = new Mail();
     private RateLimit rateLimit = new RateLimit();
+    private MalwareScan malwareScan = new MalwareScan();
     private Storage storage = new Storage();
 
     public String getDefaultLanguage() {
@@ -73,6 +74,14 @@ public class AppProperties {
 
     public void setBank(Bank bank) {
         this.bank = bank;
+    }
+
+    public MalwareScan getMalwareScan() {
+        return malwareScan;
+    }
+
+    public void setMalwareScan(MalwareScan malwareScan) {
+        this.malwareScan = malwareScan;
     }
 
     public RateLimit getRateLimit() {
@@ -165,6 +174,45 @@ public class AppProperties {
 
         public void setExposeDevTokens(boolean exposeDevTokens) {
             this.exposeDevTokens = exposeDevTokens;
+        }
+    }
+
+    public static class MalwareScan {
+        private boolean enabled = false;
+        private String host = "localhost";
+        private int port = 3310;
+        private int timeoutMillis = 5000;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getHost() {
+            return host;
+        }
+
+        public void setHost(String host) {
+            this.host = host;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public void setPort(int port) {
+            this.port = port;
+        }
+
+        public int getTimeoutMillis() {
+            return timeoutMillis;
+        }
+
+        public void setTimeoutMillis(int timeoutMillis) {
+            this.timeoutMillis = timeoutMillis;
         }
     }
 

@@ -37,6 +37,11 @@ app:
   rate-limit:
     enabled: true
     auth-per-minute: ${APP_RATE_LIMIT_AUTH_PER_MINUTE:20}
+  malware-scan:
+    enabled: ${APP_MALWARE_SCAN_ENABLED:true}
+    host: ${APP_MALWARE_SCAN_HOST:clamav}
+    port: ${APP_MALWARE_SCAN_PORT:3310}
+    timeout-millis: ${APP_MALWARE_SCAN_TIMEOUT_MILLIS:5000}
   mail:
     enabled: true
     from: ${APP_MAIL_FROM}

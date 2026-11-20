@@ -70,6 +70,11 @@ app:
   rate-limit:
     enabled: ${APP_RATE_LIMIT_ENABLED:true}
     auth-per-minute: ${APP_RATE_LIMIT_AUTH_PER_MINUTE:30}
+  malware-scan:
+    enabled: ${APP_MALWARE_SCAN_ENABLED:false}
+    host: ${APP_MALWARE_SCAN_HOST:localhost}
+    port: ${APP_MALWARE_SCAN_PORT:3310}
+    timeout-millis: ${APP_MALWARE_SCAN_TIMEOUT_MILLIS:5000}
   mail:
     enabled: ${APP_MAIL_ENABLED:false}
     from: ${APP_MAIL_FROM:no-reply@comunidad360.local}

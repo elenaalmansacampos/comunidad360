@@ -81,7 +81,24 @@ add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 - Rotación de secreto JWT planificada.
 - MFA recomendado para administradores antes de comercializar.
 
-## 5. Backups
+## 5. Antimalware
+
+Activar ClamAV antes de aceptar documentos en producción:
+
+```bash
+docker compose --profile av up -d clamav
+export APP_MALWARE_SCAN_ENABLED=true
+export APP_MALWARE_SCAN_HOST=clamav
+export APP_MALWARE_SCAN_PORT=3310
+```
+
+- El backend escanea documentos y fotografías antes de almacenarlas.
+- Si el archivo está infectado o el escáner falla, la subida se rechaza (`422`).
+- El perfil `prod` activa el escaneo por defecto.
+- Monitorizar disponibilidad de ClamAV y tasa de errores de análisis.
+- Para almacenamiento interno, no exponer el puerto 3310 públicamente.
+
+## 6. Backups
 
 Cifrado con OpenSSL:
 
@@ -106,7 +123,7 @@ Reglas:
 - Definir RPO/RTO con el Product Owner.
 - No restaurar sobre producción sin ventana y autorización.
 
-## 6. Monitorización
+## 7. Monitorización
 
 Mínimo:
 
@@ -118,7 +135,7 @@ Mínimo:
 - Panel de backups y espacio en disco.
 - Revisión periódica de auditoría.
 
-## 7. Despliegue
+## 8. Despliegue
 
 1. Construir imágenes desde un commit etiquetado.
 2. Ejecutar migraciones Flyway al arrancar el backend.
@@ -127,14 +144,14 @@ Mínimo:
 5. Comprobar que no se exponen puertos internos.
 6. Etiquetar la release y registrar el despliegue.
 
-## 8. Rollback
+## 9. Rollback
 
 - Mantener la imagen anterior.
 - No revertir migraciones destructivas sin plan.
 - Si falla el backend, volver a la imagen anterior y restaurar backup solo si hay corrupción.
 - Documentar causa, impacto y acciones.
 
-## 9. Checklist go-live
+## 10. Checklist go-live
 
 - [ ] HTTPS y HSTS.
 - [ ] Secretos gestionados y rotados.
@@ -143,7 +160,7 @@ Mínimo:
 - [ ] SMTP con dominio verificado.
 - [ ] S3 privado y política de retención.
 - [ ] Monitorización y alertas.
-- [ ] Antivirus documental.
+- [x] Integración ClamAV; activar y verificar en producción.
 - [ ] Revisión legal y textos aprobados.
 - [ ] Accesibilidad manual.
 - [ ] Pentest sin críticos/altos abiertos.

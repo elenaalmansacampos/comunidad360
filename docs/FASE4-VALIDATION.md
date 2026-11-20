@@ -15,7 +15,7 @@ La validación técnica automatizable está en verde:
 
 | Área | Resultado |
 | --- | --- |
-| Backend | 54 tests, 0 fallos |
+| Backend | 55 tests, 0 fallos |
 | Frontend | 28 tests, 0 fallos |
 | E2E Playwright | 2 tests, 0 fallos |
 | Accesibilidad automatizada | 0 violaciones serias/críticas en login y dashboard |
@@ -27,6 +27,7 @@ La validación técnica automatizable está en verde:
 | Rate limiting de autenticación | Activo y probado |
 | Rate limiting perimetral | Nginx: 30 r/s por IP con burst |
 | Métricas | Endpoint Prometheus disponible |
+| Antimalware | ClamAV opcional; subida bloqueada si infecta o falla el análisis |
 
 No se declara todavía un go/no-go de piloto: faltan validación legal, prueba con usuarios reales,
 revisión manual de accesibilidad, endurecimiento de producción y backup programado/cifrado.
@@ -100,6 +101,7 @@ que faltaban en catalán.
 - Rate limiting de endpoints de autenticación por IP y minuto, con respuesta `429` y `Retry-After`.
 - Perfil `prod` con secretos obligatorios, cookies `Secure`, seed desactivado y S3 real.
 - Backups cifrados con AES-256/OpenSSL y retención configurable.
+- Integración opcional con ClamAV (`zINSTREAM`) y política fail-closed para documentos y fotos.
 
 ### Riesgos abiertos
 
@@ -109,7 +111,7 @@ que faltaban en catalán.
 | Rate limit en memoria por instancia | Medio | Rate limiting distribuido si hay varias réplicas |
 | Sin MFA | Medio | Evaluar para administradores |
 | Secreto JWT de desarrollo | Alto en producción | Sustituir por secreto gestionado y rotación |
-| Sin antivirus/cuarentena documental | Alto | Integrar escáner antes de producción |
+| Antivirus opcional, no activo por defecto | Medio | Activar ClamAV y monitorizar fallos antes de producción |
 | Backups sin programación automática | Alto | Programar, externalizar y restringir acceso; cifrado ya disponible |
 | Sin WAF ni monitorización de seguridad | Medio | Definir infraestructura de producción |
 | Sin prueba de penetración | Alto | Contratar antes de comercializar |
@@ -192,7 +194,7 @@ El workflow añade:
 - [ ] Sustituir secretos de desarrollo y configurar cookies/HTTPS de producción.
 - [ ] Rate limiting general y protección perimetral.
 - [ ] Backup programado y almacenado fuera del host; cifrado ya disponible.
-- [ ] Antivirus/cuarentena para documentos.
+- [x] Integración antimalware con ClamAV (activar en producción).
 - [ ] Auditoría manual de accesibilidad y pruebas con usuarios.
 - [ ] Prueba de carga con datos realistas.
 - [ ] Monitorización, alertas y trazas centralizadas.

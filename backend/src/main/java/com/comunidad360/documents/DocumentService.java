@@ -7,6 +7,9 @@ import com.comunidad360.documents.dto.DocumentDetailResponse;
 import com.comunidad360.documents.dto.DocumentResponse;
 import com.comunidad360.documents.dto.DocumentVersionResponse;
 import com.comunidad360.documents.dto.UpdateDocumentRequest;
+import com.comunidad360.malware.MalwareScanner;
+import com.comunidad360.malware.ScanResult;
+import com.comunidad360.malware.ScanStatus;
 import com.comunidad360.membership.Membership;
 import com.comunidad360.security.RequestInfo;
 import com.comunidad360.security.TokenSupport;
@@ -35,6 +38,7 @@ public class DocumentService {
     private final StorageService storageService;
     private final AuditService auditService;
     private final AppProperties properties;
+    private final MalwareScanner malwareScanner;
 
     public DocumentService(DocumentRepository documentRepository,
                            DocumentVersionRepository versionRepository,
@@ -43,7 +47,8 @@ public class DocumentService {
                            AppUserRepository userRepository,
                            StorageService storageService,
                            AuditService auditService,
-                           AppProperties properties) {
+                           AppProperties properties,
+                           MalwareScanner malwareScanner) {
         this.documentRepository = documentRepository;
         this.versionRepository = versionRepository;
         this.accessLogRepository = accessLogRepository;
@@ -52,6 +57,7 @@ public class DocumentService {
         this.storageService = storageService;
         this.auditService = auditService;
         this.properties = properties;
+        this.malwareScanner = malwareScanner;
     }
 
     @Transactional(readOnly = true)
@@ -299,6 +305,13 @@ public class DocumentService {
         String extension = extensionFor(contentType, content);
         if (extension == null) {
             throw BusinessException.unprocessable("DOCUMENT_TYPE_UNSUPPORTED", "errors.validation");
+        }
+        ScanResult scan = malwareScanner.scan(content);
+        if (scan.status() == ScanStatus.INFECTED) {
+            throw BusinessException.unprocessable("DOCUMENT_INFECTED", "errors.document.infected");
+        }
+        if (scan.status() == ScanStatus.ERROR) {
+            throw BusinessException.unprocessable("DOCUMENT_SCAN_ERROR", "errors.document.scanError");
         }
         String storageKey = storageService.store(content, extension, contentType);
         return new StoredFile(

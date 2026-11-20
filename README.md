@@ -266,7 +266,7 @@ Validación FASE 4 realizada:
 - `npm audit` sin vulnerabilidades de producción.
 - Cabeceras CSP, Permissions-Policy, X-Frame y Referrer.
 - Backup y restauración real de PostgreSQL verificados, también cifrados con AES-256.
-- Rate limiting de autenticación y perimetral, métricas Prometheus y perfil de producción endurecido.
+- Rate limiting de autenticación y perimetral, métricas Prometheus, perfil de producción y ClamAV opcional.
 - Prueba básica de carga local.
 
 Pendiente para el piloto: legal, HTTPS/secretos de producción, rate limiting, antivirus,

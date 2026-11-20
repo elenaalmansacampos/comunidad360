@@ -35,6 +35,14 @@ services:
       - "9090:9090"
       - "9191:9191"
 
+  clamav:
+    image: clamav/clamav:stable
+    profiles: ["av"]
+    environment:
+      CLAMAV_NO_MILTERD: "true"
+    ports:
+      - "3310:3310"
+
   mailpit:
     image: axllent/mailpit:latest
     restart: unless-stopped
