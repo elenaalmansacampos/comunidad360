@@ -404,3 +404,12 @@ Una funcionalidad no se considera terminada si:
 ---
 
 *Fin de docs/SECURITY.md — v0.1.0 (FASE 0).*
+
+
+## CSRF
+
+La API es stateless y las operaciones de negocio usan `Authorization: Bearer`. La única cookie es
+el refresh token, `HttpOnly` y `SameSite=Lax`; no autoriza operaciones de negocio. Por ello Spring
+Security desactiva CSRF para la API. Esta decisión está revisada y se mantiene bajo vigilancia de
+CodeQL; si se añaden operaciones autenticadas por cookie, deberá activarse CSRF o un patrón
+equivalente.

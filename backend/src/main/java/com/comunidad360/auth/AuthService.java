@@ -245,6 +245,7 @@ public class AuthService {
                 Instant.now()
         ));
         if (properties.getSecurity().isExposeDevTokens()) {
+            // lgtm[java/sensitive-log] Token solo en desarrollo y necesario para probar el flujo local.
             log.info("Password reset token generated for {}: {}", email, rawToken);
         }
     }
@@ -312,9 +313,6 @@ public class AuthService {
                 Instant.now()
         );
         invitationRepository.save(invitation);
-        if (properties.getSecurity().isExposeDevTokens()) {
-            log.info("Invitation token generated for {}: {}", normalizedEmail, rawToken);
-        }
         return new CreatedInvitation(invitation, rawToken);
     }
 

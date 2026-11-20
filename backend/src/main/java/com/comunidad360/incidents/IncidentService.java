@@ -1,7 +1,6 @@
 package com.comunidad360.incidents;
 
 import com.comunidad360.audit.AuditService;
-import com.comunidad360.building.Building;
 import com.comunidad360.building.BuildingRepository;
 import com.comunidad360.common.exception.BusinessException;
 import com.comunidad360.config.AppProperties;
@@ -19,7 +18,6 @@ import com.comunidad360.malware.ScanStatus;
 import com.comunidad360.membership.Membership;
 import com.comunidad360.membership.MembershipRepository;
 import com.comunidad360.membership.MembershipStatus;
-import com.comunidad360.property.CommonElement;
 import com.comunidad360.property.CommonElementRepository;
 import com.comunidad360.property.Unit;
 import com.comunidad360.property.UnitRepository;
@@ -273,7 +271,7 @@ public class IncidentService {
         } catch (IOException exception) {
             throw new IllegalStateException("Cannot read attachment", exception);
         }
-        String extension = extensionFor(content, file.getContentType());
+        String extension = extensionFor(content);
         if (extension == null) {
             throw BusinessException.unprocessable(
                     "ATTACHMENT_TYPE_UNSUPPORTED", "errors.incident.attachmentType");
@@ -386,17 +384,17 @@ public class IncidentService {
 
     private void validateLocation(UUID communityId, UUID buildingId, UUID unitId, UUID commonElementId) {
         if (buildingId != null) {
-            Building building = buildingRepository.findByIdAndCommunityId(buildingId, communityId)
+            buildingRepository.findByIdAndCommunityId(buildingId, communityId)
                     .filter(value -> value.getArchivedAt() == null)
                     .orElseThrow(this::invalidLocation);
         }
         if (unitId != null) {
-            Unit unit = unitRepository.findByIdAndCommunityId(unitId, communityId)
+            unitRepository.findByIdAndCommunityId(unitId, communityId)
                     .filter(value -> value.getArchivedAt() == null)
                     .orElseThrow(this::invalidLocation);
         }
         if (commonElementId != null) {
-            CommonElement element = commonElementRepository.findByIdAndCommunityId(commonElementId, communityId)
+            commonElementRepository.findByIdAndCommunityId(commonElementId, communityId)
                     .filter(value -> value.getArchivedAt() == null)
                     .orElseThrow(this::invalidLocation);
         }
@@ -418,7 +416,7 @@ public class IncidentService {
                 .orElse(null);
     }
 
-    private String extensionFor(byte[] content, String mimeType) {
+    private String extensionFor(byte[] content) {
         if (content.length >= 3
                 && (content[0] & 0xFF) == 0xFF
                 && (content[1] & 0xFF) == 0xD8

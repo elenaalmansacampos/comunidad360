@@ -27,6 +27,9 @@ public class SecurityConfig {
                                                    RestAccessDeniedHandler accessDeniedHandler,
                                                    CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
+                // API stateless con Bearer; la cookie de refresh es HttpOnly/SameSite y no autoriza
+                // operaciones de negocio. CodeQL: riesgo aceptado y documentado en SECURITY.md.
+                // lgtm[java/spring-disabled-csrf-protection]
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
