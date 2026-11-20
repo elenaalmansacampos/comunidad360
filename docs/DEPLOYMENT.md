@@ -9,6 +9,8 @@
 
 ---
 
+> Despliegue gestionado alternativo: [`RENDER-DEPLOY.md`](./RENDER-DEPLOY.md).
+
 ## 1. Requisitos
 
 - HTTPS terminado en reverse proxy (Nginx, Traefik, ALB o equivalente).

@@ -73,7 +73,7 @@ completa, usa Docker Compose en local.
 
 **FASE 3 completada y FASE 4 en validación técnica.**
 
-- Backend: 55 tests.
+- Backend: 56 tests.
 - Frontend: 28 tests.
 - E2E: 3 tests de escritorio, móvil y accesibilidad.
 - CodeQL, Gitleaks, Dependency Review y Dependabot activos.
@@ -191,6 +191,17 @@ sudo scripts/install-systemd-backup.sh
 
 Ver [`docs/BACKUP.md`](docs/BACKUP.md).
 
+## Despliegue en Render
+
+El repositorio incluye [`render.yaml`](render.yaml) para desplegar PostgreSQL, API y frontend:
+
+1. Render → New → Blueprint.
+2. Conecta este repositorio.
+3. Completa los secretos de S3/R2, bootstrap y, opcionalmente, SMTP.
+4. Render crea la base de datos, la API Docker y el frontend estático.
+
+Guía completa: [`docs/RENDER-DEPLOY.md`](docs/RENDER-DEPLOY.md).
+
 ## GitHub Pages
 
 El workflow [`Deploy demo to GitHub Pages`](.github/workflows/pages.yml) publica el frontend en:
@@ -241,6 +252,7 @@ Ver [`docs/SECURITY.md`](docs/SECURITY.md) y [`docs/FASE4-VALIDATION.md`](docs/F
 | [`docs/FASE3.9-IMPLEMENTATION.md`](docs/FASE3.9-IMPLEMENTATION.md) | MVP+ |
 | [`docs/FASE4-VALIDATION.md`](docs/FASE4-VALIDATION.md) | Validación, E2E, seguridad y carga |
 | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Despliegue de producción |
+| [`docs/RENDER-DEPLOY.md`](docs/RENDER-DEPLOY.md) | Blueprint y despliegue en Render |
 | [`docs/PILOT-RUNBOOK.md`](docs/PILOT-RUNBOOK.md) | Operación del piloto |
 | [`docs/BACKUP.md`](docs/BACKUP.md) | Backups cifrados y restauración |
 | [`docs/ADR/`](docs/ADR/) | Decisiones arquitectónicas |

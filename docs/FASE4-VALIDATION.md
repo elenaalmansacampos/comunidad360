@@ -15,7 +15,7 @@ La validación técnica automatizable está en verde:
 
 | Área | Resultado |
 | --- | --- |
-| Backend | 55 tests, 0 fallos |
+| Backend | 56 tests, 0 fallos |
 | Frontend | 28 tests, 0 fallos |
 | E2E Playwright | 3 tests, 0 fallos (desktop y móvil) |
 | Accesibilidad automatizada | 0 violaciones serias/críticas en login y dashboard |
