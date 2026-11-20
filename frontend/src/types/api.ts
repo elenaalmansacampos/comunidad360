@@ -67,6 +67,17 @@ export interface DashboardMonth {
   expense: number | string;
 }
 
+export interface DashboardComparison {
+  currentMonth: number;
+  previousMonth: number;
+  currentIncome: number | string;
+  currentExpense: number | string;
+  previousIncome?: number | string | null;
+  previousExpense?: number | string | null;
+  incomeDelta?: number | string | null;
+  expenseDelta?: number | string | null;
+}
+
 export interface Dashboard {
   community: CommunitySummary;
   roles: Role[];
@@ -76,6 +87,7 @@ export interface Dashboard {
   recentIncidents: DashboardIncident[];
   upcomingMeetings: DashboardMeeting[];
   monthlyFinance: DashboardMonth[];
+  comparison?: DashboardComparison | null;
   canViewReports: boolean;
 }
 

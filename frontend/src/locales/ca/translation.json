@@ -103,7 +103,15 @@
     "noRecentIncidents": "No hi ha incidències recents",
     "viewAll": "Veure-ho tot",
     "downloadReport": "Baixa l'informe PDF",
-    "reportError": "No s'ha pogut generar l'informe"
+    "reportError": "No s'ha pogut generar l'informe",
+    "comparison": "Comparativa mensual",
+    "previousValue": "Mes anterior: {{value}}",
+    "deltaValue": "Variació: {{value}}",
+    "exports": "Exportacions",
+    "exportMonthly": "Evolució mensual (CSV)",
+    "exportMembers": "Membres (CSV)",
+    "exportIncidents": "Incidències (CSV)",
+    "exportProviders": "Proveïdors (CSV)"
   },
   "members": {
     "title": "Membres de la comunitat",

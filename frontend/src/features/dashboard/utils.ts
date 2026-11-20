@@ -14,3 +14,10 @@ export function monthLabel(month: number, language: "es" | "ca"): string {
 export function reportPath(communityId: string): string {
   return `/communities/${communityId}/reports/summary`;
 }
+
+export function exportPath(
+  communityId: string,
+  kind: "monthly" | "members" | "incidents" | "providers",
+): string {
+  return `/communities/${communityId}/reports/${kind}.csv`;
+}

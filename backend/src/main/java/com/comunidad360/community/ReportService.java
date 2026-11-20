@@ -1,6 +1,7 @@
 package com.comunidad360.community;
 
 import com.comunidad360.audit.AuditService;
+import com.comunidad360.community.dto.DashboardMonthResponse;
 import com.comunidad360.community.dto.DashboardResponse;
 import com.comunidad360.membership.Membership;
 import com.comunidad360.membership.PermissionService;
@@ -94,6 +95,10 @@ public class ReportService {
                     y -= 8;
                 }
 
+                if (!dashboard.monthlyFinance().isEmpty()) {
+                    y = chart(content, dashboard.monthlyFinance(), y);
+                }
+
                 y = line(content, PDType1Font.HELVETICA_BOLD, 12, 50, y, "Proximas reuniones");
                 if (dashboard.upcomingMeetings().isEmpty()) {
                     y = line(content, PDType1Font.HELVETICA, 10, 50, y, "Sin reuniones convocadas.");
@@ -136,6 +141,44 @@ public class ReportService {
         content.showText(text);
         content.endText();
         return y - (size + 5);
+    }
+
+    private float chart(PDPageContentStream content, java.util.List<DashboardMonthResponse> monthly, float y)
+            throws IOException {
+        y = line(content, PDType1Font.HELVETICA_BOLD, 12, 50, y, "Evolucion mensual (ingresos / gastos)");
+        float max = 0;
+        for (DashboardMonthResponse month : monthly) {
+            max = Math.max(max, Math.max(toFloat(month.income()), toFloat(month.expense())));
+        }
+        if (max <= 0) {
+            return line(content, PDType1Font.HELVETICA, 10, 50, y, "Sin movimientos.");
+        }
+        float chartHeight = 90;
+        float baseY = y - chartHeight - 10;
+        float barWidth = 12;
+        float x = 50;
+        for (DashboardMonthResponse month : monthly) {
+            float incomeHeight = chartHeight * toFloat(month.income()) / max;
+            float expenseHeight = chartHeight * toFloat(month.expense()) / max;
+            content.setNonStrokingColor(new java.awt.Color(0x2E7D32));
+            content.addRect(x, baseY, barWidth, incomeHeight);
+            content.fill();
+            content.setNonStrokingColor(new java.awt.Color(0xC62828));
+            content.addRect(x + barWidth + 2, baseY, barWidth, expenseHeight);
+            content.fill();
+            x += (barWidth * 2) + 6;
+        }
+        content.setStrokingColor(java.awt.Color.GRAY);
+        content.moveTo(50, baseY);
+        content.lineTo(x, baseY);
+        content.stroke();
+        content.setNonStrokingColor(java.awt.Color.BLACK);
+        content.setStrokingColor(java.awt.Color.BLACK);
+        return baseY - 14;
+    }
+
+    private float toFloat(BigDecimal value) {
+        return value == null ? 0f : value.floatValue();
     }
 
     private String money(BigDecimal value) {

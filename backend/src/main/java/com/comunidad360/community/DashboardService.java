@@ -2,6 +2,7 @@ package com.comunidad360.community;
 
 import com.comunidad360.common.exception.BusinessException;
 import com.comunidad360.community.dto.CommunitySummaryResponse;
+import com.comunidad360.community.dto.DashboardComparisonResponse;
 import com.comunidad360.community.dto.DashboardFinanceResponse;
 import com.comunidad360.community.dto.DashboardIncidentResponse;
 import com.comunidad360.community.dto.DashboardMeetingResponse;
@@ -148,6 +149,7 @@ public class DashboardService {
                 recentIncidents,
                 upcomingMeetings,
                 monthly,
+                comparison(monthly),
                 permissionService.hasPermission(membership, "REPORT_VIEW")
         );
     }
@@ -162,6 +164,33 @@ public class DashboardService {
 
     private BigDecimal money(BigDecimal value) {
         return value == null ? null : value.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private DashboardComparisonResponse comparison(List<DashboardMonthResponse> monthly) {
+        if (monthly.isEmpty()) {
+            return null;
+        }
+        int currentMonth = java.time.LocalDate.now().getMonthValue();
+        DashboardMonthResponse current = monthly.get(currentMonth - 1);
+        DashboardMonthResponse previous = currentMonth > 1 ? monthly.get(currentMonth - 2) : null;
+        BigDecimal currentIncome = money(current.income());
+        BigDecimal currentExpense = money(current.expense());
+        if (previous == null) {
+            return new DashboardComparisonResponse(currentMonth, 0, currentIncome, currentExpense,
+                    null, null, null, null);
+        }
+        BigDecimal previousIncome = money(previous.income());
+        BigDecimal previousExpense = money(previous.expense());
+        return new DashboardComparisonResponse(
+                currentMonth,
+                currentMonth - 1,
+                currentIncome,
+                currentExpense,
+                previousIncome,
+                previousExpense,
+                currentIncome.subtract(previousIncome),
+                currentExpense.subtract(previousExpense)
+        );
     }
 
     private List<DashboardMonthResponse> monthlyFinance(UUID communityId, UUID fiscalYearId) {

@@ -108,6 +108,8 @@ class DashboardIntegrationTest {
                 .andExpect(jsonPath("$.recentIncidents.length()").value(1))
                 .andExpect(jsonPath("$.upcomingMeetings.length()").value(1))
                 .andExpect(jsonPath("$.monthlyFinance.length()").value(12))
+                .andExpect(jsonPath("$.comparison.currentIncome").value("200.00"))
+                .andExpect(jsonPath("$.comparison.currentExpense").value("80.00"))
                 .andExpect(jsonPath("$.canViewReports").value(true));
 
         mockMvc.perform(get(dashboardPath(community.getId()))
@@ -126,6 +128,27 @@ class DashboardIntegrationTest {
         byte[] pdf = report.getResponse().getContentAsByteArray();
         assertThat(pdf.length).isGreaterThan(500);
         assertThat(new String(pdf, 0, 4, StandardCharsets.US_ASCII)).isEqualTo("%PDF");
+
+        MvcResult monthlyCsv = mockMvc.perform(
+                        get("/api/v1/communities/" + community.getId() + "/reports/monthly.csv")
+                                .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("text/csv"))
+                .andReturn();
+        String monthly = new String(monthlyCsv.getResponse().getContentAsByteArray(), StandardCharsets.UTF_8);
+        assertThat(monthly).contains("mes;ingresos;gastos;saldo");
+
+        MvcResult membersCsv = mockMvc.perform(
+                        get("/api/v1/communities/" + community.getId() + "/reports/members.csv")
+                                .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andReturn();
+        String members = new String(membersCsv.getResponse().getContentAsByteArray(), StandardCharsets.UTF_8);
+        assertThat(members).contains("nombre;email;estado;roles");
+
+        mockMvc.perform(get("/api/v1/communities/" + community.getId() + "/reports/monthly.csv")
+                        .header("Authorization", "Bearer " + ownerToken))
+                .andExpect(status().isForbidden());
 
         mockMvc.perform(get("/api/v1/communities/" + community.getId() + "/reports/summary")
                         .header("Authorization", "Bearer " + ownerToken))

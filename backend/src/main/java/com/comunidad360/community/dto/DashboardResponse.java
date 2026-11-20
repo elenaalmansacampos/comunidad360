@@ -11,6 +11,7 @@ public record DashboardResponse(
         List<DashboardIncidentResponse> recentIncidents,
         List<DashboardMeetingResponse> upcomingMeetings,
         List<DashboardMonthResponse> monthlyFinance,
+        DashboardComparisonResponse comparison,
         boolean canViewReports
 ) {
 }

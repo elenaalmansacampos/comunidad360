@@ -358,7 +358,9 @@ Orden propuesto, sujeto a valor y validación:
    - análisis de gastos;
    - clasificación de incidencias;
    - búsqueda inteligente.
-6. **Estadísticas avanzadas y BI**.
+6. **Estadísticas avanzadas y BI** — implementado en v0.1.0: comparativa mensual, exportaciones
+   CSV (evolución, miembros, incidencias, proveedores) y gráfico mensual en el PDF. Pendiente:
+   informes programados.
 7. **Facturación electrónica e integración con gestoría**.
 8. **Aplicación móvil nativa** si se justifica.
 9. **Multi-idioma ampliado** (inglés).

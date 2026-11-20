@@ -103,7 +103,15 @@
     "noRecentIncidents": "No hay incidencias recientes",
     "viewAll": "Ver todo",
     "downloadReport": "Descargar informe PDF",
-    "reportError": "No se ha podido generar el informe"
+    "reportError": "No se ha podido generar el informe",
+    "comparison": "Comparativa mensual",
+    "previousValue": "Mes anterior: {{value}}",
+    "deltaValue": "Variación: {{value}}",
+    "exports": "Exportaciones",
+    "exportMonthly": "Evolución mensual (CSV)",
+    "exportMembers": "Miembros (CSV)",
+    "exportIncidents": "Incidencias (CSV)",
+    "exportProviders": "Proveedores (CSV)"
   },
   "members": {
     "title": "Miembros de la comunidad",

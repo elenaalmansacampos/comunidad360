@@ -7,7 +7,7 @@ import { FullPageLoader } from "../components/FullPageLoader";
 import { useAuthStore } from "../features/auth/authStore";
 import { useDashboard } from "../features/communities/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
-import { barHeight, monthLabel, reportPath } from "../features/dashboard/utils";
+import { barHeight, exportPath, monthLabel, reportPath } from "../features/dashboard/utils";
 import { canViewProviders } from "../features/mvp/utils";
 import { ApiError, downloadFile } from "../services/apiClient";
 import type { Role } from "../types/api";
@@ -25,6 +25,7 @@ export function DashboardPage() {
   const dashboard = useDashboard(communityId);
   const [downloading, setDownloading] = useState(false);
   const [reportError, setReportError] = useState(false);
+  const [exporting, setExporting] = useState<string | null>(null);
   const language = i18n.language.startsWith("ca") ? "ca" : "es";
 
   useEffect(() => {
@@ -94,6 +95,28 @@ export function DashboardPage() {
     }
   }
 
+  async function downloadCsv(
+    kind: "monthly" | "members" | "incidents" | "providers",
+    filename: string,
+  ) {
+    if (!communityId) return;
+    setReportError(false);
+    setExporting(kind);
+    try {
+      const blob = await downloadFile(exportPath(communityId, kind));
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setReportError(true);
+    } finally {
+      setExporting(null);
+    }
+  }
+
   return (
     <div className="page">
       <header className="page-header">
@@ -112,6 +135,44 @@ export function DashboardPage() {
       </header>
 
       {reportError ? <Alert variant="error">{t("dashboard.reportError")}</Alert> : null}
+
+      {data.canViewReports ? (
+        <section className="dashboard-section">
+          <div className="section-heading">
+            <h2>{t("dashboard.exports")}</h2>
+          </div>
+          <div className="form-actions">
+            <Button
+              variant="secondary"
+              loading={exporting === "monthly"}
+              onClick={() => void downloadCsv("monthly", "evolucion-mensual.csv")}
+            >
+              {t("dashboard.exportMonthly")}
+            </Button>
+            <Button
+              variant="secondary"
+              loading={exporting === "members"}
+              onClick={() => void downloadCsv("members", "miembros.csv")}
+            >
+              {t("dashboard.exportMembers")}
+            </Button>
+            <Button
+              variant="secondary"
+              loading={exporting === "incidents"}
+              onClick={() => void downloadCsv("incidents", "incidencias.csv")}
+            >
+              {t("dashboard.exportIncidents")}
+            </Button>
+            <Button
+              variant="secondary"
+              loading={exporting === "providers"}
+              onClick={() => void downloadCsv("providers", "proveedores.csv")}
+            >
+              {t("dashboard.exportProviders")}
+            </Button>
+          </div>
+        </section>
+      ) : null}
 
       <section className="stat-grid">
         <article className="stat-card">
@@ -187,6 +248,60 @@ export function DashboardPage() {
               </article>
             )}
           </div>
+
+          {isCommunityFinance && data.comparison ? (
+            <div className="evolution-card">
+              <div className="section-heading">
+                <h2>{t("dashboard.comparison")}</h2>
+                <span className="badge">
+                  {monthLabel(data.comparison.currentMonth, language)}
+                  {data.comparison.previousMonth > 0
+                    ? ` vs ${monthLabel(data.comparison.previousMonth, language)}`
+                    : ""}
+                </span>
+              </div>
+              <div className="dashboard-metrics">
+                <article className="metric-card metric-card--income">
+                  <span>{t("dashboard.income")}</span>
+                  <strong>{formatMoney(data.comparison.currentIncome, language, finance.currency)}</strong>
+                  <small>
+                    {t("dashboard.previousValue", {
+                      value:
+                        data.comparison.previousIncome != null
+                          ? formatMoney(data.comparison.previousIncome, language, finance.currency)
+                          : "—",
+                    })}
+                  </small>
+                  {data.comparison.incomeDelta != null ? (
+                    <small>
+                      {t("dashboard.deltaValue", {
+                        value: formatMoney(data.comparison.incomeDelta, language, finance.currency),
+                      })}
+                    </small>
+                  ) : null}
+                </article>
+                <article className="metric-card metric-card--expense">
+                  <span>{t("dashboard.expense")}</span>
+                  <strong>{formatMoney(data.comparison.currentExpense, language, finance.currency)}</strong>
+                  <small>
+                    {t("dashboard.previousValue", {
+                      value:
+                        data.comparison.previousExpense != null
+                          ? formatMoney(data.comparison.previousExpense, language, finance.currency)
+                          : "—",
+                    })}
+                  </small>
+                  {data.comparison.expenseDelta != null ? (
+                    <small>
+                      {t("dashboard.deltaValue", {
+                        value: formatMoney(data.comparison.expenseDelta, language, finance.currency),
+                      })}
+                    </small>
+                  ) : null}
+                </article>
+              </div>
+            </div>
+          ) : null}
 
           {isCommunityFinance && data.monthlyFinance.length > 0 ? (
             <div className="evolution-card">
