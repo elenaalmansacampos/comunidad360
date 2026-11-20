@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily encrypted backup for COMUNIDAD 360
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+RandomizedDelaySec=15m
+Persistent=true
+Unit=comunidad360-backup.service
+
+[Install]
+WantedBy=timers.target

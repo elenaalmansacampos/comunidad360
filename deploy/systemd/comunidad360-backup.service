@@ -1,0 +1,20 @@
+[Unit]
+Description=COMUNIDAD 360 encrypted PostgreSQL backup
+Documentation=file:///opt/comunidad360/docs/BACKUP.md
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/comunidad360
+EnvironmentFile=/etc/comunidad360/backup.env
+ExecStart=/opt/comunidad360/scripts/backup-encrypted.sh
+Nice=10
+IOSchedulingClass=best-effort
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/backups/comunidad360 /opt/comunidad360/backups

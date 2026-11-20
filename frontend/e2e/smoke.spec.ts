@@ -37,3 +37,17 @@ test("login and dashboard have no critical accessibility violations", async ({ p
     ["critical", "serious"].includes(violation.impact ?? ""));
   expect(dashboardCritical, JSON.stringify(dashboardCritical, null, 2)).toEqual([]);
 });
+
+test.describe("mobile", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("mobile login, dashboard and navigation work", async ({ page }) => {
+    await login(page);
+    await page.locator(".mobile-nav").getByRole("link", { name: "Incidencias", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Incidencias", exact: true })).toBeVisible();
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const critical = results.violations.filter((violation) =>
+      ["critical", "serious"].includes(violation.impact ?? ""));
+    expect(critical, JSON.stringify(critical, null, 2)).toEqual([]);
+  });
+});

@@ -1,0 +1,19 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Valores de desarrollo, demo y tests"
+paths = [
+  '''\.env\.example''',
+  '''README\.md''',
+  '''docs/.*\.md''',
+  '''backend/src/test/.*''',
+  '''frontend/e2e/.*''',
+]
+regexes = [
+  '''Admin1234!''',
+  '''Password123!''',
+  '''Propietario123!''',
+  '''test-only-secret-[A-Za-z0-9-]+''',
+  '''dev-only-change-me-[A-Za-z0-9-]+''',
+]

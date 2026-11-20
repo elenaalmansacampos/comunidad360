@@ -58,6 +58,7 @@ Plataforma SaaS multi-comunidad para la gestión de comunidades de propietarios.
 | [`docs/FASE4-VALIDATION.md`](docs/FASE4-VALIDATION.md) | E2E, accesibilidad, seguridad, carga y backup/restore |
 | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Despliegue de producción, secretos, TLS, backups y rollback |
 | [`docs/PILOT-RUNBOOK.md`](docs/PILOT-RUNBOOK.md) | Carga inicial, operación, soporte y cierre del piloto |
+| [`docs/BACKUP.md`](docs/BACKUP.md) | Backups cifrados, timer systemd y restauración |
 | [`docs/ADR/`](docs/ADR/) | Decisiones arquitectónicas |
 
 Documentos de trabajo:

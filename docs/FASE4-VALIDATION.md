@@ -17,7 +17,7 @@ La validación técnica automatizable está en verde:
 | --- | --- |
 | Backend | 55 tests, 0 fallos |
 | Frontend | 28 tests, 0 fallos |
-| E2E Playwright | 2 tests, 0 fallos |
+| E2E Playwright | 3 tests, 0 fallos (desktop y móvil) |
 | Accesibilidad automatizada | 0 violaciones serias/críticas en login y dashboard |
 | i18n | 623 claves en `es` y `ca`, sin faltas |
 | Dependencias frontend | 0 vulnerabilidades de producción |
@@ -47,6 +47,7 @@ Cubre:
 - Llegada al dashboard.
 - Navegación por estructura, finanzas, banca, incidencias, documentos, reuniones, chat y votaciones.
 - Regreso al dashboard.
+- Flujo móvil con navegación inferior y escaneo axe.
 - Escaneo axe en login y dashboard con etiquetas WCAG 2 A/AA.
 - Cero violaciones `serious` o `critical`.
 
@@ -155,6 +156,7 @@ Prueba ejecutada:
 - Base temporal eliminada después.
 - Backup cifrado con AES-256/OpenSSL y restauración cifrada verificada.
 - Scripts: `backup.sh`, `restore.sh`, `backup-encrypted.sh`, `restore-encrypted.sh`.
+- Timer systemd diario incluido en `deploy/systemd/` y documentado en `docs/BACKUP.md`.
 
 Salvaguardas:
 
@@ -173,6 +175,7 @@ El workflow añade:
 - Frontend: `check:i18n`, typecheck, tests, build y audit.
 - Compose: validación de configuración.
 - E2E: arranque del stack, espera de salud, Chromium, Playwright y logs en fallo.
+- Seguridad: CodeQL, dependency review, Dependabot y Gitleaks.
 
 ## 8. Checklist de piloto
 
@@ -193,7 +196,7 @@ El workflow añade:
 - [ ] Validación legal LPH/RGPD y textos informativos.
 - [ ] Sustituir secretos de desarrollo y configurar cookies/HTTPS de producción.
 - [ ] Rate limiting general y protección perimetral.
-- [ ] Backup programado y almacenado fuera del host; cifrado ya disponible.
+- [ ] Validar timer systemd y copia offsite en el host real; plantilla y cifrado disponibles.
 - [x] Integración antimalware con ClamAV (activar en producción).
 - [ ] Auditoría manual de accesibilidad y pruebas con usuarios.
 - [ ] Prueba de carga con datos realistas.
@@ -209,7 +212,7 @@ El workflow añade:
 | US-160 Suite de autorización | Cubierta por tests de integración |
 | US-161 Suite de aislamiento multi-tenant | Cubierta por tests cruzados |
 | US-162 E2E de flujos críticos | Parcial: login, dashboard y navegación; sin creación completa por UI |
-| US-163 Backup y restauración | Backup y restore cifrados verificados; falta programación |
+| US-163 Backup y restauración | Backup/restore cifrados y timer systemd; falta validar offsite |
 | US-164 Revisión de seguridad | Revisión técnica y rate limiting; falta pentest |
 | US-165 Rendimiento y carga | Prueba básica local |
 | US-166 Accesibilidad | Automatizada en login/dashboard; falta manual |

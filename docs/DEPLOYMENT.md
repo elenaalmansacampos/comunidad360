@@ -117,7 +117,7 @@ scripts/restore-encrypted.sh /ruta/segura/backups/comunidad360-....dump.enc comu
 
 Reglas:
 
-- Programar diariamente.
+- Programar diariamente con `deploy/systemd/comunidad360-backup.timer`; ver [`BACKUP.md`](./BACKUP.md).
 - Copiar fuera del host.
 - Probar restauración mensual.
 - Definir RPO/RTO con el Product Owner.
