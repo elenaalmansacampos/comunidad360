@@ -656,6 +656,49 @@
     "statuses": {
       "ACTIVE": "Activo",
       "INACTIVE": "Inactivo"
+    },
+    "contracts": "Contratos",
+    "budgets": "Presupuestos",
+    "history": "Historial",
+    "noContracts": "No hay contratos",
+    "noBudgets": "No hay presupuestos",
+    "noHistory": "No hay actividad",
+    "note": "Nota",
+    "newContract": "Nuevo contrato",
+    "contractTitle": "Título del contrato",
+    "startDate": "Fecha de inicio",
+    "endDate": "Fecha de fin",
+    "amount": "Importe",
+    "description": "Descripción",
+    "newBudget": "Nuevo presupuesto",
+    "budgetTitle": "Título del presupuesto",
+    "validUntil": "Válido hasta",
+    "addNote": "Añadir nota",
+    "historyTypes": {
+      "CONTRACT": "Contrato",
+      "BUDGET": "Presupuesto",
+      "NOTE": "Nota"
+    },
+    "contractStatuses": {
+      "DRAFT": "Borrador",
+      "ACTIVE": "Activo",
+      "EXPIRED": "Caducado",
+      "CANCELLED": "Cancelado"
+    },
+    "budgetStatuses": {
+      "RECEIVED": "Recibido",
+      "ACCEPTED": "Aceptado",
+      "REJECTED": "Rechazado",
+      "EXPIRED": "Caducado"
+    },
+    "activityStatus": {
+      "DRAFT": "Borrador",
+      "ACTIVE": "Activo",
+      "EXPIRED": "Caducado",
+      "CANCELLED": "Cancelado",
+      "RECEIVED": "Recibido",
+      "ACCEPTED": "Aceptado",
+      "REJECTED": "Rechazado"
     }
   },
   "votings": {

@@ -656,6 +656,49 @@
     "statuses": {
       "ACTIVE": "Actiu",
       "INACTIVE": "Inactiu"
+    },
+    "contracts": "Contractes",
+    "budgets": "Pressupostos",
+    "history": "Historial",
+    "noContracts": "No hi ha contractes",
+    "noBudgets": "No hi ha pressupostos",
+    "noHistory": "No hi ha activitat",
+    "note": "Nota",
+    "newContract": "Nou contracte",
+    "contractTitle": "Títol del contracte",
+    "startDate": "Data d'inici",
+    "endDate": "Data de fi",
+    "amount": "Import",
+    "description": "Descripció",
+    "newBudget": "Nou pressupost",
+    "budgetTitle": "Títol del pressupost",
+    "validUntil": "Vàlid fins a",
+    "addNote": "Afegeix una nota",
+    "historyTypes": {
+      "CONTRACT": "Contracte",
+      "BUDGET": "Pressupost",
+      "NOTE": "Nota"
+    },
+    "contractStatuses": {
+      "DRAFT": "Esborrany",
+      "ACTIVE": "Actiu",
+      "EXPIRED": "Caducat",
+      "CANCELLED": "Cancel·lat"
+    },
+    "budgetStatuses": {
+      "RECEIVED": "Rebut",
+      "ACCEPTED": "Acceptat",
+      "REJECTED": "Rebutjat",
+      "EXPIRED": "Caducat"
+    },
+    "activityStatus": {
+      "DRAFT": "Esborrany",
+      "ACTIVE": "Actiu",
+      "EXPIRED": "Caducat",
+      "CANCELLED": "Cancel·lat",
+      "RECEIVED": "Rebut",
+      "ACCEPTED": "Acceptat",
+      "REJECTED": "Rebutjat"
     }
   },
   "votings": {

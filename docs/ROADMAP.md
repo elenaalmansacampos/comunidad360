@@ -349,7 +349,8 @@ Orden propuesto, sujeto a valor y validación:
 1. **Sincronización bancaria PSD2** con proveedor autorizado.
 2. **Push notifications** — implementado en v0.1.0 con Web Push/VAPID; ver
    [`PUSH-NOTIFICATIONS.md`](./PUSH-NOTIFICATIONS.md). Queda activar las claves en producción.
-3. **Proveedores ampliado**: contratos, presupuestos, historial.
+3. **Proveedores ampliado**: contratos, presupuestos, historial — implementado en v0.1.0
+   (contratos y presupuestos con estado, notas e historial unificado).
 4. **Votaciones formales** con validación legal.
 5. **Inteligencia artificial**:
    - asistente documental;

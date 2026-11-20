@@ -572,6 +572,51 @@ export interface ProviderContact {
   updatedAt: string;
 }
 
+export type ProviderContractStatus = "DRAFT" | "ACTIVE" | "EXPIRED" | "CANCELLED";
+
+export interface ProviderContract {
+  id: string;
+  title: string;
+  description?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  amount?: number | null;
+  status: ProviderContractStatus;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+export type ProviderBudgetStatus = "RECEIVED" | "ACCEPTED" | "REJECTED" | "EXPIRED";
+
+export interface ProviderBudget {
+  id: string;
+  title: string;
+  description?: string | null;
+  amount: number;
+  validUntil?: string | null;
+  status: ProviderBudgetStatus;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+export interface ProviderNote {
+  id: string;
+  body: string;
+  createdAt: string;
+}
+
+export interface ProviderHistoryEntry {
+  type: "CONTRACT" | "BUDGET" | "NOTE";
+  referenceId: string;
+  title?: string | null;
+  description?: string | null;
+  status?: string | null;
+  amount?: number | null;
+  date: string;
+}
+
 export type VotingStatus = "DRAFT" | "OPEN" | "CLOSED" | "CANCELLED";
 
 export interface Voting {

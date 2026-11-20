@@ -14,6 +14,7 @@ import {
   useProviderContacts,
   useUpdateProvider,
 } from "../features/providers/queries";
+import { ProviderActivity } from "../features/providers/ProviderActivity";
 import type { ProviderStatus } from "../types/api";
 
 export function ProviderDetailPage() {
@@ -113,6 +114,7 @@ export function ProviderDetailPage() {
           <div className="form-actions"><Button type="submit" loading={addContact.isPending}>{t("providers.add")}</Button></div>
         </form>
       ) : null}
+      <ProviderActivity communityId={communityId ?? ""} providerId={providerId ?? ""} canManage={canManage} />
     </div>
   );
 }

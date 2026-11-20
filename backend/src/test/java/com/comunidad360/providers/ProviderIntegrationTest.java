@@ -122,6 +122,62 @@ class ProviderIntegrationTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    void contractsBudgetsAndHistoryAreTenantScoped() throws Exception {
+        AppUser admin = createUser(uniqueEmail("provider-activity-admin"));
+        Community community = createCommunity("Provider Activity");
+        createMembership(community, admin, "COMMUNITY_ADMIN");
+        String token = accessToken(admin.getEmail());
+
+        MvcResult createdProvider = mockMvc.perform(post(providersPath(community.getId()))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("name", "Proveedor Actividad"))))
+                .andExpect(status().isCreated()).andReturn();
+        UUID providerId = UUID.fromString(json(createdProvider).get("id").asText());
+        String base = providersPath(community.getId()) + "/" + providerId;
+
+        mockMvc.perform(post(base + "/contracts")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "title", "Contrato de mantenimiento",
+                                "amount", 1200.00,
+                                "startDate", "2026-01-01",
+                                "endDate", "2026-12-31"))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("DRAFT"));
+
+        mockMvc.perform(post(base + "/budgets")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "title", "Presupuesto ascensor",
+                                "amount", 500.00))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("RECEIVED"));
+
+        mockMvc.perform(post(base + "/notes")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("body", "Visita realizada"))))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get(base + "/history")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(3));
+
+        AppUser adminB = createUser(uniqueEmail("provider-activity-b"));
+        Community communityB = createCommunity("Provider Activity B");
+        createMembership(communityB, adminB, "COMMUNITY_ADMIN");
+        String tokenB = accessToken(adminB.getEmail());
+
+        mockMvc.perform(get("/api/v1/communities/" + communityB.getId() + "/providers/" + providerId + "/contracts")
+                        .header("Authorization", "Bearer " + tokenB))
+                .andExpect(status().isNotFound());
+    }
+
     private String providersPath(UUID communityId) {
         return "/api/v1/communities/" + communityId + "/providers";
     }
