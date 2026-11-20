@@ -112,3 +112,4 @@ app:
     email: ${APP_BOOTSTRAP_EMAIL:}
     password: ${APP_BOOTSTRAP_PASSWORD:}
     community-name: ${APP_BOOTSTRAP_COMMUNITY_NAME:Comunidad Principal}
+    reset-password: ${APP_BOOTSTRAP_RESET_PASSWORD:false}

@@ -110,6 +110,23 @@ Después del primer login:
 
 El bootstrap no registra la contraseña en logs y no crea datos demo.
 
+### Reset del administrador
+
+Si el admin ya existe pero no recuerdas la contraseña (el bootstrap no la actualiza por sí solo),
+activa temporalmente el reset controlado:
+
+```text
+APP_BOOTSTRAP_ENABLED=true
+APP_BOOTSTRAP_RESET_PASSWORD=true
+APP_BOOTSTRAP_EMAIL=<email del admin>
+APP_BOOTSTRAP_PASSWORD=<nueva contraseña, mínimo 12 caracteres>
+```
+
+Al reiniciar, el runner actualiza la contraseña del usuario con ese email, lo desbloquea, lo marca
+como activo/verificado y le asegura el rol `COMMUNITY_ADMIN`. En los logs verás
+`Bootstrap admin password reset for ...`. Si el email no existe, crea uno nuevo. Después vuelve a
+poner `APP_BOOTSTRAP_RESET_PASSWORD=false` (y `APP_BOOTSTRAP_ENABLED=false`) y redeploy.
+
 ## 7. Nombres de servicio
 
 Si Render asigna nombres distintos a `comunidad360-api` o `comunidad360-web`:

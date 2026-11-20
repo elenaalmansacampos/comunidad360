@@ -37,6 +37,7 @@ public class BootstrapAdminInitializer implements CommandLineRunner {
     private final String email;
     private final String password;
     private final String communityName;
+    private final boolean resetPassword;
 
     public BootstrapAdminInitializer(AppUserRepository userRepository,
                                      CommunityRepository communityRepository,
@@ -45,7 +46,8 @@ public class BootstrapAdminInitializer implements CommandLineRunner {
                                      PasswordEncoder passwordEncoder,
                                      @Value("${app.bootstrap.email:}") String email,
                                      @Value("${app.bootstrap.password:}") String password,
-                                     @Value("${app.bootstrap.community-name:Comunidad Principal}") String communityName) {
+                                     @Value("${app.bootstrap.community-name:Comunidad Principal}") String communityName,
+                                     @Value("${app.bootstrap.reset-password:false}") boolean resetPassword) {
         this.userRepository = userRepository;
         this.communityRepository = communityRepository;
         this.membershipRepository = membershipRepository;
@@ -54,6 +56,7 @@ public class BootstrapAdminInitializer implements CommandLineRunner {
         this.email = email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
         this.password = password == null ? "" : password;
         this.communityName = communityName;
+        this.resetPassword = resetPassword;
     }
 
     @Override
@@ -64,27 +67,41 @@ public class BootstrapAdminInitializer implements CommandLineRunner {
         if (password.length() < 12) {
             throw new IllegalStateException("Bootstrap password must have at least 12 characters");
         }
-        if (userRepository.existsByEmailIgnoreCase(email)) {
+        Instant now = Instant.now();
+        AppUser user = userRepository.findByEmailIgnoreCase(email).orElse(null);
+        if (user != null && !resetPassword) {
             return;
         }
-        Instant now = Instant.now();
-        AppUser user = userRepository.save(new AppUser(
-                UUID.randomUUID(), email, passwordEncoder.encode(password),
-                "Administrador", "es", UserStatus.ACTIVE, now, now));
-        user.setEmailVerifiedAt(now);
-        userRepository.save(user);
+        if (user == null) {
+            user = userRepository.save(new AppUser(
+                    UUID.randomUUID(), email, passwordEncoder.encode(password),
+                    "Administrador", "es", UserStatus.ACTIVE, now, now));
+            user.setEmailVerifiedAt(now);
+            userRepository.save(user);
+            log.info("Bootstrap admin created for {} in community {}", email, communityName);
+        } else {
+            user.setPasswordHash(passwordEncoder.encode(password));
+            user.setStatus(UserStatus.ACTIVE);
+            user.setFailedLoginAttempts(0);
+            user.setLockedUntil(null);
+            user.setEmailVerifiedAt(now);
+            user.setUpdatedAt(now);
+            userRepository.save(user);
+            log.warn("Bootstrap admin password reset for {}", email);
+        }
 
         Community community = communityRepository.findAll().stream().findFirst().orElseGet(() ->
                 communityRepository.save(new Community(UUID.randomUUID(), communityName,
                         "Europe/Madrid", "es", "EUR", CommunityStatus.ACTIVE, now, now)));
 
-        Membership membership = membershipRepository.findByCommunityIdAndUserId(community.getId(), user.getId())
+        final AppUser admin = user;
+        Membership membership = membershipRepository.findByCommunityIdAndUserId(community.getId(), admin.getId())
                 .orElseGet(() -> membershipRepository.save(new Membership(UUID.randomUUID(),
-                        community.getId(), user.getId(), MembershipStatus.ACTIVE, now, now, now)));
+                        community.getId(), admin.getId(), MembershipStatus.ACTIVE, now, now, now)));
         if (membershipRoleRepository.findRoleCodesByMembershipId(membership.getId()).isEmpty()) {
             membershipRoleRepository.save(new MembershipRole(UUID.randomUUID(), membership.getId(),
-                    "COMMUNITY_ADMIN", now, user.getId()));
+                    "COMMUNITY_ADMIN", now, admin.getId()));
         }
-        log.info("Bootstrap admin created for {} in community {}", email, community.getId());
+        log.info("Bootstrap admin ready for {} in community {}", email, community.getId());
     }
 }
