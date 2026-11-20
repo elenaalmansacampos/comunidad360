@@ -413,3 +413,15 @@ el refresh token, `HttpOnly` y `SameSite=Lax`; no autoriza operaciones de negoci
 Security desactiva CSRF para la API. Esta decisión está revisada y se mantiene bajo vigilancia de
 CodeQL; si se añaden operaciones autenticadas por cookie, deberá activarse CSRF o un patrón
 equivalente.
+
+
+## CodeQL
+
+El workflow de seguridad ejecuta CodeQL para Java/Kotlin y JavaScript/TypeScript. Las alertas se
+revisan y clasifican. Estado actual: 0 alertas abiertas.
+
+Clasificaciones aceptadas:
+
+- CSRF desactivado en API stateless con Bearer y refresh cookie `HttpOnly`/`SameSite`.
+- Log de token de reset solo con `expose-dev-tokens=true` en desarrollo.
+- Avisos de código de test y firmas de `ExceptionHandler` clasificados como no explotables.
