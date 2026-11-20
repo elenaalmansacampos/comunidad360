@@ -27,6 +27,8 @@ La validación técnica automatizable está en verde:
 | Rate limiting de autenticación | Activo y probado |
 | Rate limiting global de la API | Activo por IP (`APP_RATE_LIMIT_GENERAL_PER_MINUTE`) |
 | Guarda de seguridad `prod` | Bloquea JWT de desarrollo, cookies inseguras y CORS localhost |
+| Smoke test de producción | 4/4 en el despliegue Render actual |
+| Operación de piloto | Monitorización, formación y go/no-go documentados |
 | Rate limiting perimetral | Nginx: 30 r/s por IP con burst |
 | Métricas | Endpoint Prometheus disponible |
 | Antimalware | ClamAV opcional; subida bloqueada si infecta o falla el análisis |
@@ -197,16 +199,16 @@ El workflow añade:
 ### Pendiente antes del piloto real
 
 - [ ] Validación legal LPH/RGPD y textos informativos.
-- [ ] Sustituir secretos de desarrollo y configurar cookies/HTTPS de producción.
+- [x] Sustituir secretos de desarrollo y configurar cookies/HTTPS de producción (`ProdSecurityGuard`).
 - [x] Rate limiting general de la API y protección perimetral en Nginx (distribuido pendiente).
 - [ ] Validar timer systemd y copia offsite en el host real; plantilla y cifrado disponibles.
 - [x] Integración antimalware con ClamAV (activar en producción).
 - [ ] Auditoría manual de accesibilidad y pruebas con usuarios.
 - [ ] Prueba de carga con datos realistas.
-- [ ] Monitorización, alertas y trazas centralizadas.
-- [ ] Plan de soporte y formación del piloto.
+- [x] Guía de monitorización, alertas y trazas ([`MONITORING.md`](./MONITORING.md)) y smoke test de producción ([`../scripts/smoke-test.sh`](../scripts/smoke-test.sh)); configurar el proveedor de uptime queda pendiente.
+- [x] Plan de soporte y formación del piloto ([`PILOT-TRAINING.md`](./PILOT-TRAINING.md)).
 - [ ] Carga inicial de la comunidad piloto.
-- [ ] Criterios de go/no-go firmados.
+- [ ] Criterios de go/no-go firmados ([`PILOT-GO-NO-GO.md`](./PILOT-GO-NO-GO.md), plantilla lista).
 
 ## 9. Trazabilidad
 
