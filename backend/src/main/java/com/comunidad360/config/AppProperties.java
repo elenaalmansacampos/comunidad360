@@ -19,6 +19,7 @@ public class AppProperties {
     private RateLimit rateLimit = new RateLimit();
     private MalwareScan malwareScan = new MalwareScan();
     private Storage storage = new Storage();
+    private Push push = new Push();
 
     public String getDefaultLanguage() {
         return defaultLanguage;
@@ -106,6 +107,14 @@ public class AppProperties {
 
     public void setStorage(Storage storage) {
         this.storage = storage;
+    }
+
+    public Push getPush() {
+        return push;
+    }
+
+    public void setPush(Push push) {
+        this.push = push;
     }
 
     public static class Cors {
@@ -405,6 +414,45 @@ public class AppProperties {
 
         public void setCreateBucket(boolean createBucket) {
             this.createBucket = createBucket;
+        }
+    }
+
+    public static class Push {
+        private boolean enabled = false;
+        private String publicKey;
+        private String privateKey;
+        private String subject = "mailto:no-reply@comunidad360.local";
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getPublicKey() {
+            return publicKey;
+        }
+
+        public void setPublicKey(String publicKey) {
+            this.publicKey = publicKey;
+        }
+
+        public String getPrivateKey() {
+            return privateKey;
+        }
+
+        public void setPrivateKey(String privateKey) {
+            this.privateKey = privateKey;
+        }
+
+        public String getSubject() {
+            return subject;
+        }
+
+        public void setSubject(String subject) {
+            this.subject = subject;
         }
     }
 

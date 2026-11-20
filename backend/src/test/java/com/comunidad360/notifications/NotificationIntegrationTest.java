@@ -85,7 +85,7 @@ class NotificationIntegrationTest {
         mockMvc.perform(get("/api/v1/me/notification-preferences")
                         .header("Authorization", "Bearer " + ownerToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(8));
+                .andExpect(jsonPath("$.length()").value(12));
 
         setPreferences(ownerToken, false);
         createMeeting(adminToken, community.getId(), "Sin aviso");

@@ -64,6 +64,10 @@ APP_STORAGE_S3_SECRET_KEY=<secret-key>
    No dejes estos valores con el texto literal `${APP_STORAGE_S3_ENDPOINT}`:
    Render no interpola variables y el arranque fallará.
 
+   Para activar notificaciones push, genera las claves VAPID y configura
+   `APP_PUSH_ENABLED=true`, `APP_PUSH_PUBLIC_KEY`, `APP_PUSH_PRIVATE_KEY` y `APP_PUSH_SUBJECT`.
+   Ver [`PUSH-NOTIFICATIONS.md`](./PUSH-NOTIFICATIONS.md).
+
 5. Aplica el Blueprint.
 
 ## 4. Cloudflare R2

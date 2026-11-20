@@ -10,9 +10,10 @@ import {
   useUpdateNotificationPreferences,
 } from "../features/notifications/queries";
 import type { NotificationChannel, NotificationPreference } from "../types/api";
+import { disablePush, enablePush, getPushState, type PushState } from "../services/push";
 
 const CATEGORIES = ["MEETINGS", "INCIDENTS", "FINANCE", "SYSTEM"];
-const CHANNELS: NotificationChannel[] = ["IN_APP", "EMAIL"];
+const CHANNELS: NotificationChannel[] = ["IN_APP", "EMAIL", "PUSH"];
 
 export function NotificationPreferencesPage() {
   const { t } = useTranslation();
@@ -20,6 +21,27 @@ export function NotificationPreferencesPage() {
   const preferences = useNotificationPreferences();
   const update = useUpdateNotificationPreferences();
   const [values, setValues] = useState<NotificationPreference[]>([]);
+  const [pushState, setPushState] = useState<PushState>("unavailable");
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushError, setPushError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    getPushState()
+      .then((state) => {
+        if (active) {
+          setPushState(state);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setPushState("unavailable");
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (preferences.data) {
@@ -67,6 +89,29 @@ export function NotificationPreferencesPage() {
       );
     } catch {
       // El error se muestra desde el estado de la mutación.
+    }
+  }
+
+  async function handleTogglePush() {
+    setPushError(null);
+    setPushBusy(true);
+    try {
+      if (pushState === "subscribed") {
+        await disablePush();
+        setPushState("unsubscribed");
+      } else {
+        await enablePush();
+        setPushState("subscribed");
+      }
+    } catch (error) {
+      setPushError(
+        error instanceof Error && error.message === "PUSH_DENIED"
+          ? t("notifications.push.denied")
+          : t("notifications.push.error"),
+      );
+      setPushState(await getPushState().catch((): PushState => "unavailable"));
+    } finally {
+      setPushBusy(false);
     }
   }
 
@@ -121,6 +166,30 @@ export function NotificationPreferencesPage() {
           <Button type="submit" loading={update.isPending}>{t("common.save")}</Button>
         </div>
       </form>
+
+      <section className="form-card">
+        <h2>{t("notifications.push.title")}</h2>
+        <p className="page-subtitle">{t("notifications.push.description")}</p>
+        {pushError ? <Alert variant="error">{pushError}</Alert> : null}
+        {pushState === "unsupported" ? (
+          <Alert variant="info">{t("notifications.push.unsupported")}</Alert>
+        ) : null}
+        {pushState === "unavailable" ? (
+          <Alert variant="info">{t("notifications.push.unavailable")}</Alert>
+        ) : null}
+        {pushState === "denied" ? (
+          <Alert variant="error">{t("notifications.push.denied")}</Alert>
+        ) : null}
+        {pushState === "subscribed" || pushState === "unsubscribed" ? (
+          <div className="form-actions">
+            <Button type="button" onClick={handleTogglePush} loading={pushBusy}>
+              {pushState === "subscribed"
+                ? t("notifications.push.disable")
+                : t("notifications.push.enable")}
+            </Button>
+          </div>
+        ) : null}
+      </section>
     </div>
   );
 }

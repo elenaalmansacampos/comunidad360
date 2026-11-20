@@ -8,8 +8,11 @@ import com.comunidad360.membership.MembershipStatus;
 import com.comunidad360.notifications.dto.NotificationPreferenceRequest;
 import com.comunidad360.notifications.dto.NotificationPreferenceResponse;
 import com.comunidad360.notifications.dto.NotificationResponse;
+import com.comunidad360.push.PushSubscriptionService;
+import com.comunidad360.push.dto.PushSendSummary;
 import com.comunidad360.user.AppUser;
 import com.comunidad360.user.AppUserRepository;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +34,7 @@ public class NotificationService {
             "MEETINGS", "INCIDENTS", "FINANCE", "SYSTEM"
     );
     private static final List<NotificationChannel> CHANNELS = List.of(
-            NotificationChannel.IN_APP, NotificationChannel.EMAIL
+            NotificationChannel.IN_APP, NotificationChannel.EMAIL, NotificationChannel.PUSH
     );
     private static final DateTimeFormatter DATE_FORMAT =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.systemDefault());
@@ -42,19 +45,25 @@ public class NotificationService {
     private final MembershipRepository membershipRepository;
     private final AppUserRepository userRepository;
     private final EmailService emailService;
+    private final PushSubscriptionService pushService;
+    private final MessageSource messageSource;
 
     public NotificationService(NotificationRepository notificationRepository,
                                NotificationPreferenceRepository preferenceRepository,
                                NotificationDeliveryRepository deliveryRepository,
                                MembershipRepository membershipRepository,
                                AppUserRepository userRepository,
-                               EmailService emailService) {
+                               EmailService emailService,
+                               PushSubscriptionService pushService,
+                               MessageSource messageSource) {
         this.notificationRepository = notificationRepository;
         this.preferenceRepository = preferenceRepository;
         this.deliveryRepository = deliveryRepository;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
+        this.pushService = pushService;
+        this.messageSource = messageSource;
     }
 
     @Transactional(readOnly = true)
@@ -162,18 +171,23 @@ public class NotificationService {
                 continue;
             }
             notifyUser(user, meeting.getCommunityId(), type, subjectKey, bodyKey, params,
+                    "/communities/" + meeting.getCommunityId() + "/meetings/" + meeting.getId(),
                     meeting.getTitle(), date, params.get("location").toString());
         }
     }
 
     private void notifyUser(AppUser user, UUID communityId, String type, String subjectKey, String bodyKey,
-                            Map<String, Object> params, Object... emailArgs) {
+                            Map<String, Object> params, String actionUrl, Object... emailArgs) {
         boolean inApp = enabled(user.getId(), "MEETINGS", NotificationChannel.IN_APP);
         boolean email = enabled(user.getId(), "MEETINGS", NotificationChannel.EMAIL);
-        if (!inApp && !email) {
+        boolean push = enabled(user.getId(), "MEETINGS", NotificationChannel.PUSH) && pushService.isConfigured();
+        if (!inApp && !email && !push) {
             return;
         }
         String locale = user.getPreferredLanguage() == null ? "es" : user.getPreferredLanguage();
+        NotificationChannel primary = inApp
+                ? NotificationChannel.IN_APP
+                : (email ? NotificationChannel.EMAIL : NotificationChannel.PUSH);
         Notification notification = notificationRepository.saveAndFlush(new Notification(
                 UUID.randomUUID(),
                 communityId,
@@ -183,7 +197,7 @@ public class NotificationService {
                 subjectKey,
                 params,
                 locale,
-                inApp ? NotificationChannel.IN_APP : NotificationChannel.EMAIL,
+                primary,
                 NotificationStatus.SENT,
                 Instant.now()
         ));
@@ -204,6 +218,24 @@ public class NotificationService {
             if (!result.sent() && !"MAIL_DISABLED".equals(result.errorCode())) {
                 notification.setErrorCode(result.errorCode());
                 notificationRepository.save(notification);
+            }
+        }
+        if (push) {
+            Locale userLocale = Locale.forLanguageTag(locale);
+            String title = messageSource.getMessage(subjectKey, emailArgs, subjectKey, userLocale);
+            String body = messageSource.getMessage(bodyKey, emailArgs, bodyKey, userLocale);
+            PushSendSummary summary = pushService.sendToUser(user.getId(), title, body, actionUrl);
+            if (summary.attempted() > 0) {
+                deliveryRepository.save(new NotificationDelivery(
+                        UUID.randomUUID(),
+                        notification.getId(),
+                        NotificationChannel.PUSH,
+                        1,
+                        summary.sent() > 0 ? NotificationDeliveryStatus.SENT : NotificationDeliveryStatus.FAILED,
+                        null,
+                        summary.failed() > 0 ? "PUSH_PARTIAL_FAILURE" : null,
+                        Instant.now()
+                ));
             }
         }
     }

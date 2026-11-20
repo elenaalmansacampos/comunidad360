@@ -100,6 +100,11 @@ app:
       create-bucket: ${APP_STORAGE_S3_CREATE_BUCKET:false}
   bank:
     import-max-rows: ${APP_BANK_IMPORT_MAX_ROWS:10000}
+  push:
+    enabled: ${APP_PUSH_ENABLED:false}
+    public-key: ${APP_PUSH_PUBLIC_KEY:}
+    private-key: ${APP_PUSH_PRIVATE_KEY:}
+    subject: ${APP_PUSH_SUBJECT:mailto:no-reply@comunidad360.local}
   structure:
     coefficient-tolerance: ${APP_STRUCTURE_COEFFICIENT_TOLERANCE:0.0001}
   seed:

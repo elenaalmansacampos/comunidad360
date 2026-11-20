@@ -602,7 +602,8 @@
     "error": "No se han podido actualizar las notificaciones",
     "channels": {
       "IN_APP": "En la app",
-      "EMAIL": "Email"
+      "EMAIL": "Email",
+      "PUSH": "Push"
     },
     "categories": {
       "MEETINGS": "Reuniones",
@@ -613,6 +614,16 @@
     "types": {
       "MEETING_CONVENED": "Nueva reunión: {{title}}",
       "MEETING_MINUTES": "Acta disponible: {{title}}"
+    },
+    "push": {
+      "title": "Notificaciones push",
+      "description": "Recibe avisos en este dispositivo aunque no tengas la aplicación abierta.",
+      "enable": "Activar en este dispositivo",
+      "disable": "Desactivar en este dispositivo",
+      "unsupported": "Este navegador no soporta notificaciones push.",
+      "unavailable": "El servidor no tiene configuradas las notificaciones push.",
+      "denied": "Has bloqueado las notificaciones en el navegador; actívalas en los ajustes del sitio.",
+      "error": "No se han podido cambiar las notificaciones push."
     }
   },
   "demo": {

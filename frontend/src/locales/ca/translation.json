@@ -602,7 +602,8 @@
     "error": "No s'han pogut actualitzar les notificacions",
     "channels": {
       "IN_APP": "A l'app",
-      "EMAIL": "Email"
+      "EMAIL": "Email",
+      "PUSH": "Push"
     },
     "categories": {
       "MEETINGS": "Reunions",
@@ -613,6 +614,16 @@
     "types": {
       "MEETING_CONVENED": "Nova reunió: {{title}}",
       "MEETING_MINUTES": "Acta disponible: {{title}}"
+    },
+    "push": {
+      "title": "Notificacions push",
+      "description": "Rep avisos en aquest dispositiu encara que no tinguis l'aplicació oberta.",
+      "enable": "Activa en aquest dispositiu",
+      "disable": "Desactiva en aquest dispositiu",
+      "unsupported": "Aquest navegador no admet notificacions push.",
+      "unavailable": "El servidor no té configurades les notificacions push.",
+      "denied": "Has bloquejat les notificacions al navegador; activa-les als ajustos del lloc.",
+      "error": "No s'han pogut canviar les notificacions push."
     }
   },
   "demo": {
