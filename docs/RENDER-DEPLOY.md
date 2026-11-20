@@ -17,11 +17,15 @@ El archivo [`../render.yaml`](../render.yaml) define:
 - **comunidad360-api**: backend Spring Boot en Docker.
 - **comunidad360-web**: frontend estático React/Vite con rewrite SPA.
 
-URLs esperadas:
+URLs reales del despliegue actual:
 
-- App: `https://comunidad360-web.onrender.com`
-- API: `https://comunidad360-api.onrender.com`
-- Salud: `https://comunidad360-api.onrender.com/actuator/health`
+- App: `https://comunidad360-web-q2ln.onrender.com`
+- API: `https://comunidad360-api-ihic.onrender.com`
+- Salud: `https://comunidad360-api-ihic.onrender.com/actuator/health`
+
+> `comunidad360-web.onrender.com` y `comunidad360-api.onrender.com` ya estaban ocupados por
+> otros servicios, así que Render asignó los sufijos `-q2ln` y `-ihic`. Usa siempre las URLs
+> reales que muestre el dashboard, no las de `render.yaml` sin sufijo.
 
 ## 2. Requisitos
 
@@ -117,12 +121,12 @@ Si Render asigna nombres distintos a `comunidad360-api` o `comunidad360-web`:
 ## 8. Comprobaciones
 
 ```bash
-curl -fsS https://comunidad360-api.onrender.com/actuator/health
+curl -fsS https://comunidad360-api-ihic.onrender.com/actuator/health
 ```
 
 En navegador:
 
-- Abre `https://comunidad360-web.onrender.com`.
+- Abre `https://comunidad360-web-q2ln.onrender.com`.
 - Login con las credenciales de bootstrap.
 - Crea un edificio y una unidad.
 - Sube un PDF a Documentos.

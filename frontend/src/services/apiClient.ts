@@ -97,17 +97,27 @@ export async function refreshAccessToken(): Promise<boolean> {
     accessToken = "demo-token";
     return true;
   }
-  const response = await fetch(`${API_BASE}/auth/refresh`, {
-    method: "POST",
-    credentials: "include",
-  });
-  if (!response.ok) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch(`${API_BASE}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      accessToken = null;
+      return false;
+    }
+    const data = (await response.json()) as TokenResponse;
+    accessToken = data.accessToken;
+    return true;
+  } catch {
     accessToken = null;
     return false;
+  } finally {
+    clearTimeout(timeout);
   }
-  const data = (await response.json()) as TokenResponse;
-  accessToken = data.accessToken;
-  return true;
 }
 
 export async function downloadFile(path: string, retry = true): Promise<Blob> {
