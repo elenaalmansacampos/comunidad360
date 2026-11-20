@@ -45,10 +45,12 @@ APP_STORAGE_S3_ACCESS_KEY=...
 APP_STORAGE_S3_SECRET_KEY=...
 APP_STORAGE_S3_PATH_STYLE=false
 APP_RATE_LIMIT_AUTH_PER_MINUTE=20
+APP_RATE_LIMIT_GENERAL_PER_MINUTE=300
 ```
 
 El perfil `prod` no arranca si faltan el secreto JWT, la base de datos o la configuración de correo.
-No usa el seed de desarrollo.
+Tampoco arranca si el secreto JWT parece de desarrollo, si `cookie-secure` es `false` o si CORS
+incluye `localhost`/`*` (`ProdSecurityGuard`). No usa el seed de desarrollo.
 
 ## 3. Reverse proxy
 

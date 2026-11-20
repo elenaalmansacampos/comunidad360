@@ -37,6 +37,7 @@ app:
   rate-limit:
     enabled: true
     auth-per-minute: ${APP_RATE_LIMIT_AUTH_PER_MINUTE:20}
+    general-per-minute: ${APP_RATE_LIMIT_GENERAL_PER_MINUTE:300}
   malware-scan:
     enabled: ${APP_MALWARE_SCAN_ENABLED:true}
     host: ${APP_MALWARE_SCAN_HOST:clamav}

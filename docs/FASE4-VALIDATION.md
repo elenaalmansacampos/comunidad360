@@ -25,6 +25,8 @@ La validación técnica automatizable está en verde:
 | Carga local | 0 peticiones fallidas en health y dashboard |
 | Cabeceras de seguridad | CSP, Permissions-Policy, X-Frame-Options y Referrer-Policy activas |
 | Rate limiting de autenticación | Activo y probado |
+| Rate limiting global de la API | Activo por IP (`APP_RATE_LIMIT_GENERAL_PER_MINUTE`) |
+| Guarda de seguridad `prod` | Bloquea JWT de desarrollo, cookies inseguras y CORS localhost |
 | Rate limiting perimetral | Nginx: 30 r/s por IP con burst |
 | Métricas | Endpoint Prometheus disponible |
 | Antimalware | ClamAV opcional; subida bloqueada si infecta o falla el análisis |
@@ -100,6 +102,8 @@ que faltaban en catalán.
 - `npm audit --omit=dev`: 0 vulnerabilidades.
 - Búsqueda de secretos en el repositorio: sin hallazgos; no hay `.env` versionado.
 - Rate limiting de endpoints de autenticación por IP y minuto, con respuesta `429` y `Retry-After`.
+- Rate limiting global de la API por IP y minuto (configurable), además del específico de auth.
+- Guarda de arranque en `prod` que rechaza secretos JWT de desarrollo, cookies no seguras y CORS con `localhost`.
 - Perfil `prod` con secretos obligatorios, cookies `Secure`, seed desactivado y S3 real.
 - Backups cifrados con AES-256/OpenSSL y retención configurable.
 - Integración opcional con ClamAV (`zINSTREAM`) y política fail-closed para documentos y fotos.
@@ -108,10 +112,9 @@ que faltaban en catalán.
 
 | Riesgo | Nivel | Acción |
 | --- | --- | --- |
-| Sin rate limiting global (solo auth) | Medio | Añadir límites generales en reverse proxy/API |
-| Rate limit en memoria por instancia | Medio | Rate limiting distribuido si hay varias réplicas |
+| Rate limit global en memoria por instancia | Medio | Distribuido (Redis) si hay varias réplicas |
 | Sin MFA | Medio | Evaluar para administradores |
-| Secreto JWT de desarrollo | Alto en producción | Sustituir por secreto gestionado y rotación |
+| Secreto JWT de desarrollo | Mitigado en prod | `ProdSecurityGuard` bloquea el arranque; rotación manual pendiente |
 | Antivirus opcional, no activo por defecto | Medio | Activar ClamAV y monitorizar fallos antes de producción |
 | Backups sin programación automática | Alto | Programar, externalizar y restringir acceso; cifrado ya disponible |
 | Sin WAF ni monitorización de seguridad | Medio | Definir infraestructura de producción |
@@ -195,7 +198,7 @@ El workflow añade:
 
 - [ ] Validación legal LPH/RGPD y textos informativos.
 - [ ] Sustituir secretos de desarrollo y configurar cookies/HTTPS de producción.
-- [ ] Rate limiting general y protección perimetral.
+- [x] Rate limiting general de la API y protección perimetral en Nginx (distribuido pendiente).
 - [ ] Validar timer systemd y copia offsite en el host real; plantilla y cifrado disponibles.
 - [x] Integración antimalware con ClamAV (activar en producción).
 - [ ] Auditoría manual de accesibilidad y pruebas con usuarios.

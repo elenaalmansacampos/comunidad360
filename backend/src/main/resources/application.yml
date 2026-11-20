@@ -73,6 +73,7 @@ app:
   rate-limit:
     enabled: ${APP_RATE_LIMIT_ENABLED:true}
     auth-per-minute: ${APP_RATE_LIMIT_AUTH_PER_MINUTE:30}
+    general-per-minute: ${APP_RATE_LIMIT_GENERAL_PER_MINUTE:300}
   malware-scan:
     enabled: ${APP_MALWARE_SCAN_ENABLED:false}
     host: ${APP_MALWARE_SCAN_HOST:localhost}

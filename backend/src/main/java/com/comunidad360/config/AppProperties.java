@@ -219,6 +219,7 @@ public class AppProperties {
     public static class RateLimit {
         private boolean enabled = true;
         private int authPerMinute = 30;
+        private int generalPerMinute = 300;
 
         public boolean isEnabled() {
             return enabled;
@@ -234,6 +235,14 @@ public class AppProperties {
 
         public void setAuthPerMinute(int authPerMinute) {
             this.authPerMinute = authPerMinute;
+        }
+
+        public int getGeneralPerMinute() {
+            return generalPerMinute;
+        }
+
+        public void setGeneralPerMinute(int generalPerMinute) {
+            this.generalPerMinute = generalPerMinute;
         }
     }
 
