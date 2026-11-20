@@ -27,26 +27,38 @@ URLs esperadas:
 
 - Cuenta en Render.
 - Repositorio `elenaalmansacampos/comunidad360` conectado.
-- Bucket S3 compatible privado. Recomendado: Cloudflare R2.
+- Opcional: bucket S3 compatible privado. Recomendado: Cloudflare R2.
 - Opcional: SMTP transaccional. Recomendado: Resend.
 - Email y contraseña para el primer administrador.
+
+> El Blueprint arranca con `APP_STORAGE_TYPE=local` para no bloquear el primer despliegue.
+> En el plan gratuito el disco es efímero: los documentos se pierden al reiniciar. Para
+> persistencia, configura R2/S3 y cambia `APP_STORAGE_TYPE=s3`.
 
 ## 3. Crear el Blueprint
 
 1. Render Dashboard → **New** → **Blueprint**.
 2. Conecta el repositorio y selecciona la rama `main`.
 3. Render detecta `render.yaml`.
-4. Completa los valores `sync: false`:
+4. Completa los valores `sync: false` obligatorios:
 
 ```text
 APP_BOOTSTRAP_EMAIL=admin@tudominio.com
 APP_BOOTSTRAP_PASSWORD=<mínimo 12 caracteres>
+```
+
+   Solo si vas a usar S3/R2, rellena además (y pon `APP_STORAGE_TYPE=s3`):
+
+```text
 APP_STORAGE_S3_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
 APP_STORAGE_S3_PUBLIC_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
 APP_STORAGE_S3_BUCKET=comunidad360-documents
 APP_STORAGE_S3_ACCESS_KEY=<access-key>
 APP_STORAGE_S3_SECRET_KEY=<secret-key>
 ```
+
+   No dejes estos valores con el texto literal `${APP_STORAGE_S3_ENDPOINT}`:
+   Render no interpola variables y el arranque fallará.
 
 5. Aplica el Blueprint.
 
@@ -121,6 +133,7 @@ En navegador:
 
 - Los web services gratuitos se suspenden por inactividad y tardan en despertar.
 - PostgreSQL gratuito puede tener límites de retención/almacenamiento.
+- El almacenamiento local (`APP_STORAGE_TYPE=local`) es efímero en el plan gratuito.
 - Para piloto real, usa planes de pago, backups y monitorización.
 - Render no ejecuta ClamAV en este Blueprint; `APP_MALWARE_SCAN_ENABLED=false`.
 - El frontend de Render no es la demo de GitHub Pages.
@@ -131,6 +144,8 @@ En navegador:
 | Síntoma | Revisar |
 | --- | --- |
 | API no arranca | Variables S3 obligatorias, `SPRING_DATASOURCE_*`, logs de Render |
+| `Illegal character in path ... ${APP_STORAGE_S3_ENDPOINT}` | El valor literal de la env var; pon un endpoint real o usa `APP_STORAGE_TYPE=local` |
+| `UnknownHostException: ${DB_HOST}` | Borra `SPRING_DATASOURCE_URL` del dashboard; se compone desde `DB_HOST`/`DB_PORT`/`DB_NAME` |
 | 401/403 en frontend | `VITE_API_BASE_URL`, CORS y URL real del frontend |
 | Error de base de datos | Host/puerto/usuario de Render y migraciones Flyway |
 | Documentos fallan | Endpoint, bucket, claves y path-style de R2 |

@@ -29,8 +29,6 @@ services:
         fromDatabase:
           name: comunidad360-db
           property: database
-      - key: SPRING_DATASOURCE_URL
-        value: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: comunidad360-db
@@ -74,7 +72,9 @@ services:
       - key: APP_MAIL_FROM_NAME
         value: Comunidad 360
       - key: APP_STORAGE_TYPE
-        value: s3
+        value: local
+      - key: APP_STORAGE_LOCAL_PATH
+        value: /app/data/uploads
       - key: APP_STORAGE_S3_ENDPOINT
         sync: false
       - key: APP_STORAGE_S3_PUBLIC_ENDPOINT
