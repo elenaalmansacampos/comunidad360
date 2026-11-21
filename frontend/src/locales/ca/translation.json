@@ -151,6 +151,24 @@
     "exportIncidents": "Incidències (CSV)",
     "exportProviders": "Proveïdors (CSV)"
   },
+  "reports": {
+    "title": "Informes programats",
+    "subtitle": "Envia l'informe de la comunitat per email automàticament",
+    "new": "Nou informe programat",
+    "name": "Nom",
+    "frequency": "Freqüència",
+    "recipients": "Destinataris (separats per comes)",
+    "enabled": "Actiu",
+    "disabled": "Inactiu",
+    "nextRun": "Propera execució",
+    "lastRun": "Darrera execució",
+    "empty": "No hi ha informes programats",
+    "run": "Executa ara",
+    "delete": "Elimina",
+    "error": "No s'ha pogut completar l'operació",
+    "frequencies": {"DAILY": "Diària", "WEEKLY": "Setmanal", "MONTHLY": "Mensual"},
+    "statuses": {"SENT": "Enviat", "FAILED": "Fallat", "SKIPPED": "Omès"}
+  },
   "members": {
     "title": "Membres de la comunitat",
     "subtitle": "Persones amb accés a aquesta comunitat",

@@ -359,8 +359,8 @@ Orden propuesto, sujeto a valor y validación:
    - clasificación de incidencias;
    - búsqueda inteligente.
 6. **Estadísticas avanzadas y BI** — implementado en v0.1.0: comparativa mensual, exportaciones
-   CSV (evolución, miembros, incidencias, proveedores) y gráfico mensual en el PDF localizado
-   (es/ca/en). Pendiente: informes programados.
+   CSV (evolución, miembros, incidencias, proveedores), gráfico mensual en el PDF localizado
+   (es/ca/en) e informes programados por email (diario/semanal/mensual).
 7. **Facturación electrónica e integración con gestoría**.
 8. **Aplicación móvil nativa** si se justifica.
 9. **Multi-idioma ampliado (inglés)** — implementado en v0.1.0: `messages_en` en backend y catálogo

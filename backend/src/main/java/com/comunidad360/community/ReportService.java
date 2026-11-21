@@ -65,6 +65,12 @@ public class ReportService {
         return pdf;
     }
 
+    public byte[] renderForCommunity(UUID communityId, UUID actorUserId) {
+        Locale locale = locale(actorUserId);
+        DashboardResponse dashboard = dashboardService.dashboard(communityId, actorUserId);
+        return render(dashboard, locale);
+    }
+
     private Locale locale(UUID userId) {
         String language = userRepository.findById(userId)
                 .map(AppUser::getPreferredLanguage)

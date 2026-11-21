@@ -7,6 +7,7 @@ import { FullPageLoader } from "../components/FullPageLoader";
 import { useAuthStore } from "../features/auth/authStore";
 import { useDashboard } from "../features/communities/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
+import { ReportSchedules } from "../features/reports/ReportSchedules";
 import { barHeight, exportPath, monthLabel, reportPath } from "../features/dashboard/utils";
 import { canViewProviders } from "../features/mvp/utils";
 import { ApiError, downloadFile } from "../services/apiClient";
@@ -173,6 +174,13 @@ export function DashboardPage() {
             </Button>
           </div>
         </section>
+      ) : null}
+
+      {data.canViewReports ? (
+        <ReportSchedules
+          communityId={communityId ?? ""}
+          canManage={data.roles.includes("COMMUNITY_ADMIN")}
+        />
       ) : null}
 
       <section className="stat-grid">

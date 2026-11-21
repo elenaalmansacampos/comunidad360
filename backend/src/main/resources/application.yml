@@ -100,6 +100,9 @@ app:
       create-bucket: ${APP_STORAGE_S3_CREATE_BUCKET:false}
   bank:
     import-max-rows: ${APP_BANK_IMPORT_MAX_ROWS:10000}
+  reports:
+    scheduled-enabled: ${APP_REPORTS_SCHEDULED_ENABLED:true}
+    scheduler-delay-ms: ${APP_REPORTS_SCHEDULER_DELAY_MS:60000}
   push:
     enabled: ${APP_PUSH_ENABLED:false}
     public-key: ${APP_PUSH_PUBLIC_KEY:}

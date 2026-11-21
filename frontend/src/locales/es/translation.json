@@ -151,6 +151,24 @@
     "exportIncidents": "Incidencias (CSV)",
     "exportProviders": "Proveedores (CSV)"
   },
+  "reports": {
+    "title": "Informes programados",
+    "subtitle": "Envía el informe de la comunidad por email automáticamente",
+    "new": "Nuevo informe programado",
+    "name": "Nombre",
+    "frequency": "Frecuencia",
+    "recipients": "Destinatarios (separados por comas)",
+    "enabled": "Activo",
+    "disabled": "Inactivo",
+    "nextRun": "Próxima ejecución",
+    "lastRun": "Última ejecución",
+    "empty": "No hay informes programados",
+    "run": "Ejecutar ahora",
+    "delete": "Eliminar",
+    "error": "No se ha podido completar la operación",
+    "frequencies": {"DAILY": "Diaria", "WEEKLY": "Semanal", "MONTHLY": "Mensual"},
+    "statuses": {"SENT": "Enviado", "FAILED": "Fallido", "SKIPPED": "Omitido"}
+  },
   "members": {
     "title": "Miembros de la comunidad",
     "subtitle": "Personas con acceso a esta comunidad",

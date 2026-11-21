@@ -151,6 +151,24 @@
     "exportIncidents": "Incidents (CSV)",
     "exportProviders": "Providers (CSV)"
   },
+  "reports": {
+    "title": "Scheduled reports",
+    "subtitle": "Email the community report automatically",
+    "new": "New scheduled report",
+    "name": "Name",
+    "frequency": "Frequency",
+    "recipients": "Recipients (comma-separated)",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "nextRun": "Next run",
+    "lastRun": "Last run",
+    "empty": "No scheduled reports",
+    "run": "Run now",
+    "delete": "Delete",
+    "error": "The operation could not be completed",
+    "frequencies": {"DAILY": "Daily", "WEEKLY": "Weekly", "MONTHLY": "Monthly"},
+    "statuses": {"SENT": "Sent", "FAILED": "Failed", "SKIPPED": "Skipped"}
+  },
   "members": {
     "title": "Community members",
     "subtitle": "People with access to this community",

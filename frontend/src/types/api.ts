@@ -120,6 +120,21 @@ export interface Dashboard {
   canViewReports: boolean;
 }
 
+export type ReportFrequency = "DAILY" | "WEEKLY" | "MONTHLY";
+export type ReportRunStatus = "SENT" | "FAILED" | "SKIPPED";
+
+export interface ReportSchedule {
+  id: string;
+  name: string;
+  frequency: ReportFrequency;
+  recipients: string[];
+  enabled: boolean;
+  lastRunAt?: string | null;
+  nextRunAt: string;
+  lastStatus?: ReportRunStatus | null;
+  version: number;
+}
+
 export interface Member {
   membershipId: string;
   userId: string;

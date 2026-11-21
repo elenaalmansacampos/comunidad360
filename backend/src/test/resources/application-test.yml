@@ -26,6 +26,8 @@ app:
     local-path: ${java.io.tmpdir}/comunidad360-test-storage
     max-incident-photo-bytes: 5242880
     max-document-bytes: 26214400
+  reports:
+    scheduled-enabled: false
   rate-limit:
     enabled: false
     auth-per-minute: 1000
