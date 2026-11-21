@@ -13,6 +13,8 @@ import com.comunidad360.user.AppUserRepository;
 import com.comunidad360.user.UserStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -183,6 +185,27 @@ class DashboardIntegrationTest {
         mockMvc.perform(get(dashboardPath(communityA.getId()))
                         .header("Authorization", "Bearer " + tokenB))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void reportIsLocalizedInEnglish() throws Exception {
+        AppUser admin = createUser(uniqueEmail("report-en"));
+        admin.setPreferredLanguage("en");
+        userRepository.save(admin);
+        Community community = createCommunity("Report EN");
+        createMembership(community, admin, "COMMUNITY_ADMIN");
+        String token = accessToken(admin.getEmail());
+
+        MvcResult result = mockMvc.perform(get("/api/v1/communities/" + community.getId() + "/reports/summary")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        try (PDDocument document = PDDocument.load(result.getResponse().getContentAsByteArray())) {
+            String text = new PDFTextStripper().getText(document);
+            assertThat(text).contains("Community report");
+            assertThat(text).contains("Overview");
+        }
     }
 
     private UUID createFiscalYear(String token, UUID communityId, int year) throws Exception {
