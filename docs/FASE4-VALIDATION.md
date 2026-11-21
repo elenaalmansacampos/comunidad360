@@ -19,7 +19,7 @@ La validación técnica automatizable está en verde:
 | Frontend | 28 tests, 0 fallos |
 | E2E Playwright | 3 tests, 0 fallos (desktop y móvil) |
 | Accesibilidad automatizada | 0 violaciones serias/críticas en login y dashboard |
-| i18n | 623 claves en `es` y `ca`, sin faltas |
+| i18n | 707 claves en `es`, `ca` y `en`, sin faltas |
 | Dependencias frontend | 0 vulnerabilidades de producción |
 | Backup/restore | Backup y restauración real verificados |
 | Carga local | 0 peticiones fallidas en health y dashboard |
@@ -75,8 +75,9 @@ npm run check:i18n
 Resultado:
 
 ```text
-[es] 623 keys OK
-[ca] 623 keys OK
+[es] 707 keys OK
+[ca] 707 keys OK
+[en] 707 keys OK
 ```
 
 El script detecta claves faltantes, sobrantes y valores vacíos. Se corrigieron claves de dashboard
@@ -189,7 +190,7 @@ El workflow añade:
 - [x] Tests backend/frontend en verde.
 - [x] E2E de login y navegación crítica.
 - [x] Accesibilidad automatizada sin hallazgos serios/críticos.
-- [x] i18n es/ca con paridad de claves.
+- [x] i18n es/ca/en con paridad de claves.
 - [x] Backup/restore probado.
 - [x] Cabeceras de seguridad básicas.
 - [x] Rate limiting de autenticación.

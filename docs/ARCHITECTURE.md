@@ -441,7 +441,7 @@ Pruebas obligatorias antes de considerar una tarea terminada:
 - Aislamiento multi-tenant en cada módulo con datos.
 - Autorización positiva y negativa por rol.
 - Cálculos financieros y redondeos.
-- Renderizado bilingüe y formatos regionales.
+- Renderizado multilingüe (`es`, `ca`, `en`) y formatos regionales.
 - Acceso a documentos y URLs firmadas.
 - Flujo de invitación, login, refresco y recuperación.
 

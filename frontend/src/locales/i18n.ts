@@ -2,17 +2,21 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import es from "./es/translation.json";
 import ca from "./ca/translation.json";
+import en from "./en/translation.json";
 
 const STORAGE_KEY = "comunidad360.language";
 const stored = localStorage.getItem(STORAGE_KEY);
+const initialLanguage = stored === "ca" || stored === "en" ? stored : "es";
 
 void i18n.use(initReactI18next).init({
   resources: {
     es: { translation: es },
     ca: { translation: ca },
+    en: { translation: en },
   },
-  lng: stored === "ca" ? "ca" : "es",
+  lng: initialLanguage,
   fallbackLng: "es",
+  supportedLngs: ["es", "ca", "en"],
   interpolation: {
     escapeValue: false,
   },

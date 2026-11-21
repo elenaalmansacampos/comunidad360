@@ -22,6 +22,7 @@ import {
 import { ApiError } from "../services/apiClient";
 import type { Building, Language, UnitType } from "../types/api";
 import { formatPercent } from "../utils/format";
+import { normalizeLanguage } from "../utils/language";
 
 type ActiveForm = "building" | "unit" | "common" | null;
 
@@ -41,7 +42,7 @@ export function StructurePage() {
     }
   }, [communityId, setSelectedCommunityId]);
 
-  const language: Language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language: Language = normalizeLanguage(i18n.language);
   const loading = buildings.isLoading || units.isLoading || commonElements.isLoading || summary.isLoading;
   const error = buildings.error ?? units.error ?? commonElements.error ?? summary.error;
 

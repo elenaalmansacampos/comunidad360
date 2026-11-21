@@ -11,7 +11,7 @@ spring:
     fallback-to-system-locale: false
 
 app:
-  supported-languages: es,ca
+  supported-languages: es,ca,en
   security:
     jwt-secret: test-only-secret-0123456789-abcdefghijklmnopqrstuvwxyz
     access-token-ttl-seconds: 900

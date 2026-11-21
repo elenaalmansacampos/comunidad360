@@ -9,7 +9,7 @@ import java.util.List;
 public class AppProperties {
 
     private String defaultLanguage = "es";
-    private List<String> supportedLanguages = new ArrayList<>(List.of("es", "ca"));
+    private List<String> supportedLanguages = new ArrayList<>(List.of("es", "ca", "en"));
     private Cors cors = new Cors();
     private Security security = new Security();
     private Seed seed = new Seed();

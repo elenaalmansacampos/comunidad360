@@ -12,6 +12,7 @@ import { useCommunityStore } from "../features/communities/communityStore";
 import { canManageVotings } from "../features/mvp/utils";
 import { useCreateVoting, useVotings } from "../features/votings/queries";
 import { formatDateTime } from "../utils/format";
+import { normalizeLanguage } from "../utils/language";
 
 export function VotingsPage() {
   const { t, i18n } = useTranslation();
@@ -19,7 +20,7 @@ export function VotingsPage() {
   const user = useAuthStore((state) => state.user);
   const setSelectedCommunityId = useCommunityStore((state) => state.setSelectedCommunityId);
   const canManage = canManageVotings(user?.memberships.find((item) => item.id === communityId)?.roles ?? []);
-  const language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
   const [showForm, setShowForm] = useState(false);
   const votings = useVotings(communityId);
 

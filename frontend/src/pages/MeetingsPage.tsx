@@ -13,6 +13,7 @@ import { canManageMeetings } from "../features/meetings/utils";
 import { useCreateMeeting, useMeetings } from "../features/meetings/queries";
 import type { MeetingStatus, MeetingType } from "../types/api";
 import { formatDateTime } from "../utils/format";
+import { normalizeLanguage } from "../utils/language";
 
 export function MeetingsPage() {
   const { t, i18n } = useTranslation();
@@ -21,7 +22,7 @@ export function MeetingsPage() {
   const setSelectedCommunityId = useCommunityStore((state) => state.setSelectedCommunityId);
   const membership = user?.memberships.find((item) => item.id === communityId);
   const canManage = canManageMeetings(membership?.roles ?? []);
-  const language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
   const [showForm, setShowForm] = useState(false);
   const meetings = useMeetings(communityId);
 

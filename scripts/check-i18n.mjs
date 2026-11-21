@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "../frontend/src/locales");
-const languages = ["es", "ca"];
+const languages = ["es", "ca", "en"];
 
 function flatten(value, prefix = "") {
   const keys = {};

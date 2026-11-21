@@ -60,7 +60,7 @@ springdoc:
 
 app:
   default-language: ${APP_DEFAULT_LANGUAGE:es}
-  supported-languages: es,ca
+  supported-languages: es,ca,en
   cors:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://localhost:13000}
   security:

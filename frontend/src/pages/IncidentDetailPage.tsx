@@ -19,6 +19,7 @@ import { canManageIncidents, nextIncidentStatuses } from "../features/incidents/
 import { downloadFile } from "../services/apiClient";
 import type { IncidentStatus } from "../types/api";
 import { formatDate } from "../utils/format";
+import { normalizeLanguage } from "../utils/language";
 
 export function IncidentDetailPage() {
   const { t, i18n } = useTranslation();
@@ -26,7 +27,7 @@ export function IncidentDetailPage() {
   const user = useAuthStore((state) => state.user);
   const membership = user?.memberships.find((item) => item.id === communityId);
   const canManage = canManageIncidents(membership?.roles ?? []);
-  const language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
   const incident = useIncident(communityId, incidentId);
   const members = useMembers(communityId, canManage);
   const updateIncident = useUpdateIncident(communityId, incidentId);

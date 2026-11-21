@@ -23,6 +23,7 @@ import {
 } from "../features/documents/utils";
 import type { DocumentCategory, DocumentVisibility } from "../types/api";
 import { formatDate } from "../utils/format";
+import { normalizeLanguage } from "../utils/language";
 
 const CATEGORIES: DocumentCategory[] = [
   "ACTA",
@@ -46,7 +47,7 @@ export function DocumentDetailPage() {
   const roles = membership?.roles ?? [];
   const canManage = canManageDocuments(roles);
   const canUpload = canUploadDocuments(roles);
-  const language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
   const detail = useDocument(communityId, documentId);
   const updateDocument = useUpdateDocument(communityId, documentId);
   const addVersion = useAddDocumentVersion(communityId, documentId);

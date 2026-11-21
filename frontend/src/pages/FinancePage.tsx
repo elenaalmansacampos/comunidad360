@@ -48,8 +48,10 @@ import type {
   LedgerEntryType,
   Payment,
   PaymentMethod,
+  Language,
 } from "../types/api";
 import { formatDate, formatMoney } from "../utils/format";
+import { normalizeLanguage } from "../utils/language";
 
 type FinanceTab = "assessments" | "charges" | "payments" | "invoices" | "ledger" | "budgets";
 
@@ -69,7 +71,7 @@ export function FinancePage() {
   const canManage = canManageFinance(roles);
   const [fiscalYearId, setFiscalYearId] = useState<string | undefined>();
   const [tab, setTab] = useState<FinanceTab>("assessments");
-  const language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
 
   const fiscalYears = useFiscalYears(communityId, staff);
   const summary = useFinanceSummary(communityId, staff ? fiscalYearId : undefined, staff ? Boolean(fiscalYearId) : owner);
@@ -227,7 +229,7 @@ export function FinancePage() {
   );
 }
 
-function SummaryCards({ summary, language }: { summary: FinanceSummary; language: "es" | "ca" }) {
+function SummaryCards({ summary, language }: { summary: FinanceSummary; language: Language }) {
   const { t } = useTranslation();
   const cards = summary.scope === "OWN"
     ? [{ label: t("finance.summary.ownScope"), value: summary.pendingCharges }]
@@ -355,7 +357,7 @@ function AssessmentsSection({
   fiscalYearId?: string;
   data: Assessment[];
   canManage: boolean;
-  language: "es" | "ca";
+  language: Language;
 }) {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
@@ -471,7 +473,7 @@ function AssessmentForm({ communityId, fiscalYearId, onDone }: { communityId: st
   );
 }
 
-function ChargesTable({ charges, language }: { charges: AssessmentCharge[]; language: "es" | "ca" }) {
+function ChargesTable({ charges, language }: { charges: AssessmentCharge[]; language: Language }) {
   const { t } = useTranslation();
   if (charges.length === 0) {
     return <div className="empty-state">{t("finance.charges.empty")}</div>;
@@ -524,7 +526,7 @@ function PaymentsSection({
   charges: AssessmentCharge[];
   invoices: Invoice[];
   canManage: boolean;
-  language: "es" | "ca";
+  language: Language;
 }) {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
@@ -567,7 +569,7 @@ function PaymentsSection({
 
 function PaymentForm({ communityId, charges, invoices, onDone }: { communityId: string; charges: AssessmentCharge[]; invoices: Invoice[]; onDone: () => void }) {
   const { t, i18n } = useTranslation();
-  const language: "es" | "ca" = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
   const mutation = useCreatePayment(communityId);
   const [targetType, setTargetType] = useState<"charge" | "invoice">("charge");
   const [targetId, setTargetId] = useState("");
@@ -629,7 +631,7 @@ function PaymentForm({ communityId, charges, invoices, onDone }: { communityId: 
   );
 }
 
-function InvoicesSection({ communityId, fiscalYearId, invoices, canManage, language }: { communityId: string; fiscalYearId?: string; invoices: Invoice[]; canManage: boolean; language: "es" | "ca" }) {
+function InvoicesSection({ communityId, fiscalYearId, invoices, canManage, language }: { communityId: string; fiscalYearId?: string; invoices: Invoice[]; canManage: boolean; language: Language }) {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   return (
@@ -711,7 +713,7 @@ function InvoiceForm({ communityId, fiscalYearId, onDone }: { communityId: strin
   );
 }
 
-function LedgerSection({ communityId, fiscalYearId, entries, canManage, language }: { communityId: string; fiscalYearId?: string; entries: LedgerEntry[]; canManage: boolean; language: "es" | "ca" }) {
+function LedgerSection({ communityId, fiscalYearId, entries, canManage, language }: { communityId: string; fiscalYearId?: string; entries: LedgerEntry[]; canManage: boolean; language: Language }) {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   const postMutation = usePostLedgerEntry(communityId);
@@ -806,7 +808,7 @@ function LedgerForm({ communityId, fiscalYearId, onDone }: { communityId: string
   );
 }
 
-function BudgetsSection({ communityId, fiscalYearId, budgets, canManage, language }: { communityId: string; fiscalYearId?: string; budgets: Budget[]; canManage: boolean; language: "es" | "ca" }) {
+function BudgetsSection({ communityId, fiscalYearId, budgets, canManage, language }: { communityId: string; fiscalYearId?: string; budgets: Budget[]; canManage: boolean; language: Language }) {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   return (
@@ -855,7 +857,7 @@ function BudgetForm({ communityId, fiscalYearId, onDone }: { communityId: string
   );
 }
 
-function BudgetCard({ communityId, budget, canManage, language }: { communityId: string; budget: Budget; canManage: boolean; language: "es" | "ca" }) {
+function BudgetCard({ communityId, budget, canManage, language }: { communityId: string; budget: Budget; canManage: boolean; language: Language }) {
   const { t } = useTranslation();
   const [showItemForm, setShowItemForm] = useState(false);
   const approveMutation = useApproveBudget(communityId);

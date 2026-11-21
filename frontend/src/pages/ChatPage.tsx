@@ -19,6 +19,7 @@ import { useMembers } from "../features/communities/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
 import { canModerateChat, formatChatTime } from "../features/mvp/utils";
 import type { ChatChannelType } from "../types/api";
+import { normalizeLanguage } from "../utils/language";
 
 export function ChatPage() {
   const { t, i18n } = useTranslation();
@@ -26,7 +27,7 @@ export function ChatPage() {
   const user = useAuthStore((state) => state.user);
   const setSelectedCommunityId = useCommunityStore((state) => state.setSelectedCommunityId);
   const canModerate = canModerateChat(user?.memberships.find((item) => item.id === communityId)?.roles ?? []);
-  const language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
   const channels = useChatChannels(communityId);
   const members = useMembers(communityId, canModerate);
   const [channelId, setChannelId] = useState("");

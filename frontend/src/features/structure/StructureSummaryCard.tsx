@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { formatPercent } from "../../utils/format";
 import type { Language, StructureSummary } from "../../types/api";
+import { normalizeLanguage } from "../../utils/language";
 
 interface StructureSummaryCardProps {
   summary: StructureSummary;
@@ -8,7 +9,7 @@ interface StructureSummaryCardProps {
 
 export function StructureSummaryCard({ summary }: StructureSummaryCardProps) {
   const { t, i18n } = useTranslation();
-  const language: Language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language: Language = normalizeLanguage(i18n.language);
 
   return (
     <section

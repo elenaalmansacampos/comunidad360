@@ -13,13 +13,14 @@ import {
   useVoting,
 } from "../features/votings/queries";
 import { formatDateTime, formatPercent, formatPercentValue } from "../utils/format";
+import { normalizeLanguage } from "../utils/language";
 
 export function VotingDetailPage() {
   const { t, i18n } = useTranslation();
   const { communityId, votingId } = useParams<{ communityId: string; votingId: string }>();
   const user = useAuthStore((state) => state.user);
   const canManage = canManageVotings(user?.memberships.find((item) => item.id === communityId)?.roles ?? []);
-  const language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
   const voting = useVoting(communityId, votingId);
   const openVoting = useOpenVoting(communityId, votingId);
   const closeVoting = useCloseVoting(communityId, votingId);

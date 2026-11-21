@@ -1,20 +1,16 @@
 import type { Language } from "../types/api";
-
-const localeByLanguage: Record<Language, string> = {
-  es: "es-ES",
-  ca: "ca-ES",
-};
+import { localeFor } from "./language";
 
 export function formatDate(value: string | Date, language: Language): string {
   const date = typeof value === "string" ? new Date(value) : value;
-  return new Intl.DateTimeFormat(localeByLanguage[language], {
+  return new Intl.DateTimeFormat(localeFor(language), {
     dateStyle: "medium",
   }).format(date);
 }
 
 export function formatDateTime(value: string | Date, language: Language): string {
   const date = typeof value === "string" ? new Date(value) : value;
-  return new Intl.DateTimeFormat(localeByLanguage[language], {
+  return new Intl.DateTimeFormat(localeFor(language), {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);
@@ -22,7 +18,7 @@ export function formatDateTime(value: string | Date, language: Language): string
 
 export function formatPercentValue(value: string | number, language: Language): string {
   const amount = typeof value === "string" ? Number(value) : value;
-  return new Intl.NumberFormat(localeByLanguage[language], {
+  return new Intl.NumberFormat(localeFor(language), {
     style: "percent",
     minimumFractionDigits: 1,
     maximumFractionDigits: 2,
@@ -31,7 +27,7 @@ export function formatPercentValue(value: string | number, language: Language): 
 
 export function formatMoney(value: string | number, language: Language, currency = "EUR"): string {
   const amount = typeof value === "string" ? Number(value) : value;
-  return new Intl.NumberFormat(localeByLanguage[language], {
+  return new Intl.NumberFormat(localeFor(language), {
     style: "currency",
     currency,
     minimumFractionDigits: 2,
@@ -41,7 +37,7 @@ export function formatMoney(value: string | number, language: Language, currency
 
 export function formatPercent(value: string | number, language: Language): string {
   const amount = typeof value === "string" ? Number(value) : value;
-  return new Intl.NumberFormat(localeByLanguage[language], {
+  return new Intl.NumberFormat(localeFor(language), {
     style: "percent",
     minimumFractionDigits: 2,
     maximumFractionDigits: 6,

@@ -23,8 +23,9 @@ import { useCommunityStore } from "../features/communities/communityStore";
 import { useLedgerEntries, usePayments } from "../features/finance/queries";
 import { canManageFinance, isFinanceStaff } from "../features/finance/utils";
 import { ApiError } from "../services/apiClient";
-import type { BankAccount, BankImportBatch, BankTransaction, LedgerEntry, Payment } from "../types/api";
+import type { BankAccount, BankImportBatch, BankTransaction, Language, LedgerEntry, Payment } from "../types/api";
 import { formatDate, formatMoney } from "../utils/format";
+import { normalizeLanguage } from "../utils/language";
 
 export function BankingPage() {
   const { t, i18n } = useTranslation();
@@ -35,7 +36,7 @@ export function BankingPage() {
   const roles = membership?.roles ?? [];
   const staff = isFinanceStaff(roles);
   const canManage = canManageFinance(roles);
-  const language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
   const [showAccountForm, setShowAccountForm] = useState(false);
   const [reconcilingId, setReconcilingId] = useState<string | null>(null);
 
@@ -275,7 +276,7 @@ function ImportForm({ communityId, accounts, canManage }: { communityId: string;
   );
 }
 
-function ImportHistory({ imports, language }: { imports: BankImportBatch[]; language: "es" | "ca" }) {
+function ImportHistory({ imports, language }: { imports: BankImportBatch[]; language: Language }) {
   const { t } = useTranslation();
   if (imports.length === 0) {
     return null;
@@ -326,7 +327,7 @@ function TransactionsTable({
 }: {
   transactions: BankTransaction[];
   canManage: boolean;
-  language: "es" | "ca";
+  language: Language;
   onReconcile: (id: string) => void;
   onUnreconcile: (id: string) => void;
 }) {
@@ -401,7 +402,7 @@ function ReconcileForm({
   onDone: () => void;
 }) {
   const { t, i18n } = useTranslation();
-  const language: "es" | "ca" = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
   const mutation = useReconcileTransaction(communityId);
   const [targetType, setTargetType] = useState<"payment" | "ledger">("payment");
   const [targetId, setTargetId] = useState("");

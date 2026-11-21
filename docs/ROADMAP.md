@@ -363,7 +363,8 @@ Orden propuesto, sujeto a valor y validación:
    informes programados.
 7. **Facturación electrónica e integración con gestoría**.
 8. **Aplicación móvil nativa** si se justifica.
-9. **Multi-idioma ampliado** (inglés).
+9. **Multi-idioma ampliado (inglés)** — implementado en v0.1.0: `messages_en` en backend y catálogo
+   `en` en frontend (707 claves), selector ES/CA/EN y validación de idioma soportado.
 10. **Organizaciones y múltiples administradores de fincas** — implementado en v0.1.0:
     organizaciones, vinculación de comunidades, administradores de organización y propagación
     automática de acceso como `COMMUNITY_ADMIN`.

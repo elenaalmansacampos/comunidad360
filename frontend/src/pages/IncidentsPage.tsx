@@ -14,6 +14,7 @@ import { useCreateIncident, useIncidents } from "../features/incidents/queries";
 import { useUnits } from "../features/structure/queries";
 import type { IncidentPriority, IncidentStatus, Role } from "../types/api";
 import { formatDate } from "../utils/format";
+import { normalizeLanguage } from "../utils/language";
 
 const CREATE_ROLES: Role[] = [
   "COMMUNITY_ADMIN",
@@ -32,7 +33,7 @@ export function IncidentsPage() {
   const membership = user?.memberships.find((item) => item.id === communityId);
   const roles = membership?.roles ?? [];
   const canCreate = roles.some((role) => CREATE_ROLES.includes(role));
-  const language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
   const [status, setStatus] = useState<IncidentStatus | "">("");
   const [priority, setPriority] = useState<IncidentPriority | "">("");
   const [assignedToMe, setAssignedToMe] = useState(false);

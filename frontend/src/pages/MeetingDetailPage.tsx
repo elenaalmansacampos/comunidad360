@@ -21,6 +21,7 @@ import {
 import { canManageMeetings, nextMeetingStatuses } from "../features/meetings/utils";
 import type { AttendanceType, MeetingStatus } from "../types/api";
 import { formatDateTime, formatPercent } from "../utils/format";
+import { normalizeLanguage } from "../utils/language";
 
 const ATTENDANCE_TYPES: AttendanceType[] = ["IN_PERSON", "ONLINE", "REPRESENTED", "ABSENT"];
 
@@ -30,7 +31,7 @@ export function MeetingDetailPage() {
   const user = useAuthStore((state) => state.user);
   const membership = user?.memberships.find((item) => item.id === communityId);
   const canManage = canManageMeetings(membership?.roles ?? []);
-  const language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
   const meeting = useMeeting(communityId, meetingId);
   const members = useMembers(communityId, canManage);
   const documents = useDocuments(communityId);

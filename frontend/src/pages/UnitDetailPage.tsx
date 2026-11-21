@@ -23,6 +23,7 @@ import { useUnit } from "../features/structure/queries";
 import { ApiError } from "../services/apiClient";
 import type { Language, Member, OwnershipType } from "../types/api";
 import { formatDate, formatPercent } from "../utils/format";
+import { normalizeLanguage } from "../utils/language";
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
@@ -42,7 +43,7 @@ export function UnitDetailPage() {
   const members = useMembers(communityId, canManage);
   const endOwnership = useEndOwnership(communityId, unitId);
   const revokeTenancy = useRevokeTenancy(communityId, unitId);
-  const language: Language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language: Language = normalizeLanguage(i18n.language);
 
   useEffect(() => {
     if (communityId) {

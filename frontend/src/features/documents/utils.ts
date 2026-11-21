@@ -1,5 +1,6 @@
 import { downloadFile } from "../../services/apiClient";
-import type { Role } from "../../types/api";
+import type { Language, Role } from "../../types/api";
+import { localeFor } from "../../utils/language";
 
 const MANAGE_ROLES: Role[] = ["COMMUNITY_ADMIN", "SECRETARY"];
 const UPLOAD_ROLES: Role[] = [
@@ -22,7 +23,7 @@ export function isExternalUrl(url: string): boolean {
   return /^https?:\/\//i.test(url);
 }
 
-export function formatFileSize(bytes: number, language: "es" | "ca"): string {
+export function formatFileSize(bytes: number, language: Language): string {
   if (bytes < 1024) {
     return `${bytes} B`;
   }
@@ -33,7 +34,7 @@ export function formatFileSize(bytes: number, language: "es" | "ca"): string {
     value /= 1024;
     unit = units[index];
   }
-  return `${new Intl.NumberFormat(language === "ca" ? "ca-ES" : "es-ES", {
+  return `${new Intl.NumberFormat(localeFor(language), {
     maximumFractionDigits: 1,
   }).format(value)} ${unit}`;
 }

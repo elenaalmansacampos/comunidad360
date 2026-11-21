@@ -12,6 +12,7 @@ import { canViewProviders } from "../features/mvp/utils";
 import { ApiError, downloadFile } from "../services/apiClient";
 import type { Role } from "../types/api";
 import { formatDateTime, formatMoney } from "../utils/format";
+import { normalizeLanguage } from "../utils/language";
 
 function roleLabel(role: Role): string {
   return `roles.${role}`;
@@ -26,7 +27,7 @@ export function DashboardPage() {
   const [downloading, setDownloading] = useState(false);
   const [reportError, setReportError] = useState(false);
   const [exporting, setExporting] = useState<string | null>(null);
-  const language = i18n.language.startsWith("ca") ? "ca" : "es";
+  const language = normalizeLanguage(i18n.language);
 
   useEffect(() => {
     if (communityId) {

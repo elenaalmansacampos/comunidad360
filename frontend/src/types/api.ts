@@ -8,7 +8,7 @@ export type Role =
   | "TENANT"
   | "PROVIDER";
 
-export type Language = "es" | "ca";
+export type Language = "es" | "ca" | "en";
 
 export interface CommunitySummary {
   id: string;
