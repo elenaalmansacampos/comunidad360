@@ -302,7 +302,7 @@ Ver [`FASE3.8-IMPLEMENTATION.md`](./FASE3.8-IMPLEMENTATION.md).
 - Push notifications (solo si se valida).
 
 **Estado:** implementados proveedores/contactos, chat persistente con polling y votaciones consultivas.
-Pendiente: WebSocket en tiempo real, adjuntos/moderación, vinculación de proveedores y push.
+Estado: WebSocket/STOMP implementado; pendiente adjuntos/moderación y vinculación de proveedores.
 Ver [`FASE3.9-IMPLEMENTATION.md`](./FASE3.9-IMPLEMENTATION.md).
 
 ### Criterio de salida del MVP

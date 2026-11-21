@@ -812,6 +812,8 @@
     "noMessages": "Todavía no hay mensajes",
     "message": "Mensaje",
     "send": "Enviar",
+    "live": "En vivo",
+    "polling": "Actualización periódica",
     "error": "No se ha podido completar la operación del chat",
     "types": {
       "GENERAL": "General",

@@ -812,6 +812,8 @@
     "noMessages": "Encara no hi ha missatges",
     "message": "Missatge",
     "send": "Envia",
+    "live": "En directe",
+    "polling": "Actualització periòdica",
     "error": "No s'ha pogut completar l'operació del xat",
     "types": {
       "GENERAL": "General",

@@ -106,6 +106,17 @@ public class ChatService {
         return ChatMessageResponse.from(message, userName(userId));
     }
 
+    @Transactional(readOnly = true)
+    public void requireChannelAccess(UUID communityId, UUID userId, UUID channelId) {
+        Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
+        permissionService.require(membership, "CHAT_VIEW");
+        ChatChannel channel = channelRepository.findByIdAndCommunityId(channelId, communityId)
+                .orElseThrow(() -> BusinessException.notFound("CHAT_CHANNEL_NOT_FOUND", "errors.resource.notFound"));
+        if (!canAccess(channel, membership)) {
+            throw BusinessException.forbidden("PERMISSION_DENIED", "errors.permission.denied");
+        }
+    }
+
     private void ensureGeneral(UUID communityId, UUID userId) {
         if (channelRepository.findFirstByCommunityIdAndTypeAndArchivedAtIsNull(
                 communityId, ChatChannelType.GENERAL).isPresent()) {

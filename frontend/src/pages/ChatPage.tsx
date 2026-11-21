@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Alert } from "../components/Alert";
@@ -15,10 +16,12 @@ import {
   useCreateChatChannel,
   useSendChatMessage,
 } from "../features/chat/queries";
+import { createChatClient } from "../features/chat/socket";
 import { useMembers } from "../features/communities/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
 import { canModerateChat, formatChatTime } from "../features/mvp/utils";
-import type { ChatChannelType } from "../types/api";
+import { demoEnabled } from "../services/demoApi";
+import type { ChatChannelType, ChatMessage } from "../types/api";
 import { normalizeLanguage } from "../utils/language";
 
 export function ChatPage() {
@@ -40,6 +43,8 @@ export function ChatPage() {
   const [type, setType] = useState<ChatChannelType>("THEMATIC");
   const [description, setDescription] = useState("");
   const [participants, setParticipants] = useState<string[]>([]);
+  const [live, setLive] = useState(false);
+  const queryClient = useQueryClient();
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { if (communityId) setSelectedCommunityId(communityId); }, [communityId, setSelectedCommunityId]);
@@ -47,6 +52,36 @@ export function ChatPage() {
     if (!channelId && channels.data?.length) setChannelId(channels.data[0].id);
   }, [channelId, channels.data]);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages.data]);
+  useEffect(() => {
+    if (!communityId || !channelId || demoEnabled) {
+      return;
+    }
+    const client = createChatClient();
+    client.onConnect = () => {
+      setLive(true);
+      client.subscribe(`/topic/communities/${communityId}/channels/${channelId}`, (frame) => {
+        const message = JSON.parse(frame.body) as ChatMessage;
+        queryClient.setQueryData<ChatMessage[]>(
+          ["chat-messages", communityId, channelId],
+          (current) => {
+            if (!current) {
+              return [message];
+            }
+            if (current.some((item) => item.id === message.id)) {
+              return current;
+            }
+            return [...current, message];
+          },
+        );
+      });
+    };
+    client.onWebSocketClose = () => setLive(false);
+    client.onStompError = () => setLive(false);
+    client.activate();
+    return () => {
+      void client.deactivate();
+    };
+  }, [communityId, channelId, queryClient]);
 
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -125,6 +160,11 @@ export function ChatPage() {
           ))}
         </aside>
         <section className="chat-panel">
+          {channelId ? (
+            <div className="chips">
+              <span className="badge">{live ? t("chat.live") : t("chat.polling")}</span>
+            </div>
+          ) : null}
           {!channelId ? <p>{t("chat.noChannels")}</p> : messages.isLoading ? <FullPageLoader /> : (
             <>
               <div className="chat-messages">

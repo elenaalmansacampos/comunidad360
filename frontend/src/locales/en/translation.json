@@ -812,6 +812,8 @@
     "noMessages": "No messages yet",
     "message": "Message",
     "send": "Send",
+    "live": "Live",
+    "polling": "Polling",
     "error": "The chat operation could not be completed",
     "types": {
       "GENERAL": "General",
