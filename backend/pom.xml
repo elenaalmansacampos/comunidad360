@@ -22,7 +22,7 @@
         <jjwt.version>0.12.6</jjwt.version>
         <springdoc.version>2.6.0</springdoc.version>
         <testcontainers.version>1.21.3</testcontainers.version>
-        <awssdk.version>2.25.60</awssdk.version>
+        <awssdk.version>2.59.2</awssdk.version>
     </properties>
 
     <dependencies>
