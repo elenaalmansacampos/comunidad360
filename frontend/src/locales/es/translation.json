@@ -68,6 +68,44 @@
     "dashboard": "Resumen",
     "members": "Miembros"
   },
+  "organizations": {
+    "title": "Organizaciones",
+    "subtitle": "Agrupa varias comunidades y gestiona administradores",
+    "new": "Nueva organización",
+    "name": "Nombre",
+    "taxId": "CIF/NIF",
+    "status": "Estado",
+    "role": "Tu rol",
+    "communityCount": "Comunidades",
+    "communities": "Comunidades",
+    "members": "Administradores",
+    "empty": "No perteneces a ninguna organización",
+    "noCommunities": "No hay comunidades vinculadas",
+    "noMembers": "No hay administradores",
+    "attachCommunity": "Vincular comunidad",
+    "selectCommunity": "Selecciona una comunidad",
+    "attach": "Vincular",
+    "detach": "Desvincular",
+    "addMember": "Añadir administrador",
+    "remove": "Quitar",
+    "memberEmail": "Email del usuario",
+    "memberRole": "Rol",
+    "backToCommunities": "Volver a comunidades",
+    "backToOrganizations": "Volver a organizaciones",
+    "error": "No se ha podido completar la operación",
+    "statuses": {
+      "ACTIVE": "Activa",
+      "INACTIVE": "Inactiva"
+    },
+    "roles": {
+      "ORG_ADMIN": "Administrador",
+      "ORG_STAFF": "Equipo"
+    },
+    "memberStatuses": {
+      "ACTIVE": "Activo",
+      "INACTIVE": "Inactivo"
+    }
+  },
   "dashboard": {
     "title": "Resumen de la comunidad",
     "welcome": "Hola, {{name}}",

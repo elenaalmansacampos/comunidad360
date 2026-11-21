@@ -37,6 +37,9 @@ public class Membership {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Column(name = "source_organization_id")
+    private UUID sourceOrganizationId;
+
     @Version
     @Column(nullable = false)
     private long version;
@@ -93,6 +96,14 @@ public class Membership {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public UUID getSourceOrganizationId() {
+        return sourceOrganizationId;
+    }
+
+    public void setSourceOrganizationId(UUID sourceOrganizationId) {
+        this.sourceOrganizationId = sourceOrganizationId;
     }
 
     public long getVersion() {

@@ -68,6 +68,44 @@
     "dashboard": "Resum",
     "members": "Membres"
   },
+  "organizations": {
+    "title": "Organitzacions",
+    "subtitle": "Agrupa diverses comunitats i gestiona administradors",
+    "new": "Nova organització",
+    "name": "Nom",
+    "taxId": "CIF/NIF",
+    "status": "Estat",
+    "role": "El teu rol",
+    "communityCount": "Comunitats",
+    "communities": "Comunitats",
+    "members": "Administradors",
+    "empty": "No pertanys a cap organització",
+    "noCommunities": "No hi ha comunitats vinculades",
+    "noMembers": "No hi ha administradors",
+    "attachCommunity": "Vincula una comunitat",
+    "selectCommunity": "Selecciona una comunitat",
+    "attach": "Vincula",
+    "detach": "Desvincula",
+    "addMember": "Afegeix un administrador",
+    "remove": "Treu",
+    "memberEmail": "Email de l'usuari",
+    "memberRole": "Rol",
+    "backToCommunities": "Torna a comunitats",
+    "backToOrganizations": "Torna a organitzacions",
+    "error": "No s'ha pogut completar l'operació",
+    "statuses": {
+      "ACTIVE": "Activa",
+      "INACTIVE": "Inactiva"
+    },
+    "roles": {
+      "ORG_ADMIN": "Administrador",
+      "ORG_STAFF": "Equip"
+    },
+    "memberStatuses": {
+      "ACTIVE": "Actiu",
+      "INACTIVE": "Inactiu"
+    }
+  },
   "dashboard": {
     "title": "Resum de la comunitat",
     "welcome": "Hola, {{name}}",

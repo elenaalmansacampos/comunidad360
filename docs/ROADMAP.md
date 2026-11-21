@@ -364,7 +364,9 @@ Orden propuesto, sujeto a valor y validación:
 7. **Facturación electrónica e integración con gestoría**.
 8. **Aplicación móvil nativa** si se justifica.
 9. **Multi-idioma ampliado** (inglés).
-10. **Organizaciones y múltiples administradores de fincas**.
+10. **Organizaciones y múltiples administradores de fincas** — implementado en v0.1.0:
+    organizaciones, vinculación de comunidades, administradores de organización y propagación
+    automática de acceso como `COMMUNITY_ADMIN`.
 11. **Planes de suscripción y facturación SaaS**.
 
 Cada evolución requiere ADR, actualización de SPEC y análisis de seguridad/privacidad.

@@ -17,6 +17,35 @@ export interface CommunitySummary {
   status: string;
 }
 
+export type OrganizationStatus = "ACTIVE" | "INACTIVE";
+export type OrganizationMemberRole = "ORG_ADMIN" | "ORG_STAFF";
+export type OrganizationMemberStatus = "ACTIVE" | "INACTIVE";
+
+export interface Organization {
+  id: string;
+  name: string;
+  taxId?: string | null;
+  status: OrganizationStatus;
+  role: OrganizationMemberRole;
+  communityCount: number;
+  createdAt: string;
+}
+
+export interface OrganizationCommunity {
+  id: string;
+  name: string;
+  status: string;
+}
+
+export interface OrganizationMember {
+  userId: string;
+  fullName: string;
+  email: string;
+  role: OrganizationMemberRole;
+  status: OrganizationMemberStatus;
+  createdAt: string;
+}
+
 export interface UserProfile {
   id: string;
   email: string;

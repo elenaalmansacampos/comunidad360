@@ -55,6 +55,9 @@ public class Community {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Column(name = "organization_id")
+    private UUID organizationId;
+
     @Version
     @Column(nullable = false)
     private long version;
@@ -164,6 +167,14 @@ public class Community {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public UUID getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(UUID organizationId) {
+        this.organizationId = organizationId;
     }
 
     public long getVersion() {

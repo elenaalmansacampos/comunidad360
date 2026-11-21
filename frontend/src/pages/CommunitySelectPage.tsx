@@ -38,6 +38,13 @@ export function CommunitySelectPage() {
         <div className="select-header__right">
           <LanguageSwitcher />
           {user ? <span className="app-header__user">{user.fullName}</span> : null}
+          <button
+            type="button"
+            className="btn btn--ghost btn--small"
+            onClick={() => navigate("/organizations")}
+          >
+            {t("organizations.title")}
+          </button>
           <button type="button" className="btn btn--ghost btn--small" onClick={handleLogout}>
             {t("common.logout")}
           </button>

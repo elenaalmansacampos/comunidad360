@@ -20,6 +20,8 @@ import { MeetingDetailPage } from "../pages/MeetingDetailPage";
 import { MeetingsPage } from "../pages/MeetingsPage";
 import { MembersPage } from "../pages/MembersPage";
 import { NotificationPreferencesPage } from "../pages/NotificationPreferencesPage";
+import { OrganizationDetailPage } from "../pages/OrganizationDetailPage";
+import { OrganizationsPage } from "../pages/OrganizationsPage";
 import { ProviderDetailPage } from "../pages/ProviderDetailPage";
 import { ProvidersPage } from "../pages/ProvidersPage";
 import { VotingDetailPage } from "../pages/VotingDetailPage";
@@ -64,6 +66,8 @@ export function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<HomeRedirect />} />
             <Route path="/communities" element={<CommunitySelectPage />} />
+            <Route path="/organizations" element={<OrganizationsPage />} />
+            <Route path="/organizations/:organizationId" element={<OrganizationDetailPage />} />
             <Route path="/communities/:communityId" element={<AppLayout />}>
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<DashboardPage />} />
