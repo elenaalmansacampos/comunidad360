@@ -1,3 +1,4 @@
+import { Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Alert } from "../components/Alert";
@@ -34,7 +35,7 @@ export function CommunitySelectPage() {
   return (
     <div className="select-shell">
       <header className="select-header">
-        <span className="brand">COMUNIDAD 360</span>
+        <span className="brand brand--link"><span className="brand__mark brand__mark--light" aria-hidden="true"><Building2 size={18} /></span><span>COMUNIDAD 360</span></span>
         <div className="select-header__right">
           <LanguageSwitcher />
           {user ? <span className="app-header__user">{user.fullName}</span> : null}
@@ -72,6 +73,7 @@ export function CommunitySelectPage() {
         <div className="community-list">
           {communities.data?.map((community) => (
             <article className="community-card" key={community.id}>
+              <span className="community-card__icon" aria-hidden="true"><Building2 size={20} /></span>
               <div>
                 <h2>{community.name}</h2>
                 <div className="chips">
