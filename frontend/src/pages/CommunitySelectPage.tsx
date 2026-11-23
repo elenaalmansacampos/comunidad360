@@ -5,6 +5,7 @@ import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
 import { FullPageLoader } from "../components/FullPageLoader";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { ThemeToggle } from "../components/ThemeToggle";
 import { useAuthStore } from "../features/auth/authStore";
 import { useCommunities } from "../features/communities/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
@@ -38,6 +39,7 @@ export function CommunitySelectPage() {
         <span className="brand brand--link"><span className="brand__mark brand__mark--light" aria-hidden="true"><Building2 size={18} /></span><span>COMUNIDAD 360</span></span>
         <div className="select-header__right">
           <LanguageSwitcher />
+          <ThemeToggle />
           {user ? <span className="app-header__user">{user.fullName}</span> : null}
           <button
             type="button"

@@ -2,6 +2,7 @@ import { Building2, FileCheck2, ShieldCheck, Wallet } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router-dom";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 export function AuthLayout() {
   const { t } = useTranslation();
@@ -37,7 +38,10 @@ export function AuthLayout() {
       <main className="auth-main">
         <header className="auth-top">
           <span className="brand">COMUNIDAD 360</span>
-          <LanguageSwitcher />
+          <div className="auth-top__actions">
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
         </header>
         <div className="auth-main__content">
           <Outlet />

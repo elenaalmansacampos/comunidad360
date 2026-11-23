@@ -20,7 +20,9 @@
     "password": "Password",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
-    "name": "Name"
+    "name": "Name",
+    "themeDark": "Enable dark mode",
+    "themeLight": "Enable light mode"
   },
   "nav": {
     "home": "Home",

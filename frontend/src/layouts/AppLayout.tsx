@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { NotificationBell } from "../components/NotificationBell";
+import { ThemeToggle } from "../components/ThemeToggle";
 import { useAuthStore } from "../features/auth/authStore";
 import { useCommunities } from "../features/communities/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
@@ -99,6 +100,7 @@ export function AppLayout() {
         <div className="app-header__right">
           <NotificationBell />
           <LanguageSwitcher />
+          <ThemeToggle />
           {user ? (
             <span className="app-header__user">
               <span className="avatar avatar--sm" aria-hidden="true">{initials(user.fullName)}</span>

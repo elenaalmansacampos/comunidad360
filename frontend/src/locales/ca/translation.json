@@ -20,7 +20,9 @@
     "password": "Contrasenya",
     "showPassword": "Mostra la contrasenya",
     "hidePassword": "Amaga la contrasenya",
-    "name": "Nom"
+    "name": "Nom",
+    "themeDark": "Activa el mode fosc",
+    "themeLight": "Activa el mode clar"
   },
   "nav": {
     "home": "Inici",

@@ -122,7 +122,7 @@ export function IncidentDetailPage() {
 
   return (
     <div className="page">
-      <Link className="text-link" to={`/communities/${communityId}/incidents`}>
+      <Link className="breadcrumb" to={`/communities/${communityId}/incidents`}>
         ← {t("incidents.title")}
       </Link>
       <header className="page-header">

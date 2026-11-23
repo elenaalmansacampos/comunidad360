@@ -73,7 +73,7 @@ export function UnitDetailPage() {
 
   return (
     <div className="page">
-      <Link className="text-link" to={`/communities/${communityId}/structure`}>
+      <Link className="breadcrumb" to={`/communities/${communityId}/structure`}>
         {t("unitDetail.back")}
       </Link>
 

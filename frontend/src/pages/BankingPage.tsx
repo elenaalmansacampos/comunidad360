@@ -80,7 +80,7 @@ export function BankingPage() {
 
   return (
     <div className="page">
-      <Link className="text-link" to={`/communities/${communityId}/finance`}>
+      <Link className="breadcrumb" to={`/communities/${communityId}/finance`}>
         {t("banking.backToFinance")}
       </Link>
       <header className="page-header">

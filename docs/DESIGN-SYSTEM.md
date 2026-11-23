@@ -108,6 +108,14 @@ space-8 = 64px
 
 Diseñar primero a 360 px.
 
+### 2.6. Tema claro y oscuro
+
+- Tema por defecto: preferencia del sistema (`prefers-color-scheme`).
+- El usuario puede alternarlo con el botón de tema; se persiste en `localStorage`
+  (`comunidad360.theme`).
+- Se aplica con `data-theme="light|dark"` en `<html>`.
+- Los tokens oscuros y los ajustes de superficies viven en `frontend/src/styles/refresh.scss`.
+
 ## 3. Layout y navegación
 
 ### 3.1. Estructura
