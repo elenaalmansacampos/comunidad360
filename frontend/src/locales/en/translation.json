@@ -36,7 +36,12 @@
     "settings": "Settings",
     "more": "More",
     "structure": "Structure",
-    "banking": "Banking"
+    "banking": "Banking",
+    "groups": {
+      "general": "General",
+      "management": "Management",
+      "community": "Community"
+    }
   },
   "auth": {
     "login": {
@@ -45,7 +50,10 @@
       "submit": "Sign in",
       "forgot": "Forgot your password?",
       "error": "Incorrect email or password",
-      "noAccount": "Access is by invitation only"
+      "noAccount": "Access is by invitation only",
+      "featureFinance": "Clear, audited financial data",
+      "featureDocuments": "Documents and minutes always at hand",
+      "featureAccess": "Role-based access per community"
     },
     "invitation": {
       "title": "Accept the invitation",
@@ -166,8 +174,16 @@
     "run": "Run now",
     "delete": "Delete",
     "error": "The operation could not be completed",
-    "frequencies": {"DAILY": "Daily", "WEEKLY": "Weekly", "MONTHLY": "Monthly"},
-    "statuses": {"SENT": "Sent", "FAILED": "Failed", "SKIPPED": "Skipped"}
+    "frequencies": {
+      "DAILY": "Daily",
+      "WEEKLY": "Weekly",
+      "MONTHLY": "Monthly"
+    },
+    "statuses": {
+      "SENT": "Sent",
+      "FAILED": "Failed",
+      "SKIPPED": "Skipped"
+    }
   },
   "members": {
     "title": "Community members",

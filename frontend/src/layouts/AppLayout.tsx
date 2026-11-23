@@ -1,4 +1,21 @@
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import {
+  AlertTriangle,
+  Building2,
+  CalendarDays,
+  ChevronDown,
+  FileText,
+  Landmark,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  MessageCircle,
+  Users,
+  Vote,
+  Wallet,
+  Wrench,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
@@ -8,6 +25,31 @@ import { useCommunities } from "../features/communities/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
 import { canViewProviders } from "../features/mvp/utils";
 import { demoEnabled } from "../services/demoApi";
+
+function initials(name: string | undefined): string {
+  if (!name) {
+    return "?";
+  }
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+function NavItem({ to, icon, label, end }: { to: string; icon: ReactNode; label: string; end?: boolean }) {
+  return (
+    <NavLink
+      to={to}
+      end={end}
+      className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
+    >
+      <span className="nav-link__icon" aria-hidden="true">{icon}</span>
+      <span>{label}</span>
+    </NavLink>
+  );
+}
 
 export function AppLayout() {
   const { t } = useTranslation();
@@ -21,6 +63,7 @@ export function AppLayout() {
   const communities = useCommunities();
   const community = communities.data?.find((item) => item.id === communityId);
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
+  const roleLabel = roles[0] ? t(`roles.${roles[0]}`, { defaultValue: roles[0] }) : "";
 
   useEffect(() => {
     if (communityId) {
@@ -42,98 +85,94 @@ export function AppLayout() {
       {demoEnabled ? <div className="demo-banner">{t("demo.banner")}</div> : null}
       <header className="app-header">
         <div className="app-header__left">
-          <span className="brand">COMUNIDAD 360</span>
-          <Link className="app-header__community" to="/communities">{community?.name ?? t("common.loading")}</Link>
+          <Link className="brand brand--link" to="/communities" aria-label={t("common.appName")}>
+            <span className="brand__mark" aria-hidden="true">
+              <Building2 size={18} />
+            </span>
+            <span>COMUNIDAD 360</span>
+          </Link>
+          <Link className="app-header__community" to="/communities">
+            <span>{community?.name ?? t("common.loading")}</span>
+            <ChevronDown size={14} aria-hidden="true" />
+          </Link>
         </div>
         <div className="app-header__right">
           <NotificationBell />
           <LanguageSwitcher />
-          {user ? <span className="app-header__user">{user.fullName}</span> : null}
-          <button type="button" className="btn btn--ghost btn--small" onClick={handleLogout}>
-            {t("common.logout")}
+          {user ? (
+            <span className="app-header__user">
+              <span className="avatar avatar--sm" aria-hidden="true">{initials(user.fullName)}</span>
+              <span className="app-header__user-name">{user.fullName}</span>
+            </span>
+          ) : null}
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={handleLogout}
+            aria-label={t("common.logout")}
+            title={t("common.logout")}
+          >
+            <LogOut size={18} aria-hidden="true" />
           </button>
         </div>
       </header>
 
       <div className="app-body">
         <aside className="sidebar" aria-label={t("nav.community")}>
+          <div className="sidebar__community">
+            <span className="sidebar__community-icon" aria-hidden="true"><Building2 size={16} /></span>
+            <div>
+              <small>{t("nav.community")}</small>
+              <strong>{community?.name ?? t("common.loading")}</strong>
+            </div>
+          </div>
           <nav className="sidebar__nav">
-            <NavLink
-              to="/communities"
-              end
-              className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
-            >
-              {t("nav.community")}
-            </NavLink>
-            <NavLink
+            <p className="nav-group">{t("nav.groups.general")}</p>
+            <NavItem to="/communities" end icon={<Building2 size={18} />} label={t("nav.community")} />
+            <NavItem
               to={`/communities/${communityId}/dashboard`}
-              className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
-            >
-              {t("nav.home")}
-            </NavLink>
-            <NavLink
+              icon={<LayoutDashboard size={18} />}
+              label={t("nav.home")}
+            />
+            <NavItem
               to={`/communities/${communityId}/structure`}
-              className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
-            >
-              {t("nav.structure")}
-            </NavLink>
-            <NavLink
-              to={`/communities/${communityId}/finance`}
-              className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
-            >
-              {t("nav.finance")}
-            </NavLink>
-            <NavLink
-              to={`/communities/${communityId}/banking`}
-              className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
-            >
-              {t("nav.banking")}
-            </NavLink>
-            <NavLink
-              to={`/communities/${communityId}/incidents`}
-              className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
-            >
-              {t("nav.incidents")}
-            </NavLink>
-            <NavLink
-              to={`/communities/${communityId}/meetings`}
-              className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
-            >
-              {t("nav.meetings")}
-            </NavLink>
-            <NavLink
-              to={`/communities/${communityId}/documents`}
-              className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
-            >
-              {t("nav.documents")}
-            </NavLink>
-            <NavLink
-              to={`/communities/${communityId}/chat`}
-              className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
-            >
-              {t("nav.chat")}
-            </NavLink>
+              icon={<Building2 size={18} />}
+              label={t("nav.structure")}
+            />
+            <p className="nav-group">{t("nav.groups.management")}</p>
+            <NavItem to={`/communities/${communityId}/finance`} icon={<Wallet size={18} />} label={t("nav.finance")} />
+            <NavItem to={`/communities/${communityId}/banking`} icon={<Landmark size={18} />} label={t("nav.banking")} />
+            <NavItem to={`/communities/${communityId}/incidents`} icon={<AlertTriangle size={18} />} label={t("nav.incidents")} />
+            <NavItem to={`/communities/${communityId}/meetings`} icon={<CalendarDays size={18} />} label={t("nav.meetings")} />
+            <NavItem to={`/communities/${communityId}/documents`} icon={<FileText size={18} />} label={t("nav.documents")} />
+            <p className="nav-group">{t("nav.groups.community")}</p>
+            <NavItem to={`/communities/${communityId}/chat`} icon={<MessageCircle size={18} />} label={t("nav.chat")} />
             {canViewProviders(roles) ? (
-              <NavLink
-                to={`/communities/${communityId}/providers`}
-                className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
-              >
-                {t("nav.providers")}
-              </NavLink>
+              <NavItem to={`/communities/${communityId}/providers`} icon={<Wrench size={18} />} label={t("nav.providers")} />
             ) : null}
-            <NavLink
-              to={`/communities/${communityId}/votings`}
-              className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
-            >
-              {t("nav.votings")}
-            </NavLink>
-            <NavLink
-              to={`/communities/${communityId}/members`}
-              className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
-            >
-              {t("nav.members")}
-            </NavLink>
+            <NavItem to={`/communities/${communityId}/votings`} icon={<Vote size={18} />} label={t("nav.votings")} />
+            <NavItem to={`/communities/${communityId}/members`} icon={<Users size={18} />} label={t("nav.members")} />
           </nav>
+          {user ? (
+            <div className="sidebar__footer">
+              <div className="sidebar__user">
+                <span className="avatar" aria-hidden="true">{initials(user.fullName)}</span>
+                <div>
+                  <strong>{user.fullName}</strong>
+                  <small>{roleLabel}</small>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="icon-btn"
+                onClick={handleLogout}
+                aria-label={t("common.logout")}
+                title={t("common.logout")}
+              >
+                <LogOut size={18} aria-hidden="true" />
+              </button>
+            </div>
+          ) : null}
         </aside>
 
         <main className="app-content">
@@ -179,25 +218,29 @@ export function AppLayout() {
           to={`/communities/${communityId}/dashboard`}
           className={({ isActive }) => `mobile-nav__item ${isActive ? "mobile-nav__item--active" : ""}`}
         >
-          {t("nav.home")}
+          <LayoutDashboard size={18} aria-hidden="true" />
+          <span>{t("nav.home")}</span>
         </NavLink>
         <NavLink
           to={`/communities/${communityId}/structure`}
           className={({ isActive }) => `mobile-nav__item ${isActive ? "mobile-nav__item--active" : ""}`}
         >
-          {t("nav.structure")}
+          <Building2 size={18} aria-hidden="true" />
+          <span>{t("nav.structure")}</span>
         </NavLink>
         <NavLink
           to={`/communities/${communityId}/finance`}
           className={({ isActive }) => `mobile-nav__item ${isActive ? "mobile-nav__item--active" : ""}`}
         >
-          {t("nav.finance")}
+          <Wallet size={18} aria-hidden="true" />
+          <span>{t("nav.finance")}</span>
         </NavLink>
         <NavLink
           to={`/communities/${communityId}/incidents`}
           className={({ isActive }) => `mobile-nav__item ${isActive ? "mobile-nav__item--active" : ""}`}
         >
-          {t("nav.incidents")}
+          <AlertTriangle size={18} aria-hidden="true" />
+          <span>{t("nav.incidents")}</span>
         </NavLink>
         <button
           type="button"
@@ -206,7 +249,8 @@ export function AppLayout() {
           aria-controls="mobile-more"
           onClick={() => setMoreOpen((value) => !value)}
         >
-          {t("nav.more")}
+          <Menu size={18} aria-hidden="true" />
+          <span>{t("nav.more")}</span>
         </button>
       </nav>
     </div>

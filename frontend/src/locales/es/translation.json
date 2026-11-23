@@ -36,7 +36,12 @@
     "settings": "Ajustes",
     "more": "Más",
     "structure": "Estructura",
-    "banking": "Banca"
+    "banking": "Banca",
+    "groups": {
+      "general": "General",
+      "management": "Gestión",
+      "community": "Comunidad"
+    }
   },
   "auth": {
     "login": {
@@ -45,7 +50,10 @@
       "submit": "Iniciar sesión",
       "forgot": "¿Has olvidado la contraseña?",
       "error": "Email o contraseña incorrectos",
-      "noAccount": "El acceso es solo por invitación"
+      "noAccount": "El acceso es solo por invitación",
+      "featureFinance": "Datos financieros claros y auditados",
+      "featureDocuments": "Documentos y actas siempre a mano",
+      "featureAccess": "Accesos por rol y por comunidad"
     },
     "invitation": {
       "title": "Acepta la invitación",
@@ -166,8 +174,16 @@
     "run": "Ejecutar ahora",
     "delete": "Eliminar",
     "error": "No se ha podido completar la operación",
-    "frequencies": {"DAILY": "Diaria", "WEEKLY": "Semanal", "MONTHLY": "Mensual"},
-    "statuses": {"SENT": "Enviado", "FAILED": "Fallido", "SKIPPED": "Omitido"}
+    "frequencies": {
+      "DAILY": "Diaria",
+      "WEEKLY": "Semanal",
+      "MONTHLY": "Mensual"
+    },
+    "statuses": {
+      "SENT": "Enviado",
+      "FAILED": "Fallido",
+      "SKIPPED": "Omitido"
+    }
   },
   "members": {
     "title": "Miembros de la comunidad",

@@ -36,7 +36,12 @@
     "settings": "Configuració",
     "more": "Més",
     "structure": "Estructura",
-    "banking": "Banca"
+    "banking": "Banca",
+    "groups": {
+      "general": "General",
+      "management": "Gestió",
+      "community": "Comunitat"
+    }
   },
   "auth": {
     "login": {
@@ -45,7 +50,10 @@
       "submit": "Inicia la sessió",
       "forgot": "Has oblidat la contrasenya?",
       "error": "Correu o contrasenya incorrectes",
-      "noAccount": "L'accés és només per invitació"
+      "noAccount": "L'accés és només per invitació",
+      "featureFinance": "Dades financeres clares i auditades",
+      "featureDocuments": "Documents i actes sempre a mà",
+      "featureAccess": "Accessos per rol i per comunitat"
     },
     "invitation": {
       "title": "Accepta la invitació",
@@ -166,8 +174,16 @@
     "run": "Executa ara",
     "delete": "Elimina",
     "error": "No s'ha pogut completar l'operació",
-    "frequencies": {"DAILY": "Diària", "WEEKLY": "Setmanal", "MONTHLY": "Mensual"},
-    "statuses": {"SENT": "Enviat", "FAILED": "Fallat", "SKIPPED": "Omès"}
+    "frequencies": {
+      "DAILY": "Diària",
+      "WEEKLY": "Setmanal",
+      "MONTHLY": "Mensual"
+    },
+    "statuses": {
+      "SENT": "Enviat",
+      "FAILED": "Fallat",
+      "SKIPPED": "Omès"
+    }
   },
   "members": {
     "title": "Membres de la comunitat",

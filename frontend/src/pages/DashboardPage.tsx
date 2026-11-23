@@ -1,4 +1,18 @@
 import { useEffect, useState } from "react";
+import {
+  AlertTriangle,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  CalendarDays,
+  FileText,
+  MessageCircle,
+  Receipt,
+  TrendingUp,
+  Users,
+  Vote,
+  Wallet,
+  Wrench,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 import { Alert } from "../components/Alert";
@@ -67,15 +81,15 @@ export function DashboardPage() {
   const isCommunityFinance = finance?.scope === "COMMUNITY";
 
   const modules = [
-    { title: t("dashboard.finance"), text: t("dashboard.financePending"), to: `/communities/${communityId}/finance` },
-    { title: t("dashboard.incidents"), text: t("dashboard.incidentsPending"), to: `/communities/${communityId}/incidents` },
-    { title: t("dashboard.documents"), text: t("dashboard.documentsPending"), to: `/communities/${communityId}/documents` },
-    { title: t("dashboard.meetings"), text: t("dashboard.meetingsPending"), to: `/communities/${communityId}/meetings` },
-    { title: t("nav.chat"), text: t("dashboard.chatPending"), to: `/communities/${communityId}/chat` },
+    { title: t("dashboard.finance"), text: t("dashboard.financePending"), to: `/communities/${communityId}/finance`, icon: <Wallet size={18} aria-hidden="true" /> },
+    { title: t("dashboard.incidents"), text: t("dashboard.incidentsPending"), to: `/communities/${communityId}/incidents`, icon: <AlertTriangle size={18} aria-hidden="true" /> },
+    { title: t("dashboard.documents"), text: t("dashboard.documentsPending"), to: `/communities/${communityId}/documents`, icon: <FileText size={18} aria-hidden="true" /> },
+    { title: t("dashboard.meetings"), text: t("dashboard.meetingsPending"), to: `/communities/${communityId}/meetings`, icon: <CalendarDays size={18} aria-hidden="true" /> },
+    { title: t("nav.chat"), text: t("dashboard.chatPending"), to: `/communities/${communityId}/chat`, icon: <MessageCircle size={18} aria-hidden="true" /> },
     ...(canViewProviders(data.roles)
-      ? [{ title: t("nav.providers"), text: t("dashboard.providersPending"), to: `/communities/${communityId}/providers` }]
+      ? [{ title: t("nav.providers"), text: t("dashboard.providersPending"), to: `/communities/${communityId}/providers`, icon: <Wrench size={18} aria-hidden="true" /> }]
       : []),
-    { title: t("nav.votings"), text: t("dashboard.votingsPending"), to: `/communities/${communityId}/votings` },
+    { title: t("nav.votings"), text: t("dashboard.votingsPending"), to: `/communities/${communityId}/votings`, icon: <Vote size={18} aria-hidden="true" /> },
   ];
 
   async function downloadReport() {
@@ -121,22 +135,70 @@ export function DashboardPage() {
 
   return (
     <div className="page">
-      <header className="page-header">
+      <section className="dash-hero">
         <div>
           <p className="eyebrow">{data.community.name}</p>
           <h1>{t("dashboard.title")}</h1>
           <p className="page-subtitle">
             {t("dashboard.welcome", { name: user?.fullName ?? "" })}
           </p>
+          <div className="chips dash-hero__roles">
+            {data.roles.map((role) => (
+              <span className="badge" key={role}>
+                {t(roleLabel(role), { defaultValue: role })}
+              </span>
+            ))}
+          </div>
         </div>
         {data.canViewReports ? (
-          <Button variant="secondary" loading={downloading} onClick={() => void downloadReport()}>
-            {t("dashboard.downloadReport")}
-          </Button>
+          <div className="dash-hero__actions">
+            <Button variant="secondary" loading={downloading} onClick={() => void downloadReport()}>
+              <FileText size={16} aria-hidden="true" /> {t("dashboard.downloadReport")}
+            </Button>
+          </div>
         ) : null}
-      </header>
+      </section>
 
       {reportError ? <Alert variant="error">{t("dashboard.reportError")}</Alert> : null}
+
+      <div className="stat-grid">
+        <article className="stat-card">
+          <span className="stat-card__icon stat-card__icon--blue"><Users size={18} aria-hidden="true" /></span>
+          <span className="stat-card__label">{t("dashboard.activeMembers")}</span>
+          <strong className="stat-card__value">{data.activeMembers}</strong>
+        </article>
+        <article className="stat-card">
+          <span className="stat-card__icon stat-card__icon--amber"><AlertTriangle size={18} aria-hidden="true" /></span>
+          <span className="stat-card__label">{t("dashboard.openIncidents")}</span>
+          <strong className="stat-card__value">{data.openIncidents}</strong>
+          <Link className="stat-card__link" to={`/communities/${communityId}/incidents`}>
+            {t("dashboard.viewIncidents")}
+          </Link>
+        </article>
+        {finance ? (
+          <article className="stat-card">
+            <span className="stat-card__icon stat-card__icon--teal"><Wallet size={18} aria-hidden="true" /></span>
+            <span className="stat-card__label">
+              {isCommunityFinance ? t("dashboard.pendingCharges") : t("dashboard.myPendingCharges")}
+            </span>
+            <strong className="stat-card__value stat-card__value--small">
+              {formatMoney(finance.pendingCharges, language, finance.currency)}
+            </strong>
+            <Link className="stat-card__link" to={`/communities/${communityId}/finance`}>
+              {t("dashboard.viewFinance")}
+            </Link>
+          </article>
+        ) : null}
+        {finance && isCommunityFinance ? (
+          <article className="stat-card">
+            <span className="stat-card__icon stat-card__icon--indigo"><TrendingUp size={18} aria-hidden="true" /></span>
+            <span className="stat-card__label">{t("dashboard.balance")}</span>
+            <strong className="stat-card__value stat-card__value--small">
+              {formatMoney(finance.balance, language, finance.currency)}
+            </strong>
+          </article>
+        ) : null}
+      </div>
 
       {data.canViewReports ? (
         <section className="dashboard-section">
@@ -183,50 +245,7 @@ export function DashboardPage() {
         />
       ) : null}
 
-      <section className="stat-grid">
-        <article className="stat-card">
-          <span className="stat-card__label">{t("dashboard.activeMembers")}</span>
-          <strong className="stat-card__value">{data.activeMembers}</strong>
-        </article>
-        <article className="stat-card">
-          <span className="stat-card__label">{t("dashboard.openIncidents")}</span>
-          <strong className="stat-card__value">{data.openIncidents}</strong>
-          <Link className="stat-card__link" to={`/communities/${communityId}/incidents`}>
-            {t("dashboard.viewIncidents")}
-          </Link>
-        </article>
-        {finance ? (
-          <article className="stat-card">
-            <span className="stat-card__label">
-              {isCommunityFinance ? t("dashboard.pendingCharges") : t("dashboard.myPendingCharges")}
-            </span>
-            <strong className="stat-card__value stat-card__value--small">
-              {formatMoney(finance.pendingCharges, language, finance.currency)}
-            </strong>
-            <Link className="stat-card__link" to={`/communities/${communityId}/finance`}>
-              {t("dashboard.viewFinance")}
-            </Link>
-          </article>
-        ) : null}
-        {finance && isCommunityFinance ? (
-          <article className="stat-card">
-            <span className="stat-card__label">{t("dashboard.balance")}</span>
-            <strong className="stat-card__value stat-card__value--small">
-              {formatMoney(finance.balance, language, finance.currency)}
-            </strong>
-          </article>
-        ) : null}
-        <article className="stat-card">
-          <span className="stat-card__label">{t("dashboard.yourRoles")}</span>
-          <div className="chips">
-            {data.roles.map((role) => (
-              <span className="badge" key={role}>
-                {t(roleLabel(role), { defaultValue: role })}
-              </span>
-            ))}
-          </div>
-        </article>
-      </section>
+      
 
       {finance ? (
         <section className="dashboard-section">
@@ -238,21 +257,21 @@ export function DashboardPage() {
             {isCommunityFinance ? (
               <>
                 <article className="metric-card metric-card--income">
-                  <span>{t("dashboard.income")}</span>
+                  <span><ArrowUpCircle size={14} aria-hidden="true" /> {t("dashboard.income")}</span>
                   <strong>{formatMoney(finance.income, language, finance.currency)}</strong>
                 </article>
                 <article className="metric-card metric-card--expense">
-                  <span>{t("dashboard.expense")}</span>
+                  <span><ArrowDownCircle size={14} aria-hidden="true" /> {t("dashboard.expense")}</span>
                   <strong>{formatMoney(finance.expense, language, finance.currency)}</strong>
                 </article>
                 <article className="metric-card">
-                  <span>{t("dashboard.pendingInvoices")}</span>
+                  <span><Receipt size={14} aria-hidden="true" /> {t("dashboard.pendingInvoices")}</span>
                   <strong>{formatMoney(finance.invoicesPending, language, finance.currency)}</strong>
                 </article>
               </>
             ) : (
               <article className="metric-card metric-card--expense">
-                <span>{t("dashboard.myPendingCharges")}</span>
+                <span><Wallet size={14} aria-hidden="true" /> {t("dashboard.myPendingCharges")}</span>
                 <strong>{formatMoney(finance.pendingCharges, language, finance.currency)}</strong>
               </article>
             )}
@@ -271,7 +290,7 @@ export function DashboardPage() {
               </div>
               <div className="dashboard-metrics">
                 <article className="metric-card metric-card--income">
-                  <span>{t("dashboard.income")}</span>
+                  <span><ArrowUpCircle size={14} aria-hidden="true" /> {t("dashboard.income")}</span>
                   <strong>{formatMoney(data.comparison.currentIncome, language, finance.currency)}</strong>
                   <small>
                     {t("dashboard.previousValue", {
@@ -290,7 +309,7 @@ export function DashboardPage() {
                   ) : null}
                 </article>
                 <article className="metric-card metric-card--expense">
-                  <span>{t("dashboard.expense")}</span>
+                  <span><ArrowDownCircle size={14} aria-hidden="true" /> {t("dashboard.expense")}</span>
                   <strong>{formatMoney(data.comparison.currentExpense, language, finance.currency)}</strong>
                   <small>
                     {t("dashboard.previousValue", {
@@ -313,7 +332,7 @@ export function DashboardPage() {
           ) : null}
 
           {isCommunityFinance && data.monthlyFinance.length > 0 ? (
-            <div className="evolution-card">
+            <div className="evolution-card" tabIndex={0} aria-label={t("dashboard.monthlyEvolution")}>
               <div className="section-heading">
                 <h2>{t("dashboard.monthlyEvolution")}</h2>
                 <div className="evolution-legend">
@@ -398,6 +417,7 @@ export function DashboardPage() {
       <section className="module-grid">
         {modules.map((module) => (
           <Link className="module-card module-card--link" to={module.to} key={module.title}>
+            <span className="module-card__icon">{module.icon}</span>
             <h2>{module.title}</h2>
             <p>{module.text}</p>
           </Link>
