@@ -179,6 +179,29 @@ const lostItems = [
     createdAt: incidentCreated,
     updatedAt: incidentCreated,
     version: 0,
+    notes: [
+      {
+        id: "demo-lost-note-1",
+        itemId: "demo-lost-1",
+        body: "Lo he visto en la conserjería. Preguntad por Juan.",
+        authorUserId: "demo-admin",
+        authorName: "Administradora Demo",
+        createdAt: incidentCreated,
+      },
+    ],
+    attachments: [
+      {
+        id: "demo-lost-attachment-1",
+        itemId: "demo-lost-1",
+        fileName: "cartel-llavero.pdf",
+        contentType: "application/pdf",
+        sizeBytes: 84210,
+        uploadedByUserId: "demo-admin",
+        uploadedByName: "Administradora Demo",
+        downloadUrl: "/communities/demo-community/lost-items/demo-lost-1/attachments/demo-lost-attachment-1",
+        createdAt: incidentCreated,
+      },
+    ],
   },
   {
     id: "demo-lost-2",
@@ -194,6 +217,17 @@ const lostItems = [
     createdAt: incidentCreated,
     updatedAt: incidentCreated,
     version: 0,
+    notes: [
+      {
+        id: "demo-lost-note-2",
+        itemId: "demo-lost-2",
+        body: "La tengo guardada en casa. Escribidme si es vuestra.",
+        authorUserId: "demo-owner",
+        authorName: "Propietario Demo",
+        createdAt: incidentCreated,
+      },
+    ],
+    attachments: [],
   },
   {
     id: "demo-lost-3",
@@ -209,6 +243,8 @@ const lostItems = [
     createdAt: incidentCreated,
     updatedAt: incidentCreated,
     version: 0,
+    notes: [],
+    attachments: [],
   },
 ];
 

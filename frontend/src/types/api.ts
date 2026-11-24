@@ -756,6 +756,29 @@ export interface LostItem {
   createdAt: string;
   updatedAt: string;
   version: number;
+  notes?: LostItemNote[];
+  attachments?: LostItemAttachment[];
+}
+
+export interface LostItemNote {
+  id: string;
+  itemId: string;
+  body: string;
+  authorUserId?: string | null;
+  authorName?: string | null;
+  createdAt: string;
+}
+
+export interface LostItemAttachment {
+  id: string;
+  itemId: string;
+  fileName: string;
+  contentType: string;
+  sizeBytes: number;
+  uploadedByUserId?: string | null;
+  uploadedByName?: string | null;
+  downloadUrl: string;
+  createdAt: string;
 }
 
 export type BoardNoteColor = "YELLOW" | "PINK" | "BLUE" | "GREEN" | "ORANGE";

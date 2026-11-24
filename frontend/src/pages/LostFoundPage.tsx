@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { ImagePlus, PackageSearch, Plus } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ImagePlus,
+  MessageSquareText,
+  PackageSearch,
+  Paperclip,
+  Plus,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Alert } from "../components/Alert";
@@ -11,17 +21,22 @@ import { Select } from "../components/Select";
 import { Textarea } from "../components/Textarea";
 import { useAuthStore } from "../features/auth/authStore";
 import { useCommunityStore } from "../features/communities/communityStore";
+import { downloadDocument, formatFileSize } from "../features/documents/utils";
 import {
+  useAddLostItemNote,
   useCreateLostItem,
   useDeleteLostItem,
+  useDeleteLostItemAttachment,
+  useDeleteLostItemNote,
   useLostItems,
   useUpdateLostItem,
+  useUploadLostItemAttachment,
   useUploadLostItemPhoto,
 } from "../features/lostfound/queries";
-import { downloadFile } from "../services/apiClient";
 import { canManageLostFound, isReadOnly } from "../features/mvp/utils";
-import type { LostItem, LostItemStatus, LostItemType } from "../types/api";
-import { formatDate } from "../utils/format";
+import { downloadFile } from "../services/apiClient";
+import type { LostItem, LostItemAttachment, LostItemNote, LostItemStatus, LostItemType } from "../types/api";
+import { formatDate, formatDateTime } from "../utils/format";
 import { normalizeLanguage } from "../utils/language";
 
 type Filter = "ALL" | LostItemType;
@@ -65,21 +80,286 @@ function LostItemPhoto({ photoUrl }: { photoUrl?: string | null }) {
   );
 }
 
-export function LostFoundPage() {
+interface LostItemCardProps {
+  item: LostItem;
+  currentUserId?: string;
+  readOnly: boolean;
+  canManage: boolean;
+  photoPending: boolean;
+  notePending: boolean;
+  attachmentPending: boolean;
+  onSetStatus: (item: LostItem, status: LostItemStatus) => void;
+  onDeleteItem: (item: LostItem) => void;
+  onUploadPhoto: (item: LostItem, file: File) => void;
+  onAddNote: (item: LostItem, body: string) => Promise<void>;
+  onDeleteNote: (item: LostItem, note: LostItemNote) => void;
+  onUploadAttachment: (item: LostItem, file: File) => Promise<void>;
+  onDeleteAttachment: (item: LostItem, attachment: LostItemAttachment) => void;
+}
+
+function LostItemCard({
+  item,
+  currentUserId,
+  readOnly,
+  canManage,
+  photoPending,
+  notePending,
+  attachmentPending,
+  onSetStatus,
+  onDeleteItem,
+  onUploadPhoto,
+  onAddNote,
+  onDeleteNote,
+  onUploadAttachment,
+  onDeleteAttachment,
+}: LostItemCardProps) {
   const { t, i18n } = useTranslation();
+  const language = normalizeLanguage(i18n.language);
+  const [open, setOpen] = useState(false);
+  const [noteDraft, setNoteDraft] = useState("");
+  const notes = item.notes ?? [];
+  const attachments = item.attachments ?? [];
+  const canEdit = !readOnly && (canManage || item.createdByUserId === currentUserId);
+  const canDeleteNote = (note: LostItemNote) =>
+    !readOnly && (canManage || note.authorUserId === currentUserId);
+  const canDeleteAttachment = (attachment: LostItemAttachment) =>
+    !readOnly && (canManage || attachment.uploadedByUserId === currentUserId);
+
+  async function submitNote() {
+    const body = noteDraft.trim();
+    if (!body) {
+      return;
+    }
+    try {
+      await onAddNote(item, body);
+      setNoteDraft("");
+    } catch {
+      // el error se muestra en el aviso global
+    }
+  }
+
+  async function uploadAttachment(file: File) {
+    try {
+      await onUploadAttachment(item, file);
+    } catch {
+      // el error se muestra en el aviso global
+    }
+  }
+
+  async function download(attachment: LostItemAttachment) {
+    try {
+      await downloadDocument(attachment.downloadUrl, attachment.fileName);
+    } catch {
+      // el error se muestra en el aviso global
+    }
+  }
+
+  return (
+    <article className={`lost-card lost-card--${item.type.toLowerCase()}`}>
+      <LostItemPhoto photoUrl={item.photoUrl} />
+      <header className="lost-card__head">
+        <span className={`lost-card__type lost-card__type--${item.type.toLowerCase()}`}>
+          {t(`lostFound.types.${item.type}`)}
+        </span>
+        <span className="badge badge--muted">{t(`lostFound.statuses.${item.status}`)}</span>
+      </header>
+      <h2>{item.title}</h2>
+      {item.description ? <p>{item.description}</p> : null}
+      <dl className="lost-card__meta">
+        {item.location ? (
+          <div><dt>{t("lostFound.location")}</dt><dd>{item.location}</dd></div>
+        ) : null}
+        {item.eventDate ? (
+          <div><dt>{t("lostFound.eventDate")}</dt><dd>{formatDate(new Date(`${item.eventDate}T00:00:00`), language)}</dd></div>
+        ) : null}
+        {item.contact ? (
+          <div><dt>{t("lostFound.contact")}</dt><dd>{item.contact}</dd></div>
+        ) : null}
+      </dl>
+
+      <button
+        type="button"
+        className="lost-card__extras-toggle"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <span><MessageSquareText size={15} aria-hidden="true" /> {t("lostFound.notes")} ({notes.length})</span>
+        <span><Paperclip size={15} aria-hidden="true" /> {t("lostFound.attachments")} ({attachments.length})</span>
+        {open ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}
+      </button>
+
+      {open ? (
+        <div className="lost-card__extras">
+          <section className="lost-subsection">
+            <h3 className="lost-subsection__title">
+              <MessageSquareText size={15} aria-hidden="true" /> {t("lostFound.notes")}
+            </h3>
+            {notes.length ? (
+              <ul className="lost-notes">
+                {notes.map((note) => (
+                  <li className="lost-note" key={note.id}>
+                    <div className="lost-note__head">
+                      <strong>{note.authorName ?? "—"}</strong>
+                      <span>{formatDateTime(note.createdAt, language)}</span>
+                      {canDeleteNote(note) ? (
+                        <button
+                          type="button"
+                          className="lost-delete"
+                          title={t("lostFound.deleteNote")}
+                          aria-label={t("lostFound.deleteNote")}
+                          onClick={() => onDeleteNote(item, note)}
+                        >
+                          <Trash2 size={13} aria-hidden="true" />
+                        </button>
+                      ) : null}
+                    </div>
+                    <p>{note.body}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="muted">{t("lostFound.notesEmpty")}</p>
+            )}
+            {!readOnly ? (
+              <div className="lost-note-form">
+                <Textarea
+                  label={t("lostFound.notePlaceholder")}
+                  value={noteDraft}
+                  onChange={(event) => setNoteDraft(event.target.value)}
+                  rows={2}
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  loading={notePending}
+                  disabled={!noteDraft.trim()}
+                  onClick={() => void submitNote()}
+                >
+                  {t("lostFound.addNote")}
+                </Button>
+              </div>
+            ) : null}
+          </section>
+
+          <section className="lost-subsection">
+            <h3 className="lost-subsection__title">
+              <Paperclip size={15} aria-hidden="true" /> {t("lostFound.attachments")}
+            </h3>
+            {attachments.length ? (
+              <ul className="lost-attachments">
+                {attachments.map((attachment) => (
+                  <li className="lost-attachment" key={attachment.id}>
+                    <button type="button" className="lost-attachment__link" onClick={() => void download(attachment)}>
+                      <Paperclip size={14} aria-hidden="true" />
+                      <span>{attachment.fileName}</span>
+                      <small>{formatFileSize(attachment.sizeBytes, language)}</small>
+                    </button>
+                    {canDeleteAttachment(attachment) ? (
+                      <button
+                        type="button"
+                        className="lost-delete"
+                        title={t("lostFound.deleteAttachment")}
+                        aria-label={t("lostFound.deleteAttachment")}
+                        onClick={() => onDeleteAttachment(item, attachment)}
+                      >
+                        <Trash2 size={13} aria-hidden="true" />
+                      </button>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="muted">{t("lostFound.attachmentsEmpty")}</p>
+            )}
+            {!readOnly ? (
+              <div className="lost-attachment-form">
+                <label className="btn btn--ghost btn--small lost-attachment-upload" aria-busy={attachmentPending}>
+                  <Upload size={14} aria-hidden="true" /> {t("lostFound.addAttachment")}
+                  <input
+                    type="file"
+                    hidden
+                    disabled={attachmentPending}
+                    accept="image/jpeg,image/png,image/webp,application/pdf"
+                    onChange={(event) => {
+                      const input = event.currentTarget;
+                      const file = input.files?.[0];
+                      if (file) {
+                        void uploadAttachment(file);
+                      }
+                      input.value = "";
+                    }}
+                  />
+                </label>
+                <p className="field__hint">{t("lostFound.attachmentHint")}</p>
+              </div>
+            ) : null}
+          </section>
+        </div>
+      ) : null}
+
+      <footer className="lost-card__foot">
+        <small>{item.createdByName ?? "—"}</small>
+        {canEdit ? (
+          <div className="lost-card__actions">
+            {item.status === "OPEN" ? (
+              <>
+                <Button variant="secondary" onClick={() => onSetStatus(item, "RESOLVED")}>
+                  {t("lostFound.resolve")}
+                </Button>
+                <Button variant="ghost" onClick={() => onSetStatus(item, "ARCHIVED")}>
+                  {t("lostFound.archive")}
+                </Button>
+              </>
+            ) : (
+              <Button variant="secondary" onClick={() => onSetStatus(item, "OPEN")}>
+                {t("lostFound.reopen")}
+              </Button>
+            )}
+            <label className="btn btn--ghost btn--small lost-photo-upload">
+              <ImagePlus size={14} aria-hidden="true" /> {t("lostFound.changePhoto")}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                hidden
+                disabled={photoPending}
+                onChange={(event) => {
+                  const input = event.currentTarget;
+                  const file = input.files?.[0];
+                  if (file) {
+                    onUploadPhoto(item, file);
+                  }
+                  input.value = "";
+                }}
+              />
+            </label>
+            <Button variant="ghost" onClick={() => onDeleteItem(item)}>
+              {t("lostFound.delete")}
+            </Button>
+          </div>
+        ) : null}
+      </footer>
+    </article>
+  );
+}
+
+export function LostFoundPage() {
+  const { t } = useTranslation();
   const { communityId } = useParams<{ communityId: string }>();
   const user = useAuthStore((state) => state.user);
   const setSelectedCommunityId = useCommunityStore((state) => state.setSelectedCommunityId);
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
   const canManage = canManageLostFound(roles);
   const readOnly = isReadOnly(roles);
-  const language = normalizeLanguage(i18n.language);
   const [filter, setFilter] = useState<Filter>("ALL");
   const items = useLostItems(communityId, filter === "ALL" ? undefined : filter);
   const create = useCreateLostItem(communityId);
   const update = useUpdateLostItem(communityId);
   const remove = useDeleteLostItem(communityId);
   const upload = useUploadLostItemPhoto(communityId);
+  const addNote = useAddLostItemNote(communityId);
+  const deleteNote = useDeleteLostItemNote(communityId);
+  const addAttachment = useUploadLostItemAttachment(communityId);
+  const deleteAttachment = useDeleteLostItemAttachment(communityId);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [type, setType] = useState<LostItemType>("LOST");
@@ -121,10 +401,6 @@ export function LostFoundPage() {
     }
   }
 
-  function canEdit(item: LostItem): boolean {
-    return !readOnly && (canManage || item.createdByUserId === user?.id);
-  }
-
   async function setStatus(item: LostItem, status: LostItemStatus) {
     try {
       await update.mutateAsync({ itemId: item.id, status, version: item.version });
@@ -152,7 +428,8 @@ export function LostFoundPage() {
       </header>
 
       {items.isError ? <Alert variant="error">{t("lostFound.error")}</Alert> : null}
-      {create.isError || update.isError || remove.isError || upload.isError ? (
+      {create.isError || update.isError || remove.isError || upload.isError
+        || addNote.isError || deleteNote.isError || addAttachment.isError || deleteAttachment.isError ? (
         <Alert variant="error">{t("lostFound.error")}</Alert>
       ) : null}
 
@@ -206,68 +483,29 @@ export function LostFoundPage() {
       {items.data?.length ? (
         <div className="lost-grid">
           {items.data.map((item) => (
-            <article className={`lost-card lost-card--${item.type.toLowerCase()}`} key={item.id}>
-              <LostItemPhoto photoUrl={item.photoUrl} />
-              <header className="lost-card__head">
-                <span className={`lost-card__type lost-card__type--${item.type.toLowerCase()}`}>
-                  {t(`lostFound.types.${item.type}`)}
-                </span>
-                <span className="badge badge--muted">{t(`lostFound.statuses.${item.status}`)}</span>
-              </header>
-              <h2>{item.title}</h2>
-              {item.description ? <p>{item.description}</p> : null}
-              <dl className="lost-card__meta">
-                {item.location ? (
-                  <div><dt>{t("lostFound.location")}</dt><dd>{item.location}</dd></div>
-                ) : null}
-                {item.eventDate ? (
-                  <div><dt>{t("lostFound.eventDate")}</dt><dd>{formatDate(new Date(`${item.eventDate}T00:00:00`), language)}</dd></div>
-                ) : null}
-                {item.contact ? (
-                  <div><dt>{t("lostFound.contact")}</dt><dd>{item.contact}</dd></div>
-                ) : null}
-              </dl>
-              <footer className="lost-card__foot">
-                <small>{item.createdByName ?? "—"}</small>
-                {canEdit(item) ? (
-                  <div className="lost-card__actions">
-                    {item.status === "OPEN" ? (
-                      <>
-                        <Button variant="secondary" onClick={() => void setStatus(item, "RESOLVED")}>
-                          {t("lostFound.resolve")}
-                        </Button>
-                        <Button variant="ghost" onClick={() => void setStatus(item, "ARCHIVED")}>
-                          {t("lostFound.archive")}
-                        </Button>
-                      </>
-                    ) : (
-                      <Button variant="secondary" onClick={() => void setStatus(item, "OPEN")}>
-                        {t("lostFound.reopen")}
-                      </Button>
-                    )}
-                    <label className="btn btn--ghost btn--small lost-photo-upload">
-                      <ImagePlus size={14} aria-hidden="true" /> {t("lostFound.changePhoto")}
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        hidden
-                        onChange={(event) => {
-                          const input = event.currentTarget;
-                          const file = input.files?.[0];
-                          if (file) {
-                            void upload.mutateAsync({ itemId: item.id, file });
-                          }
-                          input.value = "";
-                        }}
-                      />
-                    </label>
-                    <Button variant="ghost" onClick={() => void remove.mutateAsync(item.id)}>
-                      {t("lostFound.delete")}
-                    </Button>
-                  </div>
-                ) : null}
-              </footer>
-            </article>
+            <LostItemCard
+              key={item.id}
+              item={item}
+              currentUserId={user?.id}
+              readOnly={readOnly}
+              canManage={canManage}
+              photoPending={upload.isPending && upload.variables?.itemId === item.id}
+              notePending={addNote.isPending && addNote.variables?.itemId === item.id}
+              attachmentPending={addAttachment.isPending && addAttachment.variables?.itemId === item.id}
+              onSetStatus={(target, status) => { void setStatus(target, status); }}
+              onDeleteItem={(target) => { void remove.mutateAsync(target.id); }}
+              onUploadPhoto={(target, file) => { void upload.mutateAsync({ itemId: target.id, file }); }}
+              onAddNote={(target, body) =>
+                addNote.mutateAsync({ itemId: target.id, body }).then(() => undefined)}
+              onDeleteNote={(target, note) => {
+                void deleteNote.mutateAsync({ itemId: target.id, noteId: note.id });
+              }}
+              onUploadAttachment={(target, file) =>
+                addAttachment.mutateAsync({ itemId: target.id, file }).then(() => undefined)}
+              onDeleteAttachment={(target, attachment) => {
+                void deleteAttachment.mutateAsync({ itemId: target.id, attachmentId: attachment.id });
+              }}
+            />
           ))}
         </div>
       ) : (

@@ -974,7 +974,17 @@
     },
     "photo": "Photo",
     "photoHint": "JPEG, PNG or WebP · maximum 5 MB",
-    "changePhoto": "Change photo"
+    "changePhoto": "Change photo",
+    "notes": "Notes",
+    "notesEmpty": "No notes yet.",
+    "notePlaceholder": "Write a note",
+    "addNote": "Add note",
+    "attachments": "Files",
+    "attachmentsEmpty": "No files yet.",
+    "addAttachment": "Upload file",
+    "attachmentHint": "Images or PDF, max 25 MB.",
+    "deleteNote": "Delete note",
+    "deleteAttachment": "Delete file"
   },
   "workPermits": {
     "title": "Works permits",

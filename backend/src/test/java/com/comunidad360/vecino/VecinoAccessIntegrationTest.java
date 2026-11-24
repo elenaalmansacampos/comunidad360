@@ -21,6 +21,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -31,9 +32,14 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.StreamSupport;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -61,6 +67,14 @@ class VecinoAccessIntegrationTest {
         Community community = createCommunity("Vecino Community");
         createMembership(community, admin, "COMMUNITY_ADMIN");
         String adminToken = accessToken(admin.getEmail());
+
+        MvcResult adminItem = mockMvc.perform(post("/api/v1/communities/" + community.getId() + "/lost-items")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("title", "Cartera", "type", "LOST"))))
+                .andExpect(status().isCreated())
+                .andReturn();
+        UUID adminItemId = UUID.fromString(json(adminItem).get("id").asText());
 
         MvcResult generated = mockMvc.perform(post("/api/v1/communities/" + community.getId() + "/vecino-access")
                         .header("Authorization", "Bearer " + adminToken))
@@ -109,6 +123,53 @@ class VecinoAccessIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of("body", "Hola"))))
                 .andExpect(status().isCreated());
+
+        MvcResult note = mockMvc.perform(post("/api/v1/communities/" + community.getId()
+                        + "/lost-items/" + adminItemId + "/notes")
+                        .header("Authorization", "Bearer " + vecinoToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("body", "Lo vi en el portal"))))
+                .andExpect(status().isCreated())
+                .andReturn();
+        UUID noteId = UUID.fromString(json(note).get("id").asText());
+
+        MockMultipartFile attachmentFile = new MockMultipartFile("file", "aviso.pdf",
+                "application/pdf", "%PDF-1.4\n1 0 obj\n<<>>\nendobj\n".getBytes(StandardCharsets.UTF_8));
+        MvcResult attachment = mockMvc.perform(multipart("/api/v1/communities/" + community.getId()
+                        + "/lost-items/" + adminItemId + "/attachments")
+                        .file(attachmentFile)
+                        .header("Authorization", "Bearer " + vecinoToken))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.fileName").value("aviso.pdf"))
+                .andReturn();
+        UUID attachmentId = UUID.fromString(json(attachment).get("id").asText());
+
+        MvcResult lostItems = mockMvc.perform(get("/api/v1/communities/" + community.getId() + "/lost-items")
+                        .header("Authorization", "Bearer " + vecinoToken))
+                .andExpect(status().isOk())
+                .andReturn();
+        JsonNode adminItemNode = StreamSupport.stream(json(lostItems).spliterator(), false)
+                .filter(node -> node.get("id").asText().equals(adminItemId.toString()))
+                .findFirst()
+                .orElseThrow();
+        assertEquals(1, adminItemNode.get("notes").size());
+        assertEquals("Lo vi en el portal", adminItemNode.get("notes").get(0).get("body").asText());
+        assertEquals(1, adminItemNode.get("attachments").size());
+
+        mockMvc.perform(get("/api/v1/communities/" + community.getId() + "/lost-items/" + adminItemId
+                        + "/attachments/" + attachmentId)
+                        .header("Authorization", "Bearer " + vecinoToken))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/pdf"));
+
+        mockMvc.perform(delete("/api/v1/communities/" + community.getId() + "/lost-items/" + adminItemId
+                        + "/notes/" + noteId)
+                        .header("Authorization", "Bearer " + vecinoToken))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/v1/communities/" + community.getId() + "/lost-items/" + adminItemId
+                        + "/attachments/" + attachmentId)
+                        .header("Authorization", "Bearer " + vecinoToken))
+                .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/v1/communities/" + community.getId() + "/work-permits")
                         .header("Authorization", "Bearer " + vecinoToken))

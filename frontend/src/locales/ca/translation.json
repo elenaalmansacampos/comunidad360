@@ -974,7 +974,17 @@
     },
     "photo": "Fotografia",
     "photoHint": "JPEG, PNG o WebP · màxim 5 MB",
-    "changePhoto": "Canvia la foto"
+    "changePhoto": "Canvia la foto",
+    "notes": "Notes",
+    "notesEmpty": "Encara no hi ha notes.",
+    "notePlaceholder": "Escriu una nota",
+    "addNote": "Afegeix una nota",
+    "attachments": "Fitxers",
+    "attachmentsEmpty": "Encara no hi ha fitxers.",
+    "addAttachment": "Puja un fitxer",
+    "attachmentHint": "Imatges o PDF, màxim 25 MB.",
+    "deleteNote": "Elimina la nota",
+    "deleteAttachment": "Elimina el fitxer"
   },
   "workPermits": {
     "title": "Permisos d'obra",

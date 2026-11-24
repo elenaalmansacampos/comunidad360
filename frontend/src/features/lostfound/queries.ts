@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../services/apiClient";
-import type { LostItem, LostItemStatus, LostItemType } from "../../types/api";
+import type { LostItem, LostItemAttachment, LostItemNote, LostItemStatus, LostItemType } from "../../types/api";
 
 function key(communityId: string | undefined) {
   return ["lost-items", communityId] as const;
@@ -54,6 +54,47 @@ export function useUploadLostItemPhoto(communityId: string | undefined) {
       formData.append("file", file);
       return api.post<LostItem>(`/communities/${communityId}/lost-items/${itemId}/photo`, formData);
     },
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
+  });
+}
+
+export function useAddLostItemNote(communityId: string | undefined) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, body }: { itemId: string; body: string }) =>
+      api.post<LostItemNote>(
+        `/communities/${communityId}/lost-items/${itemId}/notes`, { body }),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
+  });
+}
+
+export function useDeleteLostItemNote(communityId: string | undefined) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, noteId }: { itemId: string; noteId: string }) =>
+      api.delete<void>(`/communities/${communityId}/lost-items/${itemId}/notes/${noteId}`),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
+  });
+}
+
+export function useUploadLostItemAttachment(communityId: string | undefined) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, file }: { itemId: string; file: File }) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      return api.post<LostItemAttachment>(
+        `/communities/${communityId}/lost-items/${itemId}/attachments`, formData);
+    },
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
+  });
+}
+
+export function useDeleteLostItemAttachment(communityId: string | undefined) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, attachmentId }: { itemId: string; attachmentId: string }) =>
+      api.delete<void>(`/communities/${communityId}/lost-items/${itemId}/attachments/${attachmentId}`),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
   });
 }

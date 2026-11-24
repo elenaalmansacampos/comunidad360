@@ -1941,6 +1941,208 @@ h3 {
   font-size: 0.75rem;
 }
 
+.lost-card__extras-toggle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px dashed var(--color-gray-300);
+  border-radius: 10px;
+  background: var(--color-gray-50);
+  color: #475569;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lost-card__extras-toggle:hover {
+  background: #f1f5f9;
+}
+
+.lost-card__extras-toggle span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.lost-card__extras-toggle svg:last-child {
+  margin-left: auto;
+}
+
+.lost-card__extras {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid var(--color-gray-100);
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.lost-subsection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.lost-subsection__title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.lost-notes,
+.lost-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lost-note {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--color-gray-100);
+  border-radius: 9px;
+  background: #fff;
+}
+
+.lost-note__head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.lost-note__head strong {
+  color: #334155;
+  font-size: 0.75rem;
+}
+
+.lost-note__head > span {
+  margin-left: auto;
+}
+
+.lost-note p {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+}
+
+.lost-attachment {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.lost-attachment__link {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--color-gray-100);
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  font-family: inherit;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lost-attachment__link span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lost-attachment__link small {
+  margin-left: auto;
+  color: #64748b;
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.lost-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #94a3b8;
+  font: inherit;
+  cursor: pointer;
+}
+
+.lost-delete:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.lost-note-form,
+.lost-attachment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.lost-note-form .btn,
+.lost-attachment-upload {
+  align-self: flex-start;
+}
+
+[data-theme="dark"] .lost-card__extras-toggle {
+  background: #111c31;
+  border-color: #243247;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .lost-card__extras-toggle:hover {
+  background: #16233a;
+}
+
+[data-theme="dark"] .lost-card__extras {
+  background: #0b1424;
+  border-color: #1e293b;
+}
+
+[data-theme="dark"] .lost-subsection__title,
+[data-theme="dark"] .lost-note__head,
+[data-theme="dark"] .lost-attachment__link small {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .lost-note,
+[data-theme="dark"] .lost-attachment__link {
+  background: #0f172a;
+  border-color: #1e293b;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .lost-note__head strong {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .lost-card p,
+[data-theme="dark"] .lost-note p {
+  color: #cbd5e1;
+}
+
 .lost-empty {
   display: flex;
   flex-direction: column;

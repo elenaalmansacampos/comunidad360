@@ -1,6 +1,9 @@
 package com.comunidad360.lostfound;
 
+import com.comunidad360.lostfound.dto.CreateLostItemNoteRequest;
 import com.comunidad360.lostfound.dto.CreateLostItemRequest;
+import com.comunidad360.lostfound.dto.LostItemAttachmentResponse;
+import com.comunidad360.lostfound.dto.LostItemNoteResponse;
 import com.comunidad360.lostfound.dto.LostItemResponse;
 import com.comunidad360.lostfound.dto.UpdateLostItemRequest;
 import com.comunidad360.security.AuthenticatedUser;
@@ -54,7 +57,6 @@ public class LostItemController {
         return service.update(communityId, user.id(), itemId, request, httpRequest);
     }
 
-
     @PostMapping(value = "/{itemId}/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public LostItemResponse uploadPhoto(@PathVariable UUID communityId, @PathVariable UUID itemId,
                                         @AuthenticationPrincipal AuthenticatedUser user,
@@ -77,6 +79,74 @@ public class LostItemController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .contentLength(photo.content().length)
                 .body(photo.content());
+    }
+
+    @GetMapping("/{itemId}/notes")
+    public List<LostItemNoteResponse> notes(@PathVariable UUID communityId, @PathVariable UUID itemId,
+                                            @AuthenticationPrincipal AuthenticatedUser user) {
+        return service.listNotes(communityId, user.id(), itemId);
+    }
+
+    @PostMapping("/{itemId}/notes")
+    @ResponseStatus(HttpStatus.CREATED)
+    public LostItemNoteResponse addNote(@PathVariable UUID communityId, @PathVariable UUID itemId,
+                                        @AuthenticationPrincipal AuthenticatedUser user,
+                                        @Valid @RequestBody CreateLostItemNoteRequest request,
+                                        HttpServletRequest httpRequest) {
+        return service.addNote(communityId, user.id(), itemId, request, httpRequest);
+    }
+
+    @DeleteMapping("/{itemId}/notes/{noteId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteNote(@PathVariable UUID communityId, @PathVariable UUID itemId,
+                           @PathVariable UUID noteId,
+                           @AuthenticationPrincipal AuthenticatedUser user,
+                           HttpServletRequest httpRequest) {
+        service.deleteNote(communityId, user.id(), itemId, noteId, httpRequest);
+    }
+
+    @GetMapping("/{itemId}/attachments")
+    public List<LostItemAttachmentResponse> attachments(@PathVariable UUID communityId,
+                                                        @PathVariable UUID itemId,
+                                                        @AuthenticationPrincipal AuthenticatedUser user) {
+        return service.listAttachments(communityId, user.id(), itemId);
+    }
+
+    @PostMapping(value = "/{itemId}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public LostItemAttachmentResponse addAttachment(@PathVariable UUID communityId,
+                                                    @PathVariable UUID itemId,
+                                                    @AuthenticationPrincipal AuthenticatedUser user,
+                                                    @RequestPart("file") MultipartFile file,
+                                                    HttpServletRequest httpRequest) {
+        return service.addAttachment(communityId, user.id(), itemId, file, httpRequest);
+    }
+
+    @GetMapping("/{itemId}/attachments/{attachmentId}")
+    public ResponseEntity<byte[]> attachment(@PathVariable UUID communityId, @PathVariable UUID itemId,
+                                             @PathVariable UUID attachmentId,
+                                             @AuthenticationPrincipal AuthenticatedUser user) {
+        LostItemService.AttachmentFile file =
+                service.downloadAttachment(communityId, user.id(), itemId, attachmentId);
+        String fileName = file.fileName() == null ? "archivo" : file.fileName();
+        String contentType = file.contentType() == null
+                ? MediaType.APPLICATION_OCTET_STREAM_VALUE : file.contentType();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment().filename(fileName, StandardCharsets.UTF_8)
+                                .build().toString())
+                .contentType(MediaType.parseMediaType(contentType))
+                .contentLength(file.content().length)
+                .body(file.content());
+    }
+
+    @DeleteMapping("/{itemId}/attachments/{attachmentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAttachment(@PathVariable UUID communityId, @PathVariable UUID itemId,
+                                 @PathVariable UUID attachmentId,
+                                 @AuthenticationPrincipal AuthenticatedUser user,
+                                 HttpServletRequest httpRequest) {
+        service.deleteAttachment(communityId, user.id(), itemId, attachmentId, httpRequest);
     }
 
     @DeleteMapping("/{itemId}")

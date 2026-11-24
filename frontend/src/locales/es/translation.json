@@ -974,7 +974,17 @@
     },
     "photo": "Fotografía",
     "photoHint": "JPEG, PNG o WebP · máximo 5 MB",
-    "changePhoto": "Cambiar foto"
+    "changePhoto": "Cambiar foto",
+    "notes": "Notas",
+    "notesEmpty": "Todavía no hay notas.",
+    "notePlaceholder": "Escribe una nota",
+    "addNote": "Añadir nota",
+    "attachments": "Archivos",
+    "attachmentsEmpty": "Todavía no hay archivos.",
+    "addAttachment": "Subir archivo",
+    "attachmentHint": "Imágenes o PDF, máximo 25 MB.",
+    "deleteNote": "Eliminar nota",
+    "deleteAttachment": "Eliminar archivo"
   },
   "workPermits": {
     "title": "Permisos de obra",
