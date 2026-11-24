@@ -7,6 +7,7 @@ import { Button } from "../components/Button";
 import { FullPageLoader } from "../components/FullPageLoader";
 import { Select } from "../components/Select";
 import { Textarea } from "../components/Textarea";
+import { useHasDelegation } from "../features/authorizations/queries";
 import { useAuthStore } from "../features/auth/authStore";
 import { useMembers } from "../features/communities/queries";
 import {
@@ -29,6 +30,8 @@ export function IncidentDetailPage() {
   const membership = user?.memberships.find((item) => item.id === communityId);
   const canManage = canManageIncidents(membership?.roles ?? []);
   const readOnly = isReadOnly(membership?.roles ?? []);
+  const delegated = useHasDelegation(communityId, "INCIDENT");
+  const canWrite = !readOnly || delegated;
   const language = normalizeLanguage(i18n.language);
   const incident = useIncident(communityId, incidentId);
   const members = useMembers(communityId, canManage);
@@ -225,7 +228,7 @@ export function IncidentDetailPage() {
             ))}
           </div>
         )}
-        {!readOnly ? (
+        {canWrite ? (
         <form className="form-card" onSubmit={addCommentSubmit}>
           {addComment.isError ? <Alert variant="error">{t("incidents.error")}</Alert> : null}
           <Textarea
@@ -270,7 +273,7 @@ export function IncidentDetailPage() {
             ))}
           </div>
         )}
-        {!readOnly ? (
+        {canWrite ? (
         <form className="form-card" onSubmit={uploadPhoto}>
           {uploadAttachment.isError ? <Alert variant="error">{t("incidents.error")}</Alert> : null}
           <div className="field">

@@ -8,6 +8,7 @@ import { FullPageLoader } from "../components/FullPageLoader";
 import { Input } from "../components/Input";
 import { Select } from "../components/Select";
 import { Textarea } from "../components/Textarea";
+import { useHasDelegation } from "../features/authorizations/queries";
 import { useAuthStore } from "../features/auth/authStore";
 import { useCommunityStore } from "../features/communities/communityStore";
 import { useCreateIncident, useIncidents } from "../features/incidents/queries";
@@ -33,7 +34,8 @@ export function IncidentsPage() {
   const setSelectedCommunityId = useCommunityStore((state) => state.setSelectedCommunityId);
   const membership = user?.memberships.find((item) => item.id === communityId);
   const roles = membership?.roles ?? [];
-  const canCreate = roles.some((role) => CREATE_ROLES.includes(role));
+  const delegated = useHasDelegation(communityId, "INCIDENT");
+  const canCreate = delegated || roles.some((role) => CREATE_ROLES.includes(role));
   const language = normalizeLanguage(i18n.language);
   const [status, setStatus] = useState<IncidentStatus | "">("");
   const [priority, setPriority] = useState<IncidentPriority | "">("");

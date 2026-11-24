@@ -1,6 +1,8 @@
 package com.comunidad360.works;
 
 import com.comunidad360.audit.AuditService;
+import com.comunidad360.authorization.AuthorizationScope;
+import com.comunidad360.authorization.AuthorizationService;
 import com.comunidad360.common.exception.BusinessException;
 import com.comunidad360.config.AppProperties;
 import com.comunidad360.malware.MalwareScanner;
@@ -36,11 +38,13 @@ public class WorkPermitService {
     private final StorageService storageService;
     private final MalwareScanner malwareScanner;
     private final AppProperties properties;
+    private final AuthorizationService authorizationService;
 
     public WorkPermitService(WorkPermitRepository repository, TenantAccessService tenantAccessService,
                              PermissionService permissionService, AuditService auditService,
                              AppUserRepository userRepository, StorageService storageService,
-                             MalwareScanner malwareScanner, AppProperties properties) {
+                             MalwareScanner malwareScanner, AppProperties properties,
+                             AuthorizationService authorizationService) {
         this.repository = repository;
         this.tenantAccessService = tenantAccessService;
         this.permissionService = permissionService;
@@ -49,6 +53,7 @@ public class WorkPermitService {
         this.storageService = storageService;
         this.malwareScanner = malwareScanner;
         this.properties = properties;
+        this.authorizationService = authorizationService;
     }
 
     @Transactional(readOnly = true)
@@ -61,16 +66,18 @@ public class WorkPermitService {
 
     @Transactional
     public WorkPermitResponse create(UUID communityId, UUID userId, CreateWorkPermitRequest request,
-                                     HttpServletRequest httpRequest) {
+                                     UUID onBehalfOfMembershipId, HttpServletRequest httpRequest) {
         Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
-        permissionService.require(membership, "WORK_PERMIT_CREATE");
+        Membership effective = authorizationService.resolveOnBehalf(communityId, membership,
+                onBehalfOfMembershipId, AuthorizationScope.WORK_PERMIT);
+        permissionService.require(effective, "WORK_PERMIT_CREATE");
         Instant now = Instant.now();
         WorkPermit permit = repository.saveAndFlush(new WorkPermit(UUID.randomUUID(), communityId,
                 request.title().trim(), clean(request.description()), clean(request.location()),
                 request.startDate(), request.endDate(), WorkPermitStatus.REQUESTED, userId, now, now));
         WorkPermitResponse response = response(permit);
         auditService.record(communityId, userId, "USER", "WORK_PERMIT_CREATED", "WORK_PERMIT",
-                permit.getId(), null, response, httpRequest);
+                permit.getId(), null, authorizationService.auditAfter(userId, effective, response), httpRequest);
         return response;
     }
 
@@ -126,10 +133,13 @@ public class WorkPermitService {
 
     @Transactional
     public WorkPermitResponse uploadFile(UUID communityId, UUID userId, UUID permitId,
-                                         MultipartFile file, HttpServletRequest httpRequest) {
+                                         MultipartFile file, UUID onBehalfOfMembershipId,
+                                         HttpServletRequest httpRequest) {
         Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
+        Membership effective = authorizationService.resolveOnBehalf(communityId, membership,
+                onBehalfOfMembershipId, AuthorizationScope.WORK_PERMIT);
         permissionService.require(membership, "WORK_PERMIT_VIEW");
-        permissionService.require(membership, "WORK_PERMIT_CREATE");
+        permissionService.require(effective, "WORK_PERMIT_CREATE");
         WorkPermit permit = find(communityId, permitId);
         boolean manage = permissionService.hasPermission(membership, "WORK_PERMIT_MANAGE");
         if (!manage && !userId.equals(permit.getCreatedByUserId())) {
@@ -181,7 +191,7 @@ public class WorkPermitService {
         }
         WorkPermitResponse response = response(saved);
         auditService.record(communityId, userId, "USER", "WORK_PERMIT_FILE_UPLOADED", "WORK_PERMIT",
-                permitId, null, response, httpRequest);
+                permitId, null, authorizationService.auditAfter(userId, effective, response), httpRequest);
         return response;
     }
 

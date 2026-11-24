@@ -23,7 +23,8 @@
     "name": "Name",
     "themeDark": "Enable dark mode",
     "themeLight": "Enable light mode",
-    "readOnly": "Read-only mode: you can view information but cannot change it."
+    "readOnly": "Read-only mode: you can view information but cannot change it.",
+    "delegatedReadOnly": "Read-only except for actions authorized by {{name}}."
   },
   "nav": {
     "home": "Home",
@@ -47,7 +48,8 @@
     },
     "board": "Notice board",
     "lostFound": "Lost & found",
-    "workPermits": "Works permits"
+    "workPermits": "Works permits",
+    "authorizations": "Authorizations"
   },
   "auth": {
     "login": {
@@ -839,7 +841,9 @@
       "OPEN": "Open",
       "CLOSED": "Closed",
       "CANCELLED": "Cancelled"
-    }
+    },
+    "voteRegistered": "Vote recorded.",
+    "delegatedAlreadyVoted": "This neighbor has already voted in this voting."
   },
   "chat": {
     "title": "Chat",
@@ -1012,5 +1016,50 @@
       "REJECTED": "Rejected",
       "CANCELLED": "Cancelled"
     }
+  },
+  "authorizations": {
+    "title": "Authorizations",
+    "subtitle": "Authorize another neighbor to vote or act on your behalf in the allowed modules.",
+    "new": "New authorization",
+    "newHint": "The authorized neighbor can act on your behalf only in the selected scope.",
+    "grantee": "Authorized neighbor",
+    "granteePlaceholder": "Select a neighbor",
+    "scope": "Scope",
+    "scopes": {
+      "VOTE": "Vote",
+      "WORK_PERMIT": "Work permits",
+      "INCIDENT": "Incidents",
+      "BOARD": "Notice board",
+      "LOST_FOUND": "Lost & found"
+    },
+    "validFrom": "Valid from",
+    "validUntil": "Valid until",
+    "noExpiry": "No expiry",
+    "notes": "Notes",
+    "notesPlaceholder": "Reason or details of the authorization",
+    "create": "Create authorization",
+    "revoke": "Revoke",
+    "revokeConfirm": "Revoke this authorization?",
+    "tabs": {
+      "GRANTED": "Granted",
+      "RECEIVED": "Received",
+      "ALL": "All"
+    },
+    "status": {
+      "EFFECTIVE": "Active",
+      "EXPIRED": "Expired",
+      "ACTIVE": "Active",
+      "REVOKED": "Revoked"
+    },
+    "empty": "No authorizations.",
+    "error": "The operation could not be completed.",
+    "actingAs": "Act on behalf of",
+    "asSelf": "Myself",
+    "stopActing": "Stop acting on behalf of another",
+    "sharedWarning": "The VECINO account is shared. For individual delegations, use your own account.",
+    "voteRequiresIndividual": "To delegate a vote you need an individual account with voting rights.",
+    "selectDelegation": "Select a vote authorization in “Act on behalf of” to vote for another neighbor.",
+    "scopeHint": "Only scopes you can perform yourself are shown.",
+    "chooseHint": "Select an authorization to act on behalf of another neighbor."
   }
 }

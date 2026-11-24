@@ -15,6 +15,7 @@ import {
   MessageCircle,
   PackageSearch,
   StickyNote,
+  UserCheck,
   Users,
   Vote,
   Wallet,
@@ -26,6 +27,8 @@ import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { NotificationBell } from "../components/NotificationBell";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { useAuthStore } from "../features/auth/authStore";
+import { useReceivedAuthorizations } from "../features/authorizations/queries";
+import { useDelegationStore } from "../features/authorizations/delegationStore";
 import { useCommunities } from "../features/communities/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
 import { canViewProviders, isReadOnly } from "../features/mvp/utils";
@@ -70,6 +73,30 @@ export function AppLayout() {
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
   const roleLabel = roles[0] ? t(`roles.${roles[0]}`, { defaultValue: roles[0] }) : "";
   const readOnly = isReadOnly(roles);
+  const receivedAuthorizations = useReceivedAuthorizations(communityId);
+  const activeDelegation = useDelegationStore((state) => state.active);
+  const setActiveDelegation = useDelegationStore((state) => state.setActive);
+  const clearDelegation = useDelegationStore((state) => state.clear);
+  const delegationOptions = (receivedAuthorizations.data ?? []).filter(
+    (authorization) => authorization.effective && authorization.status === "ACTIVE",
+  );
+  const activeDelegationKey = activeDelegation
+    ? `${activeDelegation.scope}:${activeDelegation.membershipId}`
+    : "";
+
+  useEffect(() => {
+    if (activeDelegation && activeDelegation.communityId !== communityId) {
+      clearDelegation();
+    }
+  }, [activeDelegation, clearDelegation, communityId]);
+
+  useEffect(() => {
+    if (activeDelegation && !delegationOptions.some((authorization) =>
+      authorization.scope === activeDelegation.scope
+      && authorization.grantorMembershipId === activeDelegation.membershipId)) {
+      clearDelegation();
+    }
+  }, [activeDelegation, clearDelegation, delegationOptions]);
 
   useEffect(() => {
     if (communityId) {
@@ -162,6 +189,7 @@ export function AppLayout() {
             ) : null}
             <NavItem to={`/communities/${communityId}/votings`} icon={<Vote size={18} />} label={t("nav.votings")} />
             <NavItem to={`/communities/${communityId}/members`} icon={<Users size={18} />} label={t("nav.members")} />
+            <NavItem to={`/communities/${communityId}/authorizations`} icon={<UserCheck size={18} />} label={t("nav.authorizations")} />
           </nav>
           {user ? (
             <div className="sidebar__footer">
@@ -186,9 +214,56 @@ export function AppLayout() {
         </aside>
 
         <main className="app-content">
+          {delegationOptions.length ? (
+            <div className="acting-bar" role="status">
+              <UserCheck size={16} aria-hidden="true" />
+              <label htmlFor="acting-as">{t("authorizations.actingAs")}</label>
+              <select
+                id="acting-as"
+                value={activeDelegationKey}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (!value) {
+                    clearDelegation();
+                    return;
+                  }
+                  const authorization = delegationOptions.find((item) =>
+                    `${item.scope}:${item.grantorMembershipId}` === value);
+                  if (authorization) {
+                    setActiveDelegation({
+                      communityId: communityId!,
+                      membershipId: authorization.grantorMembershipId,
+                      scope: authorization.scope,
+                      name: authorization.grantorName ?? "",
+                    });
+                  }
+                }}
+              >
+                <option value="">{t("authorizations.asSelf")}</option>
+                {delegationOptions.map((authorization) => (
+                  <option
+                    key={`${authorization.scope}:${authorization.grantorMembershipId}`}
+                    value={`${authorization.scope}:${authorization.grantorMembershipId}`}
+                  >
+                    {authorization.grantorName ?? "—"} · {t(`authorizations.scopes.${authorization.scope}`)}
+                  </option>
+                ))}
+              </select>
+              {activeDelegation ? (
+                <button type="button" className="text-link text-link--button" onClick={clearDelegation}>
+                  {t("authorizations.stopActing")}
+                </button>
+              ) : (
+                <span className="acting-bar__hint">{t("authorizations.chooseHint")}</span>
+              )}
+            </div>
+          ) : null}
           {readOnly ? (
             <div className="readonly-banner" role="status">
-              <Eye size={16} aria-hidden="true" /> {t("common.readOnly")}
+              <Eye size={16} aria-hidden="true" />{" "}
+              {activeDelegation
+                ? t("common.delegatedReadOnly", { name: activeDelegation.name })
+                : t("common.readOnly")}
             </div>
           ) : null}
           <Outlet />
@@ -223,6 +298,7 @@ export function AppLayout() {
               ) : null}
               <NavLink to={`/communities/${communityId}/votings`}>{t("nav.votings")}</NavLink>
               <NavLink to={`/communities/${communityId}/members`}>{t("nav.members")}</NavLink>
+              <NavLink to={`/communities/${communityId}/authorizations`}>{t("nav.authorizations")}</NavLink>
               <NavLink to={`/communities/${communityId}/notification-preferences`}>
                 {t("notifications.preferences")}
               </NavLink>

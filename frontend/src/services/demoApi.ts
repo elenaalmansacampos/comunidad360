@@ -334,6 +334,7 @@ export async function demoRequest<T>(path: string, method = "GET"): Promise<T> {
   if (clean === "/me/notification-preferences") return json(notificationPreferences as T);
   if (clean.endsWith("/dashboard")) return json(dashboard as T);
   if (clean.endsWith("/members")) return json(members as T);
+  if (clean.endsWith("/authorizations")) return json([] as T);
   if (clean.endsWith("/structure/summary")) {
     return json({ coefficientSum: "100.000000", tolerance: "0.010000", valid: true, totalUnits: 24, activeUnits: 24, buildings: 2, commonElements: 4 } as T);
   }

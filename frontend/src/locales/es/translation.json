@@ -23,7 +23,8 @@
     "name": "Nombre",
     "themeDark": "Activar modo oscuro",
     "themeLight": "Activar modo claro",
-    "readOnly": "Modo solo lectura: puedes consultar la información, pero no modificarla."
+    "readOnly": "Modo solo lectura: puedes consultar la información, pero no modificarla.",
+    "delegatedReadOnly": "Solo lectura salvo las acciones autorizadas por {{name}}."
   },
   "nav": {
     "home": "Inicio",
@@ -47,7 +48,8 @@
     },
     "board": "Tablón",
     "lostFound": "Objetos perdidos",
-    "workPermits": "Permisos de obra"
+    "workPermits": "Permisos de obra",
+    "authorizations": "Autorizaciones"
   },
   "auth": {
     "login": {
@@ -839,7 +841,9 @@
       "OPEN": "Abierta",
       "CLOSED": "Cerrada",
       "CANCELLED": "Cancelada"
-    }
+    },
+    "voteRegistered": "Voto registrado.",
+    "delegatedAlreadyVoted": "Este vecino ya ha votado en esta votación."
   },
   "chat": {
     "title": "Chat",
@@ -1012,5 +1016,50 @@
       "REJECTED": "Rechazado",
       "CANCELLED": "Cancelado"
     }
+  },
+  "authorizations": {
+    "title": "Autorizaciones",
+    "subtitle": "Autoriza a otro vecino para votar o actuar en tu nombre en los módulos permitidos.",
+    "new": "Nueva autorización",
+    "newHint": "El vecino autorizado podrá actuar en tu nombre solo en el ámbito seleccionado.",
+    "grantee": "Vecino autorizado",
+    "granteePlaceholder": "Selecciona un vecino",
+    "scope": "Ámbito",
+    "scopes": {
+      "VOTE": "Voto",
+      "WORK_PERMIT": "Permisos de obra",
+      "INCIDENT": "Incidencias",
+      "BOARD": "Tablón",
+      "LOST_FOUND": "Objetos perdidos"
+    },
+    "validFrom": "Válida desde",
+    "validUntil": "Válida hasta",
+    "noExpiry": "Sin caducidad",
+    "notes": "Notas",
+    "notesPlaceholder": "Motivo o detalle de la autorización",
+    "create": "Crear autorización",
+    "revoke": "Revocar",
+    "revokeConfirm": "¿Revocar esta autorización?",
+    "tabs": {
+      "GRANTED": "Concedidas",
+      "RECEIVED": "Recibidas",
+      "ALL": "Todas"
+    },
+    "status": {
+      "EFFECTIVE": "Activa",
+      "EXPIRED": "Caducada",
+      "ACTIVE": "Activa",
+      "REVOKED": "Revocada"
+    },
+    "empty": "No hay autorizaciones.",
+    "error": "No se ha podido completar la operación.",
+    "actingAs": "Actuar en nombre de",
+    "asSelf": "Yo mismo",
+    "stopActing": "Dejar de actuar en nombre de otro",
+    "sharedWarning": "La cuenta VECINO es compartida. Para delegaciones individuales, usa una cuenta propia.",
+    "voteRequiresIndividual": "Para delegar un voto necesitas una cuenta individual con derecho a voto.",
+    "selectDelegation": "Selecciona una autorización de voto en «Actuar en nombre de» para votar por otro vecino.",
+    "scopeHint": "Solo aparecen los ámbitos que tú mismo puedes realizar.",
+    "chooseHint": "Selecciona una autorización para actuar en nombre de otro vecino."
   }
 }

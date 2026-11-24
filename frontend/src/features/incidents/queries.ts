@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { actingQuery } from "../authorizations/delegationStore";
 import { api } from "../../services/apiClient";
 import type {
   Incident,
@@ -58,7 +59,7 @@ export function useCreateIncident(communityId: string | undefined) {
       category: string;
       priority: IncidentPriority;
       unitId?: string;
-    }) => api.post<Incident>(`/communities/${communityId}/incidents`, payload),
+    }) => api.post<Incident>(`/communities/${communityId}/incidents${actingQuery(communityId, "INCIDENT")}`, payload),
     onSuccess: () => invalidateIncident(queryClient, communityId),
   });
 }
@@ -79,7 +80,7 @@ export function useAddIncidentComment(communityId: string | undefined, incidentI
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: { body: string; internal?: boolean }) =>
-      api.post<IncidentComment>(`/communities/${communityId}/incidents/${incidentId}/comments`, payload),
+      api.post<IncidentComment>(`/communities/${communityId}/incidents/${incidentId}/comments${actingQuery(communityId, "INCIDENT")}`, payload),
     onSuccess: () => invalidateIncident(queryClient, communityId, incidentId),
   });
 }
@@ -90,7 +91,7 @@ export function useUploadIncidentAttachment(communityId: string | undefined,
   return useMutation({
     mutationFn: (formData: FormData) =>
       api.post<IncidentAttachment>(
-        `/communities/${communityId}/incidents/${incidentId}/attachments`,
+        `/communities/${communityId}/incidents/${incidentId}/attachments${actingQuery(communityId, "INCIDENT")}`,
         formData,
       ),
     onSuccess: () => invalidateIncident(queryClient, communityId, incidentId),

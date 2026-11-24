@@ -40,8 +40,9 @@ public class WorkPermitController {
     public WorkPermitResponse create(@PathVariable UUID communityId,
                                      @AuthenticationPrincipal AuthenticatedUser user,
                                      @Valid @RequestBody CreateWorkPermitRequest request,
+                                     @RequestParam(required = false) UUID onBehalfOfMembershipId,
                                      HttpServletRequest httpRequest) {
-        return service.create(communityId, user.id(), request, httpRequest);
+        return service.create(communityId, user.id(), request, onBehalfOfMembershipId, httpRequest);
     }
 
     @PatchMapping("/{permitId}")
@@ -56,8 +57,9 @@ public class WorkPermitController {
     public WorkPermitResponse uploadFile(@PathVariable UUID communityId, @PathVariable UUID permitId,
                                          @AuthenticationPrincipal AuthenticatedUser user,
                                          @RequestPart("file") MultipartFile file,
+                                         @RequestParam(required = false) UUID onBehalfOfMembershipId,
                                          HttpServletRequest httpRequest) {
-        return service.uploadFile(communityId, user.id(), permitId, file, httpRequest);
+        return service.uploadFile(communityId, user.id(), permitId, file, onBehalfOfMembershipId, httpRequest);
     }
 
     @GetMapping("/{permitId}/file")

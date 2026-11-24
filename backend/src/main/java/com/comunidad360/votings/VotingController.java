@@ -57,8 +57,10 @@ public class VotingController {
     public VotingDetailResponse vote(@PathVariable UUID communityId, @PathVariable UUID votingId,
                                      @AuthenticationPrincipal AuthenticatedUser user,
                                      @Valid @RequestBody CastVoteRequest request,
+                                     @RequestParam(required = false) UUID onBehalfOfMembershipId,
                                      HttpServletRequest httpRequest) {
-        return votingService.castVote(communityId, user.id(), votingId, request, httpRequest);
+        return votingService.castVote(communityId, user.id(), votingId, request,
+                onBehalfOfMembershipId, httpRequest);
     }
 
     @GetMapping("/{votingId}/results")

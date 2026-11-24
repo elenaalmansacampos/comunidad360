@@ -8,6 +8,7 @@ import { Button } from "../components/Button";
 import { FullPageLoader } from "../components/FullPageLoader";
 import { Input } from "../components/Input";
 import { Textarea } from "../components/Textarea";
+import { useHasDelegation } from "../features/authorizations/queries";
 import { useAuthStore } from "../features/auth/authStore";
 import {
   useAddBoardNoteComment,
@@ -109,6 +110,8 @@ export function BoardPage() {
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
   const canManage = canManageBoard(roles);
   const readOnly = isReadOnly(roles);
+  const delegated = useHasDelegation(communityId, "BOARD");
+  const canWrite = !readOnly || delegated;
   const language = normalizeLanguage(i18n.language);
   const notes = useBoardNotes(communityId);
   const create = useCreateBoardNote(communityId);
@@ -174,7 +177,7 @@ export function BoardPage() {
       {notes.isError ? <Alert variant="error">{t("board.error")}</Alert> : null}
       {failed ? <Alert variant="error">{t("board.error")}</Alert> : null}
 
-      {!readOnly ? (
+      {canWrite ? (
       <form className="board-composer" onSubmit={submit}>
         <div className="board-composer__head">
           <strong>{editingId ? t("board.editNote") : t("board.newNote")}</strong>
@@ -208,7 +211,7 @@ export function BoardPage() {
         <div className="board-canvas">
           {notes.data?.length ? (
             notes.data.map((note) => {
-              const canEdit = !readOnly && (canManage || note.createdByUserId === user?.id);
+              const canEdit = canWrite && (canManage || note.createdByUserId === user?.id);
               return (
                 <article
                   key={note.id}
@@ -236,7 +239,7 @@ export function BoardPage() {
                     <PostitComments
                       communityId={communityId ?? ""}
                       noteId={note.id}
-                      readOnly={readOnly}
+                      readOnly={!canWrite}
                     />
                   ) : null}
                   {canEdit ? (

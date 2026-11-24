@@ -56,9 +56,10 @@ public class IncidentController {
     public ResponseEntity<IncidentResponse> create(@PathVariable UUID communityId,
                                                    @AuthenticationPrincipal AuthenticatedUser user,
                                                    @Valid @RequestBody CreateIncidentRequest request,
+                                                   @RequestParam(required = false) UUID onBehalfOfMembershipId,
                                                    HttpServletRequest httpRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(incidentService.create(communityId, user.id(), request, httpRequest));
+                .body(incidentService.create(communityId, user.id(), request, onBehalfOfMembershipId, httpRequest));
     }
 
     @GetMapping("/{incidentId}")
@@ -82,9 +83,11 @@ public class IncidentController {
                                                            @PathVariable UUID incidentId,
                                                            @AuthenticationPrincipal AuthenticatedUser user,
                                                            @Valid @RequestBody IncidentCommentRequest request,
+                                                           @RequestParam(required = false) UUID onBehalfOfMembershipId,
                                                            HttpServletRequest httpRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(incidentService.addComment(communityId, user.id(), incidentId, request, httpRequest));
+                .body(incidentService.addComment(communityId, user.id(), incidentId, request,
+                        onBehalfOfMembershipId, httpRequest));
     }
 
     @PostMapping("/{incidentId}/attachments")
@@ -93,9 +96,11 @@ public class IncidentController {
             @PathVariable UUID incidentId,
             @AuthenticationPrincipal AuthenticatedUser user,
             @RequestPart("file") MultipartFile file,
+            @RequestParam(required = false) UUID onBehalfOfMembershipId,
             HttpServletRequest httpRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(incidentService.uploadAttachment(communityId, user.id(), incidentId, file, httpRequest));
+                .body(incidentService.uploadAttachment(communityId, user.id(), incidentId, file,
+                        onBehalfOfMembershipId, httpRequest));
     }
 
     @GetMapping("/{incidentId}/attachments/{attachmentId}")

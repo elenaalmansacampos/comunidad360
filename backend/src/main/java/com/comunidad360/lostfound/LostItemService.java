@@ -1,6 +1,8 @@
 package com.comunidad360.lostfound;
 
 import com.comunidad360.audit.AuditService;
+import com.comunidad360.authorization.AuthorizationScope;
+import com.comunidad360.authorization.AuthorizationService;
 import com.comunidad360.common.exception.BusinessException;
 import com.comunidad360.config.AppProperties;
 import com.comunidad360.lostfound.dto.CreateLostItemNoteRequest;
@@ -45,13 +47,14 @@ public class LostItemService {
     private final StorageService storageService;
     private final MalwareScanner malwareScanner;
     private final AppProperties properties;
+    private final AuthorizationService authorizationService;
 
     public LostItemService(LostItemRepository repository, LostItemNoteRepository noteRepository,
                            LostItemAttachmentRepository attachmentRepository,
                            TenantAccessService tenantAccessService, PermissionService permissionService,
                            AuditService auditService, AppUserRepository userRepository,
                            StorageService storageService, MalwareScanner malwareScanner,
-                           AppProperties properties) {
+                           AppProperties properties, AuthorizationService authorizationService) {
         this.repository = repository;
         this.noteRepository = noteRepository;
         this.attachmentRepository = attachmentRepository;
@@ -62,6 +65,7 @@ public class LostItemService {
         this.storageService = storageService;
         this.malwareScanner = malwareScanner;
         this.properties = properties;
+        this.authorizationService = authorizationService;
     }
 
     @Transactional(readOnly = true)
@@ -90,16 +94,18 @@ public class LostItemService {
 
     @Transactional
     public LostItemResponse create(UUID communityId, UUID userId, CreateLostItemRequest request,
-                                   HttpServletRequest httpRequest) {
+                                   UUID onBehalfOfMembershipId, HttpServletRequest httpRequest) {
         Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
-        permissionService.require(membership, "LOST_ITEM_CREATE");
+        Membership effective = authorizationService.resolveOnBehalf(communityId, membership,
+                onBehalfOfMembershipId, AuthorizationScope.LOST_FOUND);
+        permissionService.require(effective, "LOST_ITEM_CREATE");
         Instant now = Instant.now();
         LostItem item = repository.saveAndFlush(new LostItem(UUID.randomUUID(), communityId,
                 request.title().trim(), clean(request.description()), request.type(), clean(request.location()),
                 request.eventDate(), clean(request.contact()), LostItemStatus.OPEN, userId, now, now));
         LostItemResponse response = toResponse(item);
         auditService.record(communityId, userId, "USER", "LOST_ITEM_CREATED", "LOST_ITEM",
-                item.getId(), null, response, httpRequest);
+                item.getId(), null, authorizationService.auditAfter(userId, effective, response), httpRequest);
         return response;
     }
 
@@ -157,10 +163,13 @@ public class LostItemService {
 
     @Transactional
     public LostItemResponse uploadPhoto(UUID communityId, UUID userId, UUID itemId, MultipartFile file,
+                                        UUID onBehalfOfMembershipId,
                                         HttpServletRequest httpRequest) {
         Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
+        Membership effective = authorizationService.resolveOnBehalf(communityId, membership,
+                onBehalfOfMembershipId, AuthorizationScope.LOST_FOUND);
         permissionService.require(membership, "LOST_ITEM_VIEW");
-        permissionService.require(membership, "LOST_ITEM_CREATE");
+        permissionService.require(effective, "LOST_ITEM_CREATE");
         LostItem item = find(communityId, itemId);
         if (!canManage(membership, item, userId)) {
             throw BusinessException.forbidden("PERMISSION_DENIED", "errors.permission.denied");
@@ -190,7 +199,7 @@ public class LostItemService {
         }
         LostItemResponse response = toResponse(saved);
         auditService.record(communityId, userId, "USER", "LOST_ITEM_PHOTO_UPLOADED", "LOST_ITEM",
-                itemId, null, response, httpRequest);
+                itemId, null, authorizationService.auditAfter(userId, effective, response), httpRequest);
         return response;
     }
 
@@ -208,16 +217,20 @@ public class LostItemService {
 
     @Transactional
     public LostItemNoteResponse addNote(UUID communityId, UUID userId, UUID itemId,
-                                        CreateLostItemNoteRequest request, HttpServletRequest httpRequest) {
+                                        CreateLostItemNoteRequest request,
+                                        UUID onBehalfOfMembershipId,
+                                        HttpServletRequest httpRequest) {
         Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
+        Membership effective = authorizationService.resolveOnBehalf(communityId, membership,
+                onBehalfOfMembershipId, AuthorizationScope.LOST_FOUND);
         permissionService.require(membership, "LOST_ITEM_VIEW");
-        permissionService.require(membership, "LOST_ITEM_CREATE");
+        permissionService.require(effective, "LOST_ITEM_CREATE");
         LostItem item = find(communityId, itemId);
         LostItemNote note = noteRepository.saveAndFlush(new LostItemNote(UUID.randomUUID(), communityId,
                 itemId, userId, request.body().trim(), Instant.now()));
         LostItemNoteResponse response = LostItemNoteResponse.from(note, userName(userId));
         auditService.record(communityId, userId, "USER", "LOST_ITEM_NOTE_ADDED", "LOST_ITEM",
-                item.getId(), null, response, httpRequest);
+                item.getId(), null, authorizationService.auditAfter(userId, effective, response), httpRequest);
         return response;
     }
 
@@ -251,10 +264,14 @@ public class LostItemService {
 
     @Transactional
     public LostItemAttachmentResponse addAttachment(UUID communityId, UUID userId, UUID itemId,
-                                                    MultipartFile file, HttpServletRequest httpRequest) {
+                                                    MultipartFile file,
+                                                    UUID onBehalfOfMembershipId,
+                                                    HttpServletRequest httpRequest) {
         Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
+        Membership effective = authorizationService.resolveOnBehalf(communityId, membership,
+                onBehalfOfMembershipId, AuthorizationScope.LOST_FOUND);
         permissionService.require(membership, "LOST_ITEM_VIEW");
-        permissionService.require(membership, "LOST_ITEM_CREATE");
+        permissionService.require(effective, "LOST_ITEM_CREATE");
         LostItem item = find(communityId, itemId);
         if (file == null || file.isEmpty()) {
             throw BusinessException.unprocessable("ATTACHMENT_EMPTY", "errors.validation");
@@ -275,7 +292,7 @@ public class LostItemService {
                 safeFileName(file.getOriginalFilename(), extension), content.length, userId, Instant.now()));
         LostItemAttachmentResponse response = LostItemAttachmentResponse.from(attachment, userName(userId));
         auditService.record(communityId, userId, "USER", "LOST_ITEM_ATTACHMENT_ADDED", "LOST_ITEM",
-                item.getId(), null, response, httpRequest);
+                item.getId(), null, authorizationService.auditAfter(userId, effective, response), httpRequest);
         return response;
     }
 

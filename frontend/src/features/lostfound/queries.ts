@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { actingQuery } from "../authorizations/delegationStore";
 import { api } from "../../services/apiClient";
 import type { LostItem, LostItemAttachment, LostItemNote, LostItemStatus, LostItemType } from "../../types/api";
 
@@ -21,7 +22,7 @@ export function useCreateLostItem(communityId: string | undefined) {
     mutationFn: (payload: {
       title: string; description?: string; type: LostItemType; location?: string;
       eventDate?: string; contact?: string;
-    }) => api.post<LostItem>(`/communities/${communityId}/lost-items`, payload),
+    }) => api.post<LostItem>(`/communities/${communityId}/lost-items${actingQuery(communityId, "LOST_FOUND")}`, payload),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
   });
 }
@@ -52,7 +53,7 @@ export function useUploadLostItemPhoto(communityId: string | undefined) {
     mutationFn: ({ itemId, file }: { itemId: string; file: File }) => {
       const formData = new FormData();
       formData.append("file", file);
-      return api.post<LostItem>(`/communities/${communityId}/lost-items/${itemId}/photo`, formData);
+      return api.post<LostItem>(`/communities/${communityId}/lost-items/${itemId}/photo${actingQuery(communityId, "LOST_FOUND")}`, formData);
     },
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
   });
@@ -63,7 +64,7 @@ export function useAddLostItemNote(communityId: string | undefined) {
   return useMutation({
     mutationFn: ({ itemId, body }: { itemId: string; body: string }) =>
       api.post<LostItemNote>(
-        `/communities/${communityId}/lost-items/${itemId}/notes`, { body }),
+        `/communities/${communityId}/lost-items/${itemId}/notes${actingQuery(communityId, "LOST_FOUND")}`, { body }),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
   });
 }
@@ -84,7 +85,8 @@ export function useUploadLostItemAttachment(communityId: string | undefined) {
       const formData = new FormData();
       formData.append("file", file);
       return api.post<LostItemAttachment>(
-        `/communities/${communityId}/lost-items/${itemId}/attachments`, formData);
+        `/communities/${communityId}/lost-items/${itemId}/attachments${actingQuery(communityId, "LOST_FOUND")}`,
+        formData);
     },
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
   });

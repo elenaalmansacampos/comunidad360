@@ -4,6 +4,8 @@ import { Link, useParams } from "react-router-dom";
 import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
 import { FullPageLoader } from "../components/FullPageLoader";
+import { useHasDelegation } from "../features/authorizations/queries";
+import { useDelegationStore } from "../features/authorizations/delegationStore";
 import { useAuthStore } from "../features/auth/authStore";
 import { canCastVotes, canManageVotings } from "../features/mvp/utils";
 import {
@@ -22,12 +24,20 @@ export function VotingDetailPage() {
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
   const canManage = canManageVotings(roles);
   const canCast = canCastVotes(roles);
+  const delegated = useHasDelegation(communityId, "VOTE");
+  const activeDelegation = useDelegationStore((state) => state.active);
+  const actingVoteKey = activeDelegation
+    && activeDelegation.communityId === communityId
+    && activeDelegation.scope === "VOTE"
+    ? activeDelegation.membershipId
+    : "";
   const language = normalizeLanguage(i18n.language);
   const voting = useVoting(communityId, votingId);
   const openVoting = useOpenVoting(communityId, votingId);
   const closeVoting = useCloseVoting(communityId, votingId);
   const castVote = useCastVote(communityId, votingId);
   const [optionId, setOptionId] = useState("");
+  const [votedKey, setVotedKey] = useState<string | null>(null);
 
   if (voting.isLoading) return <FullPageLoader />;
   if (voting.isError || !voting.data) {
@@ -35,11 +45,20 @@ export function VotingDetailPage() {
   }
   const data = voting.data;
   const item = data.voting;
-  const canVote = item.status === "OPEN" && !item.hasVoted && canCast;
+  const actingDelegation = data.delegations?.find((delegation) => delegation.membershipId === actingVoteKey);
+  const actingAlreadyVoted = Boolean(actingVoteKey && actingDelegation?.hasVoted);
+  const voteRegistered = (votedKey === actingVoteKey && Boolean(actingVoteKey))
+    || actingAlreadyVoted
+    || (!actingVoteKey && item.hasVoted);
+  const canVote = item.status === "OPEN" && (canCast || delegated)
+    && (!item.hasVoted || Boolean(actingVoteKey)) && !voteRegistered;
 
   async function vote() {
     if (!optionId) return;
-    try { await castVote.mutateAsync(optionId); } catch { /* state */ }
+    try {
+      await castVote.mutateAsync(optionId);
+      setVotedKey(actingVoteKey);
+    } catch { /* state */ }
   }
 
   return (
@@ -66,6 +85,9 @@ export function VotingDetailPage() {
       </header>
 
       <Alert variant="info">{t("votings.legalNotice")}</Alert>
+      {delegated && !actingVoteKey ? (
+        <Alert variant="info">{t("authorizations.selectDelegation")}</Alert>
+      ) : null}
       {openVoting.isError || closeVoting.isError || castVote.isError ? (
         <Alert variant="error">{t("votings.error")}</Alert>
       ) : null}
@@ -127,7 +149,10 @@ export function VotingDetailPage() {
               </label>
             ))}
           </div>
-          {item.hasVoted ? <Alert variant="success">{t("votings.alreadyVoted")}</Alert> : null}
+          {actingAlreadyVoted ? <Alert variant="success">{t("votings.delegatedAlreadyVoted")}</Alert> : null}
+          {!actingAlreadyVoted && voteRegistered ? <Alert variant="success">{t("votings.voteRegistered")}</Alert> : null}
+          {!actingAlreadyVoted && !voteRegistered && item.hasVoted
+            ? <Alert variant="success">{t("votings.alreadyVoted")}</Alert> : null}
           {canVote ? (
             <div className="form-actions">
               <Button loading={castVote.isPending} disabled={!optionId} onClick={() => void vote()}>

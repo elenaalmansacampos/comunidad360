@@ -718,6 +718,14 @@ export interface VotingDetail {
   voting: Voting;
   options: VotingOption[];
   results?: VotingResults | null;
+  delegations?: VotingDelegation[];
+}
+
+export interface VotingDelegation {
+  membershipId: string;
+  userId?: string | null;
+  name?: string | null;
+  hasVoted: boolean;
 }
 
 export type ChatChannelType = "GENERAL" | "THEMATIC" | "PRIVATE";
@@ -843,4 +851,34 @@ export interface VecinoAccess {
   email: string;
   password: string;
   role: string;
+}
+
+export type AuthorizationScope = "VOTE" | "WORK_PERMIT" | "INCIDENT" | "BOARD" | "LOST_FOUND";
+
+export type AuthorizationStatus = "ACTIVE" | "REVOKED";
+
+export interface Authorization {
+  id: string;
+  grantorMembershipId: string;
+  grantorUserId?: string | null;
+  grantorName?: string | null;
+  granteeMembershipId: string;
+  granteeUserId?: string | null;
+  granteeName?: string | null;
+  scope: AuthorizationScope;
+  status: AuthorizationStatus;
+  effective: boolean;
+  validFrom: string;
+  validUntil?: string | null;
+  notes?: string | null;
+  createdAt: string;
+  revokedAt?: string | null;
+}
+
+export interface CreateAuthorizationPayload {
+  granteeMembershipId: string;
+  scope: AuthorizationScope;
+  validFrom?: string;
+  validUntil?: string;
+  notes?: string;
 }

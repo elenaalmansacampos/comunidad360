@@ -1,6 +1,8 @@
 package com.comunidad360.votings;
 
 import com.comunidad360.audit.AuditService;
+import com.comunidad360.authorization.AuthorizationScope;
+import com.comunidad360.authorization.AuthorizationService;
 import com.comunidad360.common.exception.BusinessException;
 import com.comunidad360.membership.Membership;
 import com.comunidad360.membership.MembershipRepository;
@@ -11,6 +13,8 @@ import com.comunidad360.property.PropertyOwnership;
 import com.comunidad360.property.PropertyOwnershipRepository;
 import com.comunidad360.property.Unit;
 import com.comunidad360.property.UnitRepository;
+import com.comunidad360.user.AppUser;
+import com.comunidad360.user.AppUserRepository;
 import com.comunidad360.votings.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
@@ -34,12 +38,15 @@ public class VotingService {
     private final PropertyOwnershipRepository ownershipRepository;
     private final UnitRepository unitRepository;
     private final AuditService auditService;
+    private final AuthorizationService authorizationService;
+    private final AppUserRepository userRepository;
 
     public VotingService(VotingRepository votingRepository, VotingOptionRepository optionRepository,
                          VotingEligibilityRepository eligibilityRepository, VoteRepository voteRepository,
                          MembershipRepository membershipRepository, TenantAccessService tenantAccessService,
                          PermissionService permissionService, PropertyOwnershipRepository ownershipRepository,
-                         UnitRepository unitRepository, AuditService auditService) {
+                         UnitRepository unitRepository, AuditService auditService,
+                         AuthorizationService authorizationService, AppUserRepository userRepository) {
         this.votingRepository = votingRepository;
         this.optionRepository = optionRepository;
         this.eligibilityRepository = eligibilityRepository;
@@ -50,6 +57,8 @@ public class VotingService {
         this.ownershipRepository = ownershipRepository;
         this.unitRepository = unitRepository;
         this.auditService = auditService;
+        this.authorizationService = authorizationService;
+        this.userRepository = userRepository;
     }
 
     @Transactional(readOnly = true)
@@ -70,7 +79,19 @@ public class VotingService {
                 .map(VotingOptionResponse::from).toList();
         VotingResultsResponse results = voting.getStatus() == VotingStatus.CLOSED
                 ? results(communityId, votingId) : null;
-        return new VotingDetailResponse(toResponse(communityId, membership, voting), options, results);
+        List<VotingDelegationResponse> delegations = authorizationService
+                .receivedEffective(communityId, membership.getId(), AuthorizationScope.VOTE).stream()
+                .map(authorization -> {
+                    Membership grantor = membershipRepository
+                            .findById(authorization.getGrantorMembershipId()).orElse(null);
+                    boolean hasVoted = eligibilityRepository
+                            .findByVotingIdAndMembershipId(votingId, authorization.getGrantorMembershipId())
+                            .map(VotingEligibility::isHasVoted).orElse(false);
+                    return new VotingDelegationResponse(authorization.getGrantorMembershipId(),
+                            grantor == null ? null : grantor.getUserId(),
+                            grantor == null ? null : userName(grantor.getUserId()), hasVoted);
+                }).toList();
+        return new VotingDetailResponse(toResponse(communityId, membership, voting), options, results, delegations);
     }
 
     @Transactional
@@ -149,9 +170,12 @@ public class VotingService {
 
     @Transactional
     public VotingDetailResponse castVote(UUID communityId, UUID userId, UUID votingId,
-                                         CastVoteRequest request, HttpServletRequest httpRequest) {
+                                         CastVoteRequest request, UUID onBehalfOfMembershipId,
+                                         HttpServletRequest httpRequest) {
         Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
-        permissionService.require(membership, "VOTE_CAST");
+        Membership effective = authorizationService.resolveOnBehalf(communityId, membership,
+                onBehalfOfMembershipId, AuthorizationScope.VOTE);
+        permissionService.require(effective, "VOTE_CAST");
         Voting voting = find(communityId, votingId);
         Instant now = Instant.now();
         if (voting.getStatus() != VotingStatus.OPEN || (voting.getOpensAt() != null && now.isBefore(voting.getOpensAt()))
@@ -159,7 +183,7 @@ public class VotingService {
             throw BusinessException.unprocessable("VOTING_NOT_OPEN", "errors.voting.notOpen");
         }
         VotingEligibility eligibility = eligibilityRepository
-                .findByVotingIdAndMembershipId(votingId, membership.getId())
+                .findByVotingIdAndMembershipId(votingId, effective.getId())
                 .orElseThrow(() -> BusinessException.forbidden("PERMISSION_DENIED", "errors.permission.denied"));
         if (eligibility.isHasVoted()) {
             throw BusinessException.conflict("VOTE_ALREADY_CAST", "errors.voting.alreadyVoted");
@@ -172,7 +196,8 @@ public class VotingService {
         eligibility.setHasVoted(true);
         eligibilityRepository.saveAndFlush(eligibility);
         auditService.record(communityId, userId, "USER", "VOTE_CAST", "VOTING",
-                votingId, null, Map.of("optionId", option.getId().toString()), httpRequest);
+                votingId, null, authorizationService.auditAfter(userId, effective,
+                        Map.of("optionId", option.getId().toString())), httpRequest);
         return detail(communityId, userId, votingId);
     }
 
@@ -238,6 +263,17 @@ public class VotingService {
                     .divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP));
         }
         return total.setScale(6, RoundingMode.HALF_UP);
+    }
+
+    private String userName(UUID userId) {
+        if (userId == null) {
+            return null;
+        }
+        return userRepository.findById(userId).map(this::name).orElse(null);
+    }
+
+    private String name(AppUser user) {
+        return user.getFullName() == null || user.getFullName().isBlank() ? user.getEmail() : user.getFullName();
     }
 
     private String clean(String value) {

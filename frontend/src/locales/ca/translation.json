@@ -23,7 +23,8 @@
     "name": "Nom",
     "themeDark": "Activa el mode fosc",
     "themeLight": "Activa el mode clar",
-    "readOnly": "Mode només lectura: pots consultar la informació, però no modificar-la."
+    "readOnly": "Mode només lectura: pots consultar la informació, però no modificar-la.",
+    "delegatedReadOnly": "Només lectura excepte les accions autoritzades per {{name}}."
   },
   "nav": {
     "home": "Inici",
@@ -47,7 +48,8 @@
     },
     "board": "Tabló",
     "lostFound": "Objectes perduts",
-    "workPermits": "Permisos d'obra"
+    "workPermits": "Permisos d'obra",
+    "authorizations": "Autoritzacions"
   },
   "auth": {
     "login": {
@@ -839,7 +841,9 @@
       "OPEN": "Oberta",
       "CLOSED": "Tancada",
       "CANCELLED": "Cancel·lada"
-    }
+    },
+    "voteRegistered": "Vot registrat.",
+    "delegatedAlreadyVoted": "Aquest veí ja ha votat en aquesta votació."
   },
   "chat": {
     "title": "Xat",
@@ -1012,5 +1016,50 @@
       "REJECTED": "Rebutjat",
       "CANCELLED": "Cancel·lat"
     }
+  },
+  "authorizations": {
+    "title": "Autoritzacions",
+    "subtitle": "Autoritza un altre veí per votar o actuar en el teu nom als mòduls permesos.",
+    "new": "Nova autorització",
+    "newHint": "El veí autoritzat podrà actuar en el teu nom només en l'àmbit seleccionat.",
+    "grantee": "Veí autoritzat",
+    "granteePlaceholder": "Selecciona un veí",
+    "scope": "Àmbit",
+    "scopes": {
+      "VOTE": "Vot",
+      "WORK_PERMIT": "Permisos d'obra",
+      "INCIDENT": "Incidències",
+      "BOARD": "Taulell",
+      "LOST_FOUND": "Objectes perduts"
+    },
+    "validFrom": "Vàlida des de",
+    "validUntil": "Vàlida fins a",
+    "noExpiry": "Sense caducitat",
+    "notes": "Notes",
+    "notesPlaceholder": "Motiu o detall de l'autorització",
+    "create": "Crea l'autorització",
+    "revoke": "Revoca",
+    "revokeConfirm": "Vols revocar aquesta autorització?",
+    "tabs": {
+      "GRANTED": "Concedides",
+      "RECEIVED": "Rebudes",
+      "ALL": "Totes"
+    },
+    "status": {
+      "EFFECTIVE": "Activa",
+      "EXPIRED": "Caducada",
+      "ACTIVE": "Activa",
+      "REVOKED": "Revocada"
+    },
+    "empty": "No hi ha autoritzacions.",
+    "error": "No s'ha pogut completar l'operació.",
+    "actingAs": "Actuar en nom de",
+    "asSelf": "Jo mateix",
+    "stopActing": "Deixa d'actuar en nom d'un altre",
+    "sharedWarning": "El compte VECÍ és compartit. Per a delegacions individuals, utilitza un compte propi.",
+    "voteRequiresIndividual": "Per delegar un vot necessites un compte individual amb dret a vot.",
+    "selectDelegation": "Selecciona una autorització de vot a «Actuar en nom de» per votar per un altre veí.",
+    "scopeHint": "Només apareixen els àmbits que tu mateix pots realitzar.",
+    "chooseHint": "Selecciona una autorització per actuar en nom d'un altre veí."
   }
 }

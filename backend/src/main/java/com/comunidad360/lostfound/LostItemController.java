@@ -45,8 +45,9 @@ public class LostItemController {
     public LostItemResponse create(@PathVariable UUID communityId,
                                    @AuthenticationPrincipal AuthenticatedUser user,
                                    @Valid @RequestBody CreateLostItemRequest request,
+                                   @RequestParam(required = false) UUID onBehalfOfMembershipId,
                                    HttpServletRequest httpRequest) {
-        return service.create(communityId, user.id(), request, httpRequest);
+        return service.create(communityId, user.id(), request, onBehalfOfMembershipId, httpRequest);
     }
 
     @PatchMapping("/{itemId}")
@@ -61,8 +62,9 @@ public class LostItemController {
     public LostItemResponse uploadPhoto(@PathVariable UUID communityId, @PathVariable UUID itemId,
                                         @AuthenticationPrincipal AuthenticatedUser user,
                                         @RequestPart("file") MultipartFile file,
+                                        @RequestParam(required = false) UUID onBehalfOfMembershipId,
                                         HttpServletRequest httpRequest) {
-        return service.uploadPhoto(communityId, user.id(), itemId, file, httpRequest);
+        return service.uploadPhoto(communityId, user.id(), itemId, file, onBehalfOfMembershipId, httpRequest);
     }
 
     @GetMapping("/{itemId}/photo")
@@ -92,8 +94,9 @@ public class LostItemController {
     public LostItemNoteResponse addNote(@PathVariable UUID communityId, @PathVariable UUID itemId,
                                         @AuthenticationPrincipal AuthenticatedUser user,
                                         @Valid @RequestBody CreateLostItemNoteRequest request,
+                                        @RequestParam(required = false) UUID onBehalfOfMembershipId,
                                         HttpServletRequest httpRequest) {
-        return service.addNote(communityId, user.id(), itemId, request, httpRequest);
+        return service.addNote(communityId, user.id(), itemId, request, onBehalfOfMembershipId, httpRequest);
     }
 
     @DeleteMapping("/{itemId}/notes/{noteId}")
@@ -118,8 +121,9 @@ public class LostItemController {
                                                     @PathVariable UUID itemId,
                                                     @AuthenticationPrincipal AuthenticatedUser user,
                                                     @RequestPart("file") MultipartFile file,
+                                                    @RequestParam(required = false) UUID onBehalfOfMembershipId,
                                                     HttpServletRequest httpRequest) {
-        return service.addAttachment(communityId, user.id(), itemId, file, httpRequest);
+        return service.addAttachment(communityId, user.id(), itemId, file, onBehalfOfMembershipId, httpRequest);
     }
 
     @GetMapping("/{itemId}/attachments/{attachmentId}")

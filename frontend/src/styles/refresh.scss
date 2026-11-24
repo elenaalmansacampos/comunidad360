@@ -2560,3 +2560,176 @@ h3 {
 .vecino-access-card .invite-link code {
   flex: none;
 }
+
+/* Authorizations */
+.acting-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.8rem;
+  margin-bottom: 1rem;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.acting-bar select {
+  max-width: min(22rem, 100%);
+  padding: 0.3rem 0.45rem;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #fff;
+  color: #1e3a8a;
+  font: inherit;
+}
+
+.acting-bar .text-link--button {
+  margin-left: auto;
+}
+
+.authorization-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.authorization-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--color-gray-100);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.authorization-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.authorization-card__scope {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #1e3a8a;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.authorization-card__status {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.authorization-card__status--active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.authorization-card__status--inactive {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.authorization-card__people {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.authorization-card__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.75rem;
+}
+
+.authorization-card__meta dt {
+  color: #64748b;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.authorization-card__meta dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.authorization-card__notes {
+  margin: 0;
+  color: var(--color-gray-700);
+  font-size: 0.82rem;
+  white-space: pre-wrap;
+}
+
+.authorization-card .btn {
+  align-self: flex-start;
+}
+
+@media (min-width: 900px) {
+  .authorization-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+[data-theme="dark"] .acting-bar {
+  border-color: #1e40af;
+  background: #10203f;
+  color: #bfdbfe;
+}
+
+[data-theme="dark"] .acting-bar select {
+  border-color: #1e40af;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .authorization-card {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+
+[data-theme="dark"] .authorization-card__scope {
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .authorization-card__status--inactive {
+  background: #1e293b;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .authorization-card__meta dt {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .authorization-card__notes {
+  color: #cbd5e1;
+}
+
+.acting-bar__hint {
+  margin-left: auto;
+  color: #3b5b8c;
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .acting-bar__hint {
+  color: #93c5fd;
+}

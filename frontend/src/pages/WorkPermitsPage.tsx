@@ -8,6 +8,7 @@ import { Button } from "../components/Button";
 import { FullPageLoader } from "../components/FullPageLoader";
 import { Input } from "../components/Input";
 import { Textarea } from "../components/Textarea";
+import { useHasDelegation } from "../features/authorizations/queries";
 import { useAuthStore } from "../features/auth/authStore";
 import { useCommunityStore } from "../features/communities/communityStore";
 import { canCreateWorkPermits, canManageWorkPermits, isReadOnly } from "../features/mvp/utils";
@@ -30,7 +31,8 @@ export function WorkPermitsPage() {
   const setSelectedCommunityId = useCommunityStore((state) => state.setSelectedCommunityId);
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
   const readOnly = isReadOnly(roles);
-  const canCreate = !readOnly && canCreateWorkPermits(roles);
+  const delegated = useHasDelegation(communityId, "WORK_PERMIT");
+  const canCreate = delegated || (!readOnly && canCreateWorkPermits(roles));
   const canManage = canManageWorkPermits(roles);
   const language = normalizeLanguage(i18n.language);
   const permits = useWorkPermits(communityId);
@@ -99,7 +101,7 @@ export function WorkPermitsPage() {
   }
 
   function canEdit(permit: WorkPermit): boolean {
-    return !readOnly && (canManage || permit.createdByUserId === user?.id);
+    return (delegated || !readOnly) && (canManage || permit.createdByUserId === user?.id);
   }
 
   const failed = create.isError || update.isError || upload.isError || remove.isError;

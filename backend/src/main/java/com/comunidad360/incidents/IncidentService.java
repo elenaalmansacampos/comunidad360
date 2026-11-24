@@ -1,6 +1,8 @@
 package com.comunidad360.incidents;
 
 import com.comunidad360.audit.AuditService;
+import com.comunidad360.authorization.AuthorizationScope;
+import com.comunidad360.authorization.AuthorizationService;
 import com.comunidad360.building.BuildingRepository;
 import com.comunidad360.common.exception.BusinessException;
 import com.comunidad360.config.AppProperties;
@@ -66,6 +68,7 @@ public class IncidentService {
     private final AuditService auditService;
     private final AppProperties properties;
     private final MalwareScanner malwareScanner;
+    private final AuthorizationService authorizationService;
 
     public IncidentService(IncidentRepository incidentRepository,
                            IncidentCommentRepository commentRepository,
@@ -80,7 +83,8 @@ public class IncidentService {
                            StorageService storageService,
                            AuditService auditService,
                            AppProperties properties,
-                           MalwareScanner malwareScanner) {
+                           MalwareScanner malwareScanner,
+                           AuthorizationService authorizationService) {
         this.incidentRepository = incidentRepository;
         this.commentRepository = commentRepository;
         this.historyRepository = historyRepository;
@@ -95,6 +99,7 @@ public class IncidentService {
         this.auditService = auditService;
         this.properties = properties;
         this.malwareScanner = malwareScanner;
+        this.authorizationService = authorizationService;
     }
 
     @Transactional(readOnly = true)
@@ -144,8 +149,11 @@ public class IncidentService {
 
     @Transactional
     public IncidentResponse create(UUID communityId, UUID userId, CreateIncidentRequest request,
-                                   HttpServletRequest httpRequest) {
-        accessService.requireCreate(communityId, userId);
+                                   UUID onBehalfOfMembershipId, HttpServletRequest httpRequest) {
+        Membership membership = accessService.requireMembership(communityId, userId);
+        Membership effective = authorizationService.resolveOnBehalf(communityId, membership,
+                onBehalfOfMembershipId, AuthorizationScope.INCIDENT);
+        accessService.requireCreate(effective);
         validateLocation(communityId, request.buildingId(), request.unitId(), request.commonElementId());
         Instant now = Instant.now();
         Incident incident = new Incident(
@@ -166,7 +174,7 @@ public class IncidentService {
         recordHistory(communityId, saved.getId(), null, IncidentStatus.OPEN, userId, now, "Incidencia creada");
         IncidentResponse response = toResponse(saved);
         auditService.record(communityId, userId, "USER", "INCIDENT_CREATED", "INCIDENT",
-                saved.getId(), null, response, httpRequest);
+                saved.getId(), null, authorizationService.auditAfter(userId, effective, response), httpRequest);
         return response;
     }
 
@@ -228,11 +236,15 @@ public class IncidentService {
 
     @Transactional
     public IncidentCommentResponse addComment(UUID communityId, UUID userId, UUID incidentId,
-                                              IncidentCommentRequest request, HttpServletRequest httpRequest) {
+                                              IncidentCommentRequest request,
+                                              UUID onBehalfOfMembershipId,
+                                              HttpServletRequest httpRequest) {
         Membership membership = accessService.requireMembership(communityId, userId);
+        Membership effective = authorizationService.resolveOnBehalf(communityId, membership,
+                onBehalfOfMembershipId, AuthorizationScope.INCIDENT);
         Incident incident = find(communityId, incidentId);
         accessService.requireView(incident, userId, membership);
-        accessService.requireComment(membership);
+        accessService.requireComment(effective);
         if (request.internal() && !accessService.canViewAll(membership)) {
             throw BusinessException.forbidden("PERMISSION_DENIED", "errors.permission.denied");
         }
@@ -250,17 +262,22 @@ public class IncidentService {
         IncidentComment saved = commentRepository.saveAndFlush(comment);
         IncidentCommentResponse response = IncidentCommentResponse.from(saved, userName(userId));
         auditService.record(communityId, userId, "USER", "INCIDENT_COMMENT_CREATED", "INCIDENT",
-                incidentId, null, Map.of("commentId", saved.getId(), "internal", request.internal()), httpRequest);
+                incidentId, null, authorizationService.auditAfter(userId, effective,
+                        Map.of("commentId", saved.getId(), "internal", request.internal())), httpRequest);
         return response;
     }
 
     @Transactional
     public IncidentAttachmentResponse uploadAttachment(UUID communityId, UUID userId, UUID incidentId,
-                                                       MultipartFile file, HttpServletRequest httpRequest) {
+                                                       MultipartFile file,
+                                                       UUID onBehalfOfMembershipId,
+                                                       HttpServletRequest httpRequest) {
         Membership membership = accessService.requireMembership(communityId, userId);
+        Membership effective = authorizationService.resolveOnBehalf(communityId, membership,
+                onBehalfOfMembershipId, AuthorizationScope.INCIDENT);
         Incident incident = find(communityId, incidentId);
         accessService.requireView(incident, userId, membership);
-        accessService.requireComment(membership);
+        accessService.requireComment(effective);
         if (file == null || file.isEmpty()) {
             throw BusinessException.unprocessable("ATTACHMENT_EMPTY", "errors.incident.attachmentInvalid");
         }
@@ -308,7 +325,8 @@ public class IncidentService {
         IncidentAttachment saved = attachmentRepository.saveAndFlush(attachment);
         IncidentAttachmentResponse response = toAttachmentResponse(saved);
         auditService.record(communityId, userId, "USER", "INCIDENT_ATTACHMENT_CREATED", "INCIDENT",
-                incidentId, null, Map.of("attachmentId", saved.getId()), httpRequest);
+                incidentId, null, authorizationService.auditAfter(userId, effective,
+                        Map.of("attachmentId", saved.getId())), httpRequest);
         return response;
     }
 

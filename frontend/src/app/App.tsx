@@ -43,6 +43,8 @@ const BoardPage = lazy(() => import("../pages/BoardPage").then((m) => ({ default
 const LostFoundPage = lazy(() => import("../pages/LostFoundPage").then((m) => ({ default: m.LostFoundPage })));
 const WorkPermitsPage = lazy(() => import("../pages/WorkPermitsPage").then((m) => ({ default: m.WorkPermitsPage })));
 const MembersPage = lazy(() => import("../pages/MembersPage").then((m) => ({ default: m.MembersPage })));
+const AuthorizationsPage = lazy(() =>
+  import("../pages/AuthorizationsPage").then((m) => ({ default: m.AuthorizationsPage })));
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })));
 
 const queryClient = new QueryClient({
@@ -106,6 +108,7 @@ export function App() {
                 <Route path="lost-found" element={<LostFoundPage />} />
                 <Route path="work-permits" element={<WorkPermitsPage />} />
                 <Route path="members" element={<MembersPage />} />
+                <Route path="authorizations" element={<AuthorizationsPage />} />
               </Route>
             </Route>
 

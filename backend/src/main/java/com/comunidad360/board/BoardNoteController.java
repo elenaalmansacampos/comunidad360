@@ -36,8 +36,9 @@ public class BoardNoteController {
     public BoardNoteResponse create(@PathVariable UUID communityId,
                                     @AuthenticationPrincipal AuthenticatedUser user,
                                     @Valid @RequestBody CreateBoardNoteRequest request,
+                                    @RequestParam(required = false) UUID onBehalfOfMembershipId,
                                     HttpServletRequest httpRequest) {
-        return service.create(communityId, user.id(), request, httpRequest);
+        return service.create(communityId, user.id(), request, onBehalfOfMembershipId, httpRequest);
     }
 
     @PatchMapping("/{noteId}")
@@ -61,8 +62,9 @@ public class BoardNoteController {
                                                @PathVariable UUID noteId,
                                                @AuthenticationPrincipal AuthenticatedUser user,
                                                @Valid @RequestBody CreateBoardNoteCommentRequest request,
+                                               @RequestParam(required = false) UUID onBehalfOfMembershipId,
                                                HttpServletRequest httpRequest) {
-        return service.addComment(communityId, user.id(), noteId, request, httpRequest);
+        return service.addComment(communityId, user.id(), noteId, request, onBehalfOfMembershipId, httpRequest);
     }
 
     @DeleteMapping("/{noteId}")

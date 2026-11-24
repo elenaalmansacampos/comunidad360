@@ -19,6 +19,7 @@ import { FullPageLoader } from "../components/FullPageLoader";
 import { Input } from "../components/Input";
 import { Select } from "../components/Select";
 import { Textarea } from "../components/Textarea";
+import { useHasDelegation } from "../features/authorizations/queries";
 import { useAuthStore } from "../features/auth/authStore";
 import { useCommunityStore } from "../features/communities/communityStore";
 import { downloadDocument, formatFileSize } from "../features/documents/utils";
@@ -350,6 +351,8 @@ export function LostFoundPage() {
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
   const canManage = canManageLostFound(roles);
   const readOnly = isReadOnly(roles);
+  const delegated = useHasDelegation(communityId, "LOST_FOUND");
+  const canWrite = !readOnly || delegated;
   const [filter, setFilter] = useState<Filter>("ALL");
   const items = useLostItems(communityId, filter === "ALL" ? undefined : filter);
   const create = useCreateLostItem(communityId);
@@ -420,7 +423,7 @@ export function LostFoundPage() {
           <h1>{t("lostFound.title")}</h1>
           <p className="page-subtitle">{t("lostFound.subtitle")}</p>
         </div>
-        {!readOnly ? (
+        {canWrite ? (
           <Button onClick={() => setShowForm((value) => !value)}>
             <Plus size={16} aria-hidden="true" /> {t("lostFound.newItem")}
           </Button>
@@ -448,7 +451,7 @@ export function LostFoundPage() {
         ))}
       </div>
 
-      {showForm && !readOnly ? (
+      {showForm && canWrite ? (
         <form className="form-card" onSubmit={submit}>
           <h3>{t("lostFound.newItem")}</h3>
           <div className="form-grid">
@@ -487,7 +490,7 @@ export function LostFoundPage() {
               key={item.id}
               item={item}
               currentUserId={user?.id}
-              readOnly={readOnly}
+              readOnly={!canWrite}
               canManage={canManage}
               photoPending={upload.isPending && upload.variables?.itemId === item.id}
               notePending={addNote.isPending && addNote.variables?.itemId === item.id}

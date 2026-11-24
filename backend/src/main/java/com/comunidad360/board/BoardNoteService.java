@@ -1,6 +1,8 @@
 package com.comunidad360.board;
 
 import com.comunidad360.audit.AuditService;
+import com.comunidad360.authorization.AuthorizationScope;
+import com.comunidad360.authorization.AuthorizationService;
 import com.comunidad360.board.dto.BoardNoteCommentResponse;
 import com.comunidad360.board.dto.BoardNoteResponse;
 import com.comunidad360.board.dto.CreateBoardNoteCommentRequest;
@@ -29,16 +31,19 @@ public class BoardNoteService {
     private final PermissionService permissionService;
     private final AuditService auditService;
     private final AppUserRepository userRepository;
+    private final AuthorizationService authorizationService;
 
     public BoardNoteService(BoardNoteRepository repository, BoardNoteCommentRepository commentRepository,
                             TenantAccessService tenantAccessService, PermissionService permissionService,
-                            AuditService auditService, AppUserRepository userRepository) {
+                            AuditService auditService, AppUserRepository userRepository,
+                            AuthorizationService authorizationService) {
         this.repository = repository;
         this.commentRepository = commentRepository;
         this.tenantAccessService = tenantAccessService;
         this.permissionService = permissionService;
         this.auditService = auditService;
         this.userRepository = userRepository;
+        this.authorizationService = authorizationService;
     }
 
     @Transactional(readOnly = true)
@@ -53,15 +58,17 @@ public class BoardNoteService {
 
     @Transactional
     public BoardNoteResponse create(UUID communityId, UUID userId, CreateBoardNoteRequest request,
-                                    HttpServletRequest httpRequest) {
+                                    UUID onBehalfOfMembershipId, HttpServletRequest httpRequest) {
         Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
-        permissionService.require(membership, "BOARD_CREATE");
+        Membership effective = authorizationService.resolveOnBehalf(communityId, membership,
+                onBehalfOfMembershipId, AuthorizationScope.BOARD);
+        permissionService.require(effective, "BOARD_CREATE");
         Instant now = Instant.now();
         BoardNote note = repository.saveAndFlush(new BoardNote(UUID.randomUUID(), communityId,
                 request.title().trim(), request.body().trim(), request.color(), false, userId, now, now));
         BoardNoteResponse response = BoardNoteResponse.from(note, userName(userId), 0);
         auditService.record(communityId, userId, "USER", "BOARD_NOTE_CREATED", "BOARD_NOTE",
-                note.getId(), null, response, httpRequest);
+                note.getId(), null, authorizationService.auditAfter(userId, effective, response), httpRequest);
         return response;
     }
 
@@ -130,16 +137,19 @@ public class BoardNoteService {
     @Transactional
     public BoardNoteCommentResponse addComment(UUID communityId, UUID userId, UUID noteId,
                                                CreateBoardNoteCommentRequest request,
+                                               UUID onBehalfOfMembershipId,
                                                HttpServletRequest httpRequest) {
         Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
+        Membership effective = authorizationService.resolveOnBehalf(communityId, membership,
+                onBehalfOfMembershipId, AuthorizationScope.BOARD);
         permissionService.require(membership, "BOARD_VIEW");
-        permissionService.require(membership, "BOARD_CREATE");
+        permissionService.require(effective, "BOARD_CREATE");
         find(communityId, noteId);
         BoardNoteComment comment = commentRepository.saveAndFlush(new BoardNoteComment(UUID.randomUUID(),
                 communityId, noteId, userId, request.body().trim(), Instant.now()));
         BoardNoteCommentResponse response = BoardNoteCommentResponse.from(comment, userName(userId));
         auditService.record(communityId, userId, "USER", "BOARD_NOTE_COMMENT_CREATED", "BOARD_NOTE",
-                noteId, null, response, httpRequest);
+                noteId, null, authorizationService.auditAfter(userId, effective, response), httpRequest);
         return response;
     }
 

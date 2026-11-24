@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { actingQuery } from "../authorizations/delegationStore";
 import { api } from "../../services/apiClient";
 import type { Voting, VotingDetail } from "../../types/api";
 
@@ -59,7 +60,7 @@ export function useCastVote(communityId: string | undefined, votingId: string | 
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (optionId: string) =>
-      api.post<VotingDetail>(`/communities/${communityId}/votings/${votingId}/votes`, { optionId }),
+      api.post<VotingDetail>(`/communities/${communityId}/votings/${votingId}/votes${actingQuery(communityId, "VOTE")}`, { optionId }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: votingsKey(communityId) });
       void queryClient.invalidateQueries({ queryKey: votingKey(communityId, votingId) });

@@ -45,6 +45,11 @@ public class IncidentAccessService {
     }
 
     @Transactional(readOnly = true)
+    public void requireCreate(Membership membership) {
+        permissionService.require(membership, "INCIDENT_CREATE");
+    }
+
+    @Transactional(readOnly = true)
     public void requireManage(UUID communityId, UUID userId) {
         Membership membership = requireMembership(communityId, userId);
         permissionService.require(membership, "INCIDENT_MANAGE");
