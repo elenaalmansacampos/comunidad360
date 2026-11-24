@@ -37,7 +37,8 @@ export function MembersPage() {
   const members = useMembers(communityId);
   const invite = useInviteMember(communityId);
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
-  const canInvite = roles.some((role) => ["COMMUNITY_ADMIN", "SECRETARY"].includes(role));
+  const canInvite = roles.some((role) =>
+    ["COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY"].includes(role));
   const isAdmin = roles.includes("COMMUNITY_ADMIN");
   const vecino = useGenerateVecinoAccess(communityId);
   const [showInvite, setShowInvite] = useState(false);
