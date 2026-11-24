@@ -10,6 +10,7 @@ import com.comunidad360.documents.dto.UpdateDocumentRequest;
 import com.comunidad360.malware.MalwareScanner;
 import com.comunidad360.malware.ScanResult;
 import com.comunidad360.malware.ScanStatus;
+import com.comunidad360.meetings.MeetingRepository;
 import com.comunidad360.membership.Membership;
 import com.comunidad360.security.RequestInfo;
 import com.comunidad360.security.TokenSupport;
@@ -33,6 +34,8 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final DocumentVersionRepository versionRepository;
     private final DocumentAccessLogRepository accessLogRepository;
+    private final DocumentAclRepository aclRepository;
+    private final MeetingRepository meetingRepository;
     private final DocumentAccessService accessService;
     private final AppUserRepository userRepository;
     private final StorageService storageService;
@@ -43,6 +46,8 @@ public class DocumentService {
     public DocumentService(DocumentRepository documentRepository,
                            DocumentVersionRepository versionRepository,
                            DocumentAccessLogRepository accessLogRepository,
+                           DocumentAclRepository aclRepository,
+                           MeetingRepository meetingRepository,
                            DocumentAccessService accessService,
                            AppUserRepository userRepository,
                            StorageService storageService,
@@ -52,6 +57,8 @@ public class DocumentService {
         this.documentRepository = documentRepository;
         this.versionRepository = versionRepository;
         this.accessLogRepository = accessLogRepository;
+        this.aclRepository = aclRepository;
+        this.meetingRepository = meetingRepository;
         this.accessService = accessService;
         this.userRepository = userRepository;
         this.storageService = storageService;
@@ -216,6 +223,37 @@ public class DocumentService {
         logAccess(communityId, documentId, null, userId, DocumentAccessAction.DELETE, httpRequest);
         auditService.record(communityId, userId, "USER", "DOCUMENT_ARCHIVED", "DOCUMENT",
                 documentId, before, toResponse(saved), httpRequest);
+    }
+
+    @Transactional
+    public void deletePermanent(UUID communityId, UUID userId, UUID documentId,
+                                HttpServletRequest httpRequest) {
+        Membership membership = accessService.requireMembership(communityId, userId);
+        Document document = find(communityId, documentId);
+        accessService.requireManage(membership);
+        if (meetingRepository.existsByConvocationDocumentIdOrMinutesDocumentId(documentId, documentId)) {
+            throw BusinessException.unprocessable("DOCUMENT_IN_USE", "errors.document.inUse");
+        }
+        DocumentResponse before = toResponse(document);
+        List<DocumentVersion> versions =
+                versionRepository.findByCommunityIdAndDocumentIdOrderByVersionNumberDesc(communityId, documentId);
+        List<String> storageKeys = versions.stream().map(DocumentVersion::getStorageKey).toList();
+        document.setCurrentVersionId(null);
+        documentRepository.saveAndFlush(document);
+        aclRepository.deleteByCommunityIdAndDocumentId(communityId, documentId);
+        accessLogRepository.deleteByCommunityIdAndDocumentId(communityId, documentId);
+        versionRepository.deleteByCommunityIdAndDocumentId(communityId, documentId);
+        documentRepository.delete(document);
+        documentRepository.flush();
+        for (String storageKey : storageKeys) {
+            try {
+                storageService.delete(storageKey);
+            } catch (Exception ignored) {
+                // el archivo huérfano no bloquea el borrado del documento
+            }
+        }
+        auditService.record(communityId, userId, "USER", "DOCUMENT_DELETED", "DOCUMENT",
+                documentId, before, null, httpRequest);
     }
 
     @Transactional

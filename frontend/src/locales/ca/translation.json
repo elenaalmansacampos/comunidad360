@@ -24,7 +24,8 @@
     "themeDark": "Activa el mode fosc",
     "themeLight": "Activa el mode clar",
     "readOnly": "Mode només lectura: pots consultar la informació, però no modificar-la.",
-    "delegatedReadOnly": "Només lectura excepte les accions autoritzades per {{name}}."
+    "delegatedReadOnly": "Només lectura excepte les accions autoritzades per {{name}}.",
+    "close": "Tancar"
   },
   "nav": {
     "home": "Inici",
@@ -631,7 +632,15 @@
       "ROLE": "Rol específic",
       "PRIVATE": "Privat"
     },
-    "fileMissing": "El fitxer no està disponible. Torna a pujar-lo com a nova versió."
+    "fileMissing": "El fitxer no està disponible. Torna a pujar-lo com a nova versió.",
+    "delete": "Elimina",
+    "deleteConfirm": "Vols eliminar definitivament aquest document i totes les seves versions? No es pot desfer.",
+    "deleteError": "No s'ha pogut eliminar el document.",
+    "deleteInUse": "No es pot eliminar: està vinculat a una reunió.",
+    "actions": "Accions",
+    "view": "Veure",
+    "openInTab": "Obre en una pestanya",
+    "previewError": "No s'ha pogut obrir la vista prèvia."
   },
   "meetings": {
     "title": "Reunions",

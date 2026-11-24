@@ -41,6 +41,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -191,6 +192,32 @@ class DocumentIntegrationTest {
                 community.getId(), documentId, DocumentAccessAction.UPLOAD)).isEqualTo(2);
         assertThat(accessLogRepository.countByCommunityIdAndDocumentIdAndAction(
                 community.getId(), documentId, DocumentAccessAction.DOWNLOAD)).isEqualTo(1);
+    }
+
+    @Test
+    void administratorsCanPermanentlyDeleteDocuments() throws Exception {
+        AppUser admin = createUser(uniqueEmail("doc-delete-admin"));
+        AppUser owner = createUser(uniqueEmail("doc-delete-owner"));
+        Community community = createCommunity("Document Delete");
+        createMembership(community, admin, "COMMUNITY_ADMIN");
+        createMembership(community, owner, "OWNER");
+        String adminToken = accessToken(admin.getEmail());
+        String ownerToken = accessToken(owner.getEmail());
+        UUID documentId = createDocument(adminToken, community.getId(),
+                "Factura a borrar", "FACTURA", "COMMUNITY", "factura.pdf", "application/pdf", PDF);
+
+        mockMvc.perform(delete(documentPath(community.getId(), documentId) + "/permanent")
+                        .header("Authorization", "Bearer " + ownerToken))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(delete(documentPath(community.getId(), documentId) + "/permanent")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isNoContent());
+        list(adminToken, community.getId())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+        mockMvc.perform(get(documentPath(community.getId(), documentId) + "/download")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isNotFound());
     }
 
     @Test

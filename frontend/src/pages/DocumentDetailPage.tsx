@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Alert } from "../components/Alert";
+import { DocumentViewer } from "../components/DocumentViewer";
 import { Button } from "../components/Button";
 import { FullPageLoader } from "../components/FullPageLoader";
 import { Input } from "../components/Input";
@@ -10,9 +11,11 @@ import { Select } from "../components/Select";
 import { Textarea } from "../components/Textarea";
 import { useAuthStore } from "../features/auth/authStore";
 import { ApiError } from "../services/apiClient";
+import { canPreviewDocument, useDocumentPreview } from "../features/documents/preview";
 import {
   useAddDocumentVersion,
   useArchiveDocument,
+  useDeleteDocumentPermanent,
   useDocument,
   useUpdateDocument,
 } from "../features/documents/queries";
@@ -53,6 +56,8 @@ export function DocumentDetailPage() {
   const updateDocument = useUpdateDocument(communityId, documentId);
   const addVersion = useAddDocumentVersion(communityId, documentId);
   const archiveDocument = useArchiveDocument(communityId, documentId);
+  const deleteDocument = useDeleteDocumentPermanent(communityId);
+  const preview = useDocumentPreview();
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -60,6 +65,7 @@ export function DocumentDetailPage() {
   const [visibility, setVisibility] = useState<DocumentVisibility>("COMMUNITY");
   const [versionFile, setVersionFile] = useState<File | null>(null);
   const [downloadError, setDownloadError] = useState<"NONE" | "MISSING" | "GENERIC">("NONE");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   if (detail.isLoading) {
     return <FullPageLoader />;
@@ -124,6 +130,23 @@ export function DocumentDetailPage() {
     }
   }
 
+  async function removePermanently() {
+    if (!window.confirm(t("documents.deleteConfirm"))) {
+      return;
+    }
+    setDeleteError(null);
+    try {
+      await deleteDocument.mutateAsync(document.id);
+      navigate(`/communities/${communityId}/documents`);
+    } catch (error) {
+      setDeleteError(
+        error instanceof ApiError && error.code === "DOCUMENT_IN_USE"
+          ? t("documents.deleteInUse")
+          : t("documents.deleteError"),
+      );
+    }
+  }
+
   async function download(url: string, fileName: string) {
     setDownloadError("NONE");
     try {
@@ -148,6 +171,12 @@ export function DocumentDetailPage() {
           </div>
         </div>
         <div className="page-header__actions">
+          {document.downloadUrl && document.fileName
+            && canPreviewDocument(document.mimeType, document.fileName) ? (
+            <Button variant="secondary" loading={preview.loading} onClick={() => void preview.open(document)}>
+              {t("documents.view")}
+            </Button>
+          ) : null}
           {document.downloadUrl && document.fileName ? (
             <Button
               variant="secondary"
@@ -162,11 +191,21 @@ export function DocumentDetailPage() {
               <Button variant="ghost" onClick={() => void archive()} loading={archiveDocument.isPending}>
                 {t("documents.archive")}
               </Button>
+              <Button
+                variant="ghost"
+                className="btn--danger"
+                onClick={() => void removePermanently()}
+                loading={deleteDocument.isPending}
+              >
+                {t("documents.delete")}
+              </Button>
             </>
           ) : null}
         </div>
       </header>
 
+      {deleteError ? <Alert variant="error">{deleteError}</Alert> : null}
+      {preview.error ? <Alert variant="error">{t("documents.previewError")}</Alert> : null}
       {downloadError !== "NONE" ? (
         <Alert variant="error">
           {downloadError === "MISSING" ? t("documents.fileMissing") : t("documents.downloadError")}
@@ -296,6 +335,7 @@ export function DocumentDetailPage() {
           </table>
         </div>
       </section>
+      <DocumentViewer preview={preview.preview} onClose={preview.close} />
     </div>
   );
 }

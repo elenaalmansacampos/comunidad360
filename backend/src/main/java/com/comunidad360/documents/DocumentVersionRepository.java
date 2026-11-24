@@ -15,4 +15,6 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
 
     Optional<DocumentVersion> findFirstByCommunityIdAndDocumentIdOrderByVersionNumberDesc(
             UUID communityId, UUID documentId);
+
+    void deleteByCommunityIdAndDocumentId(UUID communityId, UUID documentId);
 }

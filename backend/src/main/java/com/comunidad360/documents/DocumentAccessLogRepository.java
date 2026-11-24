@@ -8,4 +8,6 @@ public interface DocumentAccessLogRepository extends JpaRepository<DocumentAcces
 
     long countByCommunityIdAndDocumentIdAndAction(UUID communityId, UUID documentId,
                                                   DocumentAccessAction action);
+
+    void deleteByCommunityIdAndDocumentId(UUID communityId, UUID documentId);
 }

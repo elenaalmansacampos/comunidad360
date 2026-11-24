@@ -24,7 +24,8 @@
     "themeDark": "Activar modo oscuro",
     "themeLight": "Activar modo claro",
     "readOnly": "Modo solo lectura: puedes consultar la información, pero no modificarla.",
-    "delegatedReadOnly": "Solo lectura salvo las acciones autorizadas por {{name}}."
+    "delegatedReadOnly": "Solo lectura salvo las acciones autorizadas por {{name}}.",
+    "close": "Cerrar"
   },
   "nav": {
     "home": "Inicio",
@@ -631,7 +632,15 @@
       "ROLE": "Rol específico",
       "PRIVATE": "Privado"
     },
-    "fileMissing": "El archivo no está disponible. Vuelve a subirlo como nueva versión."
+    "fileMissing": "El archivo no está disponible. Vuelve a subirlo como nueva versión.",
+    "delete": "Eliminar",
+    "deleteConfirm": "¿Eliminar definitivamente este documento y todas sus versiones? No se puede deshacer.",
+    "deleteError": "No se ha podido eliminar el documento.",
+    "deleteInUse": "No se puede eliminar: está vinculado a una reunión.",
+    "actions": "Acciones",
+    "view": "Ver",
+    "openInTab": "Abrir en pestaña",
+    "previewError": "No se ha podido abrir la vista previa."
   },
   "meetings": {
     "title": "Reuniones",

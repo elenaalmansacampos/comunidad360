@@ -24,7 +24,8 @@
     "themeDark": "Enable dark mode",
     "themeLight": "Enable light mode",
     "readOnly": "Read-only mode: you can view information but cannot change it.",
-    "delegatedReadOnly": "Read-only except for actions authorized by {{name}}."
+    "delegatedReadOnly": "Read-only except for actions authorized by {{name}}.",
+    "close": "Close"
   },
   "nav": {
     "home": "Home",
@@ -631,7 +632,15 @@
       "ROLE": "Specific role",
       "PRIVATE": "Private"
     },
-    "fileMissing": "The file is not available. Please upload it again as a new version."
+    "fileMissing": "The file is not available. Please upload it again as a new version.",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this document and all its versions permanently? This cannot be undone.",
+    "deleteError": "The document could not be deleted.",
+    "deleteInUse": "It cannot be deleted because it is linked to a meeting.",
+    "actions": "Actions",
+    "view": "View",
+    "openInTab": "Open in tab",
+    "previewError": "The preview could not be opened."
   },
   "meetings": {
     "title": "Meetings",

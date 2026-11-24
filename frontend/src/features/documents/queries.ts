@@ -86,3 +86,12 @@ export function useArchiveDocument(communityId: string | undefined, documentId: 
     onSuccess: () => invalidateDocument(queryClient, communityId, documentId),
   });
 }
+
+export function useDeleteDocumentPermanent(communityId: string | undefined) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (documentId: string) =>
+      api.delete<void>(`/communities/${communityId}/documents/${documentId}/permanent`),
+    onSuccess: (_data, documentId) => invalidateDocument(queryClient, communityId, documentId),
+  });
+}

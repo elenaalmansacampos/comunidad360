@@ -8,4 +8,6 @@ import java.util.UUID;
 public interface DocumentAclRepository extends JpaRepository<DocumentAcl, UUID> {
 
     List<DocumentAcl> findByCommunityIdAndDocumentId(UUID communityId, UUID documentId);
+
+    void deleteByCommunityIdAndDocumentId(UUID communityId, UUID documentId);
 }

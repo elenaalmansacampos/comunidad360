@@ -2,7 +2,7 @@ import { downloadFile } from "../../services/apiClient";
 import type { Language, Role } from "../../types/api";
 import { localeFor } from "../../utils/language";
 
-const MANAGE_ROLES: Role[] = ["COMMUNITY_ADMIN", "SECRETARY"];
+const MANAGE_ROLES: Role[] = ["COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY"];
 const UPLOAD_ROLES: Role[] = [
   "COMMUNITY_ADMIN",
   "PRESIDENT",

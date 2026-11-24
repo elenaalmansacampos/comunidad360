@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 import { Alert } from "../components/Alert";
+import { DocumentViewer } from "../components/DocumentViewer";
 import { Button } from "../components/Button";
 import { FullPageLoader } from "../components/FullPageLoader";
 import { Input } from "../components/Input";
@@ -10,9 +11,14 @@ import { Select } from "../components/Select";
 import { Textarea } from "../components/Textarea";
 import { useAuthStore } from "../features/auth/authStore";
 import { useCommunityStore } from "../features/communities/communityStore";
-import { useCreateDocument, useDocuments } from "../features/documents/queries";
+import {
+  useCreateDocument,
+  useDeleteDocumentPermanent,
+  useDocuments,
+} from "../features/documents/queries";
 import { ApiError } from "../services/apiClient";
-import { canUploadDocuments, downloadDocument, formatFileSize } from "../features/documents/utils";
+import { canPreviewDocument, useDocumentPreview } from "../features/documents/preview";
+import { canManageDocuments, canUploadDocuments, downloadDocument, formatFileSize } from "../features/documents/utils";
 import type { DocumentCategory, DocumentVisibility } from "../types/api";
 import { formatDate } from "../utils/format";
 import { normalizeLanguage } from "../utils/language";
@@ -38,11 +44,15 @@ export function DocumentsPage() {
   const membership = user?.memberships.find((item) => item.id === communityId);
   const roles = membership?.roles ?? [];
   const canUpload = canUploadDocuments(roles);
+  const canManage = canManageDocuments(roles);
   const language = normalizeLanguage(i18n.language);
   const [category, setCategory] = useState<DocumentCategory | "">("");
   const [showForm, setShowForm] = useState(false);
   const [downloadError, setDownloadError] = useState<"NONE" | "MISSING" | "GENERIC">("NONE");
   const documents = useDocuments(communityId, category || undefined);
+  const deleteDocument = useDeleteDocumentPermanent(communityId);
+  const preview = useDocumentPreview();
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     if (communityId) {
@@ -60,6 +70,22 @@ export function DocumentsPage() {
         <Alert variant="error">{t("documents.error")}</Alert>
       </div>
     );
+  }
+
+  async function removeDocument(documentId: string) {
+    if (!window.confirm(t("documents.deleteConfirm"))) {
+      return;
+    }
+    setDeleteError(null);
+    try {
+      await deleteDocument.mutateAsync(documentId);
+    } catch (error) {
+      setDeleteError(
+        error instanceof ApiError && error.code === "DOCUMENT_IN_USE"
+          ? t("documents.deleteInUse")
+          : t("documents.deleteError"),
+      );
+    }
   }
 
   async function handleDownload(url: string, fileName: string) {
@@ -89,6 +115,8 @@ export function DocumentsPage() {
         <DocumentForm communityId={communityId} onDone={() => setShowForm(false)} />
       ) : null}
 
+      {deleteError ? <Alert variant="error">{deleteError}</Alert> : null}
+      {preview.error ? <Alert variant="error">{t("documents.previewError")}</Alert> : null}
       {downloadError !== "NONE" ? (
         <Alert variant="error">
           {downloadError === "MISSING" ? t("documents.fileMissing") : t("documents.downloadError")}
@@ -121,6 +149,7 @@ export function DocumentsPage() {
                 <th>{t("documents.version")}</th>
                 <th>{t("documents.updated")}</th>
                 <th>{t("documents.file")}</th>
+                {canManage ? <th>{t("documents.actions")}</th> : null}
               </tr>
             </thead>
             <tbody>
@@ -149,6 +178,18 @@ export function DocumentsPage() {
                       {document.sizeBytes ? (
                         <small>{formatFileSize(document.sizeBytes, language)}</small>
                       ) : null}
+                      {document.downloadUrl && document.fileName
+                        && canPreviewDocument(document.mimeType, document.fileName) ? (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="btn--small"
+                          loading={preview.loading}
+                          onClick={() => void preview.open(document)}
+                        >
+                          {t("documents.view")}
+                        </Button>
+                      ) : null}
                       {document.downloadUrl && document.fileName ? (
                         <Button
                           type="button"
@@ -163,12 +204,28 @@ export function DocumentsPage() {
                       ) : null}
                     </div>
                   </td>
+                  {canManage ? (
+                    <td data-label={t("documents.actions")}>
+                      {canManage ? (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="btn--danger"
+                          loading={deleteDocument.isPending}
+                          onClick={() => void removeDocument(document.id)}
+                        >
+                          {t("documents.delete")}
+                        </Button>
+                      ) : null}
+                    </td>
+                  ) : null}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
+      <DocumentViewer preview={preview.preview} onClose={preview.close} />
     </div>
   );
 }

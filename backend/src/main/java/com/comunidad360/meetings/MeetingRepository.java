@@ -14,4 +14,6 @@ public interface MeetingRepository extends JpaRepository<Meeting, UUID> {
 
     List<Meeting> findTop5ByCommunityIdAndStatusAndScheduledStartAfterOrderByScheduledStartAsc(
             UUID communityId, MeetingStatus status, java.time.Instant after);
+
+    boolean existsByConvocationDocumentIdOrMinutesDocumentId(UUID convocationDocumentId, UUID minutesDocumentId);
 }

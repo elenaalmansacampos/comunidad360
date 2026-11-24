@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -85,6 +86,14 @@ public class DocumentController {
                                         HttpServletRequest httpRequest) {
         documentService.archive(communityId, user.id(), documentId, httpRequest);
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{documentId}/permanent")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePermanent(@PathVariable UUID communityId, @PathVariable UUID documentId,
+                                @AuthenticationPrincipal AuthenticatedUser user,
+                                HttpServletRequest httpRequest) {
+        documentService.deletePermanent(communityId, user.id(), documentId, httpRequest);
     }
 
     @PostMapping("/{documentId}/versions")
