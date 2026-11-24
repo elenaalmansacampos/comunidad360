@@ -819,11 +819,7 @@
       "RECEIVED": "Rebut",
       "ACCEPTED": "Acceptat",
       "REJECTED": "Rebutjat"
-    },
-    "primeBadge": "Prime",
-    "primeTitle": "Serveis de proveïdors Prime",
-    "primeMessage": "La gestió de proveïdors, contractes i pressupostos formarà part de la versió Prime de Comunidad 360. Encara està en desenvolupament; properament estarà disponible la contractació.",
-    "primeSoon": "Properament"
+    }
   },
   "votings": {
     "title": "Votacions",
@@ -1155,5 +1151,15 @@
     "displayNamePlaceholder": "Com vols aparèixer al directori",
     "unitLabel": "Pis / habitatge",
     "unitLabelPlaceholder": "Ex. 3rB"
+  },
+  "prime": {
+    "badge": "Prime",
+    "soon": "Properament",
+    "providersTitle": "Serveis de proveïdors Prime",
+    "providersMessage": "La gestió de proveïdors, contractes i pressupostos formarà part de la versió Prime de Comunidad 360. Encara està en desenvolupament; properament estarà disponible la contractació.",
+    "bankingTitle": "Banca Prime",
+    "bankingMessage": "La gestió bancària, la conciliació i els moviments formaran part de la versió Prime de Comunidad 360. Encara està en desenvolupament; properament estarà disponible la contractació.",
+    "chatTitle": "Xat Prime",
+    "chatMessage": "El xat comunitari i els seus canals formaran part de la versió Prime de Comunidad 360. Encara està en desenvolupament; properament estarà disponible la contractació."
   }
 }

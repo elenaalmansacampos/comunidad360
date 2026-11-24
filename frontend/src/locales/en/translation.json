@@ -819,11 +819,7 @@
       "RECEIVED": "Received",
       "ACCEPTED": "Accepted",
       "REJECTED": "Rejected"
-    },
-    "primeBadge": "Prime",
-    "primeTitle": "Prime provider services",
-    "primeMessage": "Provider, contract and budget management will be part of the Prime version of Comunidad 360. It is still in development; contracting will be available soon.",
-    "primeSoon": "Coming soon"
+    }
   },
   "votings": {
     "title": "Votings",
@@ -1155,5 +1151,15 @@
     "displayNamePlaceholder": "How you want to appear in the directory",
     "unitLabel": "Floor / home",
     "unitLabelPlaceholder": "E.g. 3B"
+  },
+  "prime": {
+    "badge": "Prime",
+    "soon": "Coming soon",
+    "providersTitle": "Prime provider services",
+    "providersMessage": "Provider, contract and budget management will be part of the Prime version of Comunidad 360. It is still in development; contracting will be available soon.",
+    "bankingTitle": "Prime banking",
+    "bankingMessage": "Banking management, reconciliation and transactions will be part of the Prime version of Comunidad 360. It is still in development; contracting will be available soon.",
+    "chatTitle": "Prime chat",
+    "chatMessage": "Community chat and its channels will be part of the Prime version of Comunidad 360. It is still in development; contracting will be available soon."
   }
 }

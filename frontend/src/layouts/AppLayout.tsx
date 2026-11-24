@@ -128,7 +128,7 @@ export function AppLayout() {
   const communityMoreLinks: { to: string; label: string; community: boolean; accent: string; badge?: string }[] = [
     { to: `/communities/${communityId}/incidents`, label: t("nav.incidents"), community: true, accent: "rose" },
     { to: `/communities/${communityId}/reservations`, label: t("nav.reservations"), community: true, accent: "violet" },
-    { to: `/communities/${communityId}/chat`, label: t("nav.chat"), community: true, accent: "blue" },
+    { to: `/communities/${communityId}/chat`, label: t("nav.chat"), community: true, accent: "blue", badge: t("prime.badge") },
     { to: `/communities/${communityId}/board`, label: t("nav.board"), community: true, accent: "amber" },
     { to: `/communities/${communityId}/lost-found`, label: t("nav.lostFound"), community: true, accent: "teal" },
     { to: `/communities/${communityId}/votings`, label: t("nav.votings"), community: true, accent: "indigo" },
@@ -138,9 +138,9 @@ export function AppLayout() {
   ];
   const managementMoreLinks: { to: string; label: string; community: boolean; accent: string; badge?: string }[] = [
     ...(canViewProviders(roles)
-      ? [{ to: `/communities/${communityId}/providers`, label: t("nav.providers"), community: false, accent: "", badge: t("providers.primeBadge") }]
+      ? [{ to: `/communities/${communityId}/providers`, label: t("nav.providers"), community: false, accent: "", badge: t("prime.badge") }]
       : []),
-    { to: `/communities/${communityId}/banking`, label: t("nav.banking"), community: false, accent: "" },
+    { to: `/communities/${communityId}/banking`, label: t("nav.banking"), community: false, accent: "", badge: t("prime.badge") },
     { to: `/communities/${communityId}/meetings`, label: t("nav.meetings"), community: false, accent: "" },
     { to: `/communities/${communityId}/documents`, label: t("nav.documents"), community: false, accent: "" },
     { to: `/communities/${communityId}/work-permits`, label: t("nav.workPermits"), community: false, accent: "" },
@@ -219,7 +219,12 @@ export function AppLayout() {
             <div className="nav-section nav-section--management">
               <p className="nav-group">{t("nav.groups.management")}</p>
               <NavItem to={`/communities/${communityId}/finance`} icon={<Wallet size={18} />} label={t("nav.finance")} />
-              <NavItem to={`/communities/${communityId}/banking`} icon={<Landmark size={18} />} label={t("nav.banking")} />
+              <NavItem
+                to={`/communities/${communityId}/banking`}
+                icon={<Landmark size={18} />}
+                label={t("nav.banking")}
+                badge={t("prime.badge")}
+              />
               {!isVecino ? (
                 <>
                   <NavItem to={`/communities/${communityId}/incidents`} icon={<AlertTriangle size={18} />} label={t("nav.incidents")} />
@@ -254,6 +259,7 @@ export function AppLayout() {
                 icon={<MessageCircle size={18} />}
                 label={t("nav.chat")}
                 accent={isVecino ? "blue" : undefined}
+                badge={t("prime.badge")}
               />
               <NavItem
                 to={`/communities/${communityId}/board`}
@@ -273,7 +279,7 @@ export function AppLayout() {
                   icon={<Wrench size={18} />}
                   label={t("nav.providers")}
                   accent={isVecino ? "orange" : undefined}
-                  badge={t("providers.primeBadge")}
+                  badge={t("prime.badge")}
                 />
               ) : null}
               <NavItem

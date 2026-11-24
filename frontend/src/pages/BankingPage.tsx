@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
 import { FullPageLoader } from "../components/FullPageLoader";
+import { PrimeNotice } from "../components/PrimeNotice";
 import { Input } from "../components/Input";
 import { Select } from "../components/Select";
 import { Textarea } from "../components/Textarea";
@@ -89,6 +90,7 @@ export function BankingPage() {
           <p className="page-subtitle">{t("banking.subtitle")}</p>
         </div>
       </header>
+      <PrimeNotice feature="banking" />
 
       <section className="structure-section">
         <div className="section-heading">

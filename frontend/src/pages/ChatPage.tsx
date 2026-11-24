@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
 import { FullPageLoader } from "../components/FullPageLoader";
+import { PrimeNotice } from "../components/PrimeNotice";
 import { Input } from "../components/Input";
 import { Select } from "../components/Select";
 import { Textarea } from "../components/Textarea";
@@ -114,6 +115,7 @@ export function ChatPage() {
           <Button variant="secondary" onClick={() => setShowForm((value) => !value)}>{t("chat.newChannel")}</Button>
         ) : null}
       </header>
+      <PrimeNotice feature="chat" />
       {showForm ? (
         <form className="form-card" onSubmit={create}>
           <h3>{t("chat.newChannel")}</h3>

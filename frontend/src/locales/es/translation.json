@@ -819,11 +819,7 @@
       "RECEIVED": "Recibido",
       "ACCEPTED": "Aceptado",
       "REJECTED": "Rechazado"
-    },
-    "primeBadge": "Prime",
-    "primeTitle": "Servicios de proveedores Prime",
-    "primeMessage": "La gestión de proveedores, contratos y presupuestos formará parte de la versión Prime de Comunidad 360. Aún está en desarrollo; próximamente estará disponible la contratación.",
-    "primeSoon": "Próximamente"
+    }
   },
   "votings": {
     "title": "Votaciones",
@@ -1155,5 +1151,15 @@
     "displayNamePlaceholder": "Cómo quieres aparecer en el directorio",
     "unitLabel": "Piso / vivienda",
     "unitLabelPlaceholder": "Ej. 3ºB"
+  },
+  "prime": {
+    "badge": "Prime",
+    "soon": "Próximamente",
+    "providersTitle": "Servicios de proveedores Prime",
+    "providersMessage": "La gestión de proveedores, contratos y presupuestos formará parte de la versión Prime de Comunidad 360. Aún está en desarrollo; próximamente estará disponible la contratación.",
+    "bankingTitle": "Banca Prime",
+    "bankingMessage": "La gestión bancaria, la conciliación y los movimientos formarán parte de la versión Prime de Comunidad 360. Aún está en desarrollo; próximamente estará disponible la contratación.",
+    "chatTitle": "Chat Prime",
+    "chatMessage": "El chat comunitario y sus canales formarán parte de la versión Prime de Comunidad 360. Aún está en desarrollo; próximamente estará disponible la contratación."
   }
 }
