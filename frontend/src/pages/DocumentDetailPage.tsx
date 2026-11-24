@@ -9,6 +9,7 @@ import { Input } from "../components/Input";
 import { Select } from "../components/Select";
 import { Textarea } from "../components/Textarea";
 import { useAuthStore } from "../features/auth/authStore";
+import { ApiError } from "../services/apiClient";
 import {
   useAddDocumentVersion,
   useArchiveDocument,
@@ -58,7 +59,7 @@ export function DocumentDetailPage() {
   const [category, setCategory] = useState<DocumentCategory>("ACTA");
   const [visibility, setVisibility] = useState<DocumentVisibility>("COMMUNITY");
   const [versionFile, setVersionFile] = useState<File | null>(null);
-  const [downloadError, setDownloadError] = useState(false);
+  const [downloadError, setDownloadError] = useState<"NONE" | "MISSING" | "GENERIC">("NONE");
 
   if (detail.isLoading) {
     return <FullPageLoader />;
@@ -124,11 +125,11 @@ export function DocumentDetailPage() {
   }
 
   async function download(url: string, fileName: string) {
-    setDownloadError(false);
+    setDownloadError("NONE");
     try {
       await downloadDocument(url, fileName);
-    } catch {
-      setDownloadError(true);
+    } catch (error) {
+      setDownloadError(error instanceof ApiError && error.code === "FILE_NOT_FOUND" ? "MISSING" : "GENERIC");
     }
   }
 
@@ -166,7 +167,11 @@ export function DocumentDetailPage() {
         </div>
       </header>
 
-      {downloadError ? <Alert variant="error">{t("documents.downloadError")}</Alert> : null}
+      {downloadError !== "NONE" ? (
+        <Alert variant="error">
+          {downloadError === "MISSING" ? t("documents.fileMissing") : t("documents.downloadError")}
+        </Alert>
+      ) : null}
       {archiveDocument.isError ? <Alert variant="error">{t("documents.updateError")}</Alert> : null}
 
       <section className="detail-grid">
@@ -188,11 +193,16 @@ export function DocumentDetailPage() {
         <article className="detail-card">
           <h2>{t("documents.currentFile")}</h2>
           {document.fileName ? (
-            <div className="documents-current-file">
-              <strong>{document.fileName}</strong>
-              <span>{document.mimeType}</span>
-              {document.sizeBytes ? <span>{formatFileSize(document.sizeBytes, language)}</span> : null}
-            </div>
+            <>
+              <div className="documents-current-file">
+                <strong>{document.fileName}</strong>
+                <span>{document.mimeType}</span>
+                {document.sizeBytes ? <span>{formatFileSize(document.sizeBytes, language)}</span> : null}
+              </div>
+              {!document.downloadUrl ? (
+                <Alert variant="error">{t("documents.fileMissing")}</Alert>
+              ) : null}
+            </>
           ) : (
             <p>{t("common.empty")}</p>
           )}

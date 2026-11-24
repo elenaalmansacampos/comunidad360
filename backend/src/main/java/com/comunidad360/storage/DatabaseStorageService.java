@@ -1,6 +1,7 @@
 package com.comunidad360.storage;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,17 @@ public class DatabaseStorageService implements StorageService {
     @Override
     public boolean supportsPresignedUrls() {
         return false;
+    }
+
+    @Override
+    public boolean exists(String key) {
+        try {
+            Boolean exists = jdbcTemplate.queryForObject(
+                    "select exists(select 1 from stored_file where storage_key = ?)", Boolean.class, key);
+            return Boolean.TRUE.equals(exists);
+        } catch (DataAccessException exception) {
+            return true;
+        }
     }
 
     private void validateKey(String key) {

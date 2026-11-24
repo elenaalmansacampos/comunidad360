@@ -630,7 +630,8 @@
       "OWNERS": "Propietarios",
       "ROLE": "Rol específico",
       "PRIVATE": "Privado"
-    }
+    },
+    "fileMissing": "El archivo no está disponible. Vuelve a subirlo como nueva versión."
   },
   "meetings": {
     "title": "Reuniones",

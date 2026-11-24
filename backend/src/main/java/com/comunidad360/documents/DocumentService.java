@@ -243,19 +243,21 @@ public class DocumentService {
 
     private DocumentResponse toResponse(Document document) {
         DocumentVersion current = currentVersionOrNull(document);
+        boolean available = current != null && storageService.exists(current.getStorageKey());
         return DocumentResponse.from(
                 document,
                 current == null ? null : current.getVersionNumber(),
                 current == null ? null : current.getFileName(),
                 current == null ? null : current.getMimeType(),
                 current == null ? null : current.getSizeBytes(),
-                current == null ? null : downloadUrl(document, current, false)
+                available ? downloadUrl(document, current, false) : null
         );
     }
 
     private DocumentVersionResponse toVersionResponse(DocumentVersion version) {
         Document document = documentRepository.findById(version.getDocumentId()).orElse(null);
-        String url = document == null ? null : downloadUrl(document, version, true);
+        String url = document != null && storageService.exists(version.getStorageKey())
+                ? downloadUrl(document, version, true) : null;
         return DocumentVersionResponse.from(version, userName(version.getUploadedByUserId()), url);
     }
 

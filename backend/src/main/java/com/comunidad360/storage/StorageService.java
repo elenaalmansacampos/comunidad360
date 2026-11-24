@@ -17,4 +17,8 @@ public interface StorageService {
     String presignedGetUrl(String key, Duration ttl);
 
     boolean supportsPresignedUrls();
+
+    default boolean exists(String key) {
+        return true;
+    }
 }

@@ -630,7 +630,8 @@
       "OWNERS": "Propietaris",
       "ROLE": "Rol específic",
       "PRIVATE": "Privat"
-    }
+    },
+    "fileMissing": "El fitxer no està disponible. Torna a pujar-lo com a nova versió."
   },
   "meetings": {
     "title": "Reunions",

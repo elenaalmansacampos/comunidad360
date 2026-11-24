@@ -68,6 +68,15 @@ public class LocalStorageService implements StorageService {
         return false;
     }
 
+    @Override
+    public boolean exists(String key) {
+        try {
+            return Files.exists(resolve(key));
+        } catch (RuntimeException exception) {
+            return true;
+        }
+    }
+
     private Path resolve(String key) {
         if (key == null || !key.matches("[a-f0-9-]+\\.[a-z0-9]+")) {
             throw new IllegalArgumentException("Invalid storage key");

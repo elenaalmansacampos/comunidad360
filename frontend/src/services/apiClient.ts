@@ -139,7 +139,19 @@ export async function downloadFile(path: string, retry = true): Promise<Blob> {
     }
   }
   if (!response.ok) {
-    throw new ApiError(response.status, "DOWNLOAD_ERROR", "errors.generic");
+    let problem: Problem | undefined;
+    try {
+      problem = (await response.json()) as Problem;
+    } catch {
+      problem = undefined;
+    }
+    throw new ApiError(
+      response.status,
+      problem?.code ?? "DOWNLOAD_ERROR",
+      problem?.messageKey ?? "errors.generic",
+      problem?.detail,
+      problem?.traceId,
+    );
   }
   return response.blob();
 }

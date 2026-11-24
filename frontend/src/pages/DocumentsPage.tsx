@@ -11,6 +11,7 @@ import { Textarea } from "../components/Textarea";
 import { useAuthStore } from "../features/auth/authStore";
 import { useCommunityStore } from "../features/communities/communityStore";
 import { useCreateDocument, useDocuments } from "../features/documents/queries";
+import { ApiError } from "../services/apiClient";
 import { canUploadDocuments, downloadDocument, formatFileSize } from "../features/documents/utils";
 import type { DocumentCategory, DocumentVisibility } from "../types/api";
 import { formatDate } from "../utils/format";
@@ -40,7 +41,7 @@ export function DocumentsPage() {
   const language = normalizeLanguage(i18n.language);
   const [category, setCategory] = useState<DocumentCategory | "">("");
   const [showForm, setShowForm] = useState(false);
-  const [downloadError, setDownloadError] = useState(false);
+  const [downloadError, setDownloadError] = useState<"NONE" | "MISSING" | "GENERIC">("NONE");
   const documents = useDocuments(communityId, category || undefined);
 
   useEffect(() => {
@@ -62,11 +63,11 @@ export function DocumentsPage() {
   }
 
   async function handleDownload(url: string, fileName: string) {
-    setDownloadError(false);
+    setDownloadError("NONE");
     try {
       await downloadDocument(url, fileName);
-    } catch {
-      setDownloadError(true);
+    } catch (error) {
+      setDownloadError(error instanceof ApiError && error.code === "FILE_NOT_FOUND" ? "MISSING" : "GENERIC");
     }
   }
 
@@ -88,7 +89,11 @@ export function DocumentsPage() {
         <DocumentForm communityId={communityId} onDone={() => setShowForm(false)} />
       ) : null}
 
-      {downloadError ? <Alert variant="error">{t("documents.downloadError")}</Alert> : null}
+      {downloadError !== "NONE" ? (
+        <Alert variant="error">
+          {downloadError === "MISSING" ? t("documents.fileMissing") : t("documents.downloadError")}
+        </Alert>
+      ) : null}
 
       <div className="filter-bar">
         <Select
@@ -153,6 +158,8 @@ export function DocumentsPage() {
                         >
                           {t("documents.download")}
                         </Button>
+                      ) : document.fileName ? (
+                        <small className="documents-file-missing">{t("documents.fileMissing")}</small>
                       ) : null}
                     </div>
                   </td>
