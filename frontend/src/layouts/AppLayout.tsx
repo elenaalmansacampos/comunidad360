@@ -48,12 +48,19 @@ function initials(name: string | undefined): string {
     .join("");
 }
 
-function NavItem({ to, icon, label, end }: { to: string; icon: ReactNode; label: string; end?: boolean }) {
+function NavItem({ to, icon, label, end, accent }: {
+  to: string;
+  icon: ReactNode;
+  label: string;
+  end?: boolean;
+  accent?: string;
+}) {
   return (
     <NavLink
       to={to}
       end={end}
-      className={({ isActive }) => `nav-link ${isActive ? "nav-link--active" : ""}`}
+      className={({ isActive }) =>
+        `nav-link ${isActive ? "nav-link--active" : ""} ${accent ? `nav-link--accent-${accent}` : ""}`}
     >
       <span className="nav-link__icon" aria-hidden="true">{icon}</span>
       <span>{label}</span>
@@ -73,7 +80,9 @@ export function AppLayout() {
   const communities = useCommunities();
   const community = communities.data?.find((item) => item.id === communityId);
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
+  const isVecino = roles.includes("VECINO");
   const roleLabel = roles[0] ? t(`roles.${roles[0]}`, { defaultValue: roles[0] }) : "";
+  const displayRoleLabel = isVecino ? t("roles.VECINO") : roleLabel;
   const readOnly = isReadOnly(roles);
   const receivedAuthorizations = useReceivedAuthorizations(communityId);
   const activeDelegation = useDelegationStore((state) => state.active);
@@ -114,6 +123,31 @@ export function AppLayout() {
     await logout();
     navigate("/login", { replace: true });
   }
+
+  const communityMoreLinks = [
+    { to: `/communities/${communityId}/incidents`, label: t("nav.incidents"), community: true, accent: "rose" },
+    { to: `/communities/${communityId}/reservations`, label: t("nav.reservations"), community: true, accent: "violet" },
+    { to: `/communities/${communityId}/chat`, label: t("nav.chat"), community: true, accent: "blue" },
+    { to: `/communities/${communityId}/board`, label: t("nav.board"), community: true, accent: "amber" },
+    { to: `/communities/${communityId}/lost-found`, label: t("nav.lostFound"), community: true, accent: "teal" },
+    { to: `/communities/${communityId}/votings`, label: t("nav.votings"), community: true, accent: "indigo" },
+    { to: `/communities/${communityId}/members`, label: t("nav.members"), community: true, accent: "slate" },
+    { to: `/communities/${communityId}/authorizations`, label: t("nav.authorizations"), community: true, accent: "cyan" },
+    { to: `/communities/${communityId}/directory`, label: t("nav.directory"), community: true, accent: "green" },
+  ];
+  const managementMoreLinks = [
+    ...(canViewProviders(roles)
+      ? [{ to: `/communities/${communityId}/providers`, label: t("nav.providers"), community: false, accent: "" }]
+      : []),
+    { to: `/communities/${communityId}/banking`, label: t("nav.banking"), community: false, accent: "" },
+    { to: `/communities/${communityId}/meetings`, label: t("nav.meetings"), community: false, accent: "" },
+    { to: `/communities/${communityId}/documents`, label: t("nav.documents"), community: false, accent: "" },
+    { to: `/communities/${communityId}/work-permits`, label: t("nav.workPermits"), community: false, accent: "" },
+    { to: `/communities/${communityId}/notification-preferences`, label: t("notifications.preferences"), community: false, accent: "" },
+  ];
+  const orderedMobileLinks = isVecino
+    ? [...communityMoreLinks, ...managementMoreLinks]
+    : [...managementMoreLinks, ...communityMoreLinks];
 
   return (
     <div className="app-shell">
@@ -162,38 +196,110 @@ export function AppLayout() {
               <strong>{community?.name ?? t("common.loading")}</strong>
             </div>
           </div>
-          <nav className="sidebar__nav">
-            <p className="nav-group">{t("nav.groups.general")}</p>
-            <NavItem to="/communities" end icon={<Building2 size={18} />} label={t("nav.community")} />
-            <NavItem
-              to={`/communities/${communityId}/dashboard`}
-              icon={<LayoutDashboard size={18} />}
-              label={t("nav.home")}
-            />
-            <NavItem
-              to={`/communities/${communityId}/structure`}
-              icon={<Building2 size={18} />}
-              label={t("nav.structure")}
-            />
-            <p className="nav-group">{t("nav.groups.management")}</p>
-            <NavItem to={`/communities/${communityId}/finance`} icon={<Wallet size={18} />} label={t("nav.finance")} />
-            <NavItem to={`/communities/${communityId}/banking`} icon={<Landmark size={18} />} label={t("nav.banking")} />
-            <NavItem to={`/communities/${communityId}/incidents`} icon={<AlertTriangle size={18} />} label={t("nav.incidents")} />
-            <NavItem to={`/communities/${communityId}/meetings`} icon={<CalendarDays size={18} />} label={t("nav.meetings")} />
-            <NavItem to={`/communities/${communityId}/reservations`} icon={<CalendarCheck size={18} />} label={t("nav.reservations")} />
-            <NavItem to={`/communities/${communityId}/documents`} icon={<FileText size={18} />} label={t("nav.documents")} />
-            <NavItem to={`/communities/${communityId}/work-permits`} icon={<HardHat size={18} />} label={t("nav.workPermits")} />
-            <p className="nav-group">{t("nav.groups.community")}</p>
-            <NavItem to={`/communities/${communityId}/chat`} icon={<MessageCircle size={18} />} label={t("nav.chat")} />
-            <NavItem to={`/communities/${communityId}/board`} icon={<StickyNote size={18} />} label={t("nav.board")} />
-            <NavItem to={`/communities/${communityId}/lost-found`} icon={<PackageSearch size={18} />} label={t("nav.lostFound")} />
-            {canViewProviders(roles) ? (
-              <NavItem to={`/communities/${communityId}/providers`} icon={<Wrench size={18} />} label={t("nav.providers")} />
-            ) : null}
-            <NavItem to={`/communities/${communityId}/votings`} icon={<Vote size={18} />} label={t("nav.votings")} />
-            <NavItem to={`/communities/${communityId}/members`} icon={<Users size={18} />} label={t("nav.members")} />
-            <NavItem to={`/communities/${communityId}/authorizations`} icon={<UserCheck size={18} />} label={t("nav.authorizations")} />
-            <NavItem to={`/communities/${communityId}/directory`} icon={<BookUser size={18} />} label={t("nav.directory")} />
+          <div className={`sidebar__role ${isVecino ? "sidebar__role--vecino" : ""}`}>
+            <span>{t("common.role")}</span>
+            <strong>{displayRoleLabel}</strong>
+          </div>
+          <nav className={`sidebar__nav ${isVecino ? "sidebar__nav--vecino" : ""}`}>
+            <div className="nav-section nav-section--general">
+              <p className="nav-group">{t("nav.groups.general")}</p>
+              <NavItem to="/communities" end icon={<Building2 size={18} />} label={t("nav.community")} />
+              <NavItem
+                to={`/communities/${communityId}/dashboard`}
+                icon={<LayoutDashboard size={18} />}
+                label={t("nav.home")}
+              />
+              <NavItem
+                to={`/communities/${communityId}/structure`}
+                icon={<Building2 size={18} />}
+                label={t("nav.structure")}
+              />
+            </div>
+
+            <div className="nav-section nav-section--management">
+              <p className="nav-group">{t("nav.groups.management")}</p>
+              <NavItem to={`/communities/${communityId}/finance`} icon={<Wallet size={18} />} label={t("nav.finance")} />
+              <NavItem to={`/communities/${communityId}/banking`} icon={<Landmark size={18} />} label={t("nav.banking")} />
+              {!isVecino ? (
+                <>
+                  <NavItem to={`/communities/${communityId}/incidents`} icon={<AlertTriangle size={18} />} label={t("nav.incidents")} />
+                  <NavItem to={`/communities/${communityId}/reservations`} icon={<CalendarCheck size={18} />} label={t("nav.reservations")} />
+                </>
+              ) : null}
+              <NavItem to={`/communities/${communityId}/meetings`} icon={<CalendarDays size={18} />} label={t("nav.meetings")} />
+              <NavItem to={`/communities/${communityId}/documents`} icon={<FileText size={18} />} label={t("nav.documents")} />
+              <NavItem to={`/communities/${communityId}/work-permits`} icon={<HardHat size={18} />} label={t("nav.workPermits")} />
+            </div>
+
+            <div className="nav-section nav-section--community">
+              <p className="nav-group">{t("nav.groups.community")}</p>
+              {isVecino ? (
+                <>
+                  <NavItem
+                    to={`/communities/${communityId}/incidents`}
+                    icon={<AlertTriangle size={18} />}
+                    label={t("nav.incidents")}
+                    accent="rose"
+                  />
+                  <NavItem
+                    to={`/communities/${communityId}/reservations`}
+                    icon={<CalendarCheck size={18} />}
+                    label={t("nav.reservations")}
+                    accent="violet"
+                  />
+                </>
+              ) : null}
+              <NavItem
+                to={`/communities/${communityId}/chat`}
+                icon={<MessageCircle size={18} />}
+                label={t("nav.chat")}
+                accent={isVecino ? "blue" : undefined}
+              />
+              <NavItem
+                to={`/communities/${communityId}/board`}
+                icon={<StickyNote size={18} />}
+                label={t("nav.board")}
+                accent={isVecino ? "amber" : undefined}
+              />
+              <NavItem
+                to={`/communities/${communityId}/lost-found`}
+                icon={<PackageSearch size={18} />}
+                label={t("nav.lostFound")}
+                accent={isVecino ? "teal" : undefined}
+              />
+              {canViewProviders(roles) ? (
+                <NavItem
+                  to={`/communities/${communityId}/providers`}
+                  icon={<Wrench size={18} />}
+                  label={t("nav.providers")}
+                  accent={isVecino ? "orange" : undefined}
+                />
+              ) : null}
+              <NavItem
+                to={`/communities/${communityId}/votings`}
+                icon={<Vote size={18} />}
+                label={t("nav.votings")}
+                accent={isVecino ? "indigo" : undefined}
+              />
+              <NavItem
+                to={`/communities/${communityId}/members`}
+                icon={<Users size={18} />}
+                label={t("nav.members")}
+                accent={isVecino ? "slate" : undefined}
+              />
+              <NavItem
+                to={`/communities/${communityId}/authorizations`}
+                icon={<UserCheck size={18} />}
+                label={t("nav.authorizations")}
+                accent={isVecino ? "cyan" : undefined}
+              />
+              <NavItem
+                to={`/communities/${communityId}/directory`}
+                icon={<BookUser size={18} />}
+                label={t("nav.directory")}
+                accent={isVecino ? "green" : undefined}
+              />
+            </div>
           </nav>
           {user ? (
             <div className="sidebar__footer">
@@ -201,7 +307,7 @@ export function AppLayout() {
                 <span className="avatar" aria-hidden="true">{initials(user.fullName)}</span>
                 <div>
                   <strong>{user.fullName}</strong>
-                  <small>{roleLabel}</small>
+                  <small>{displayRoleLabel}</small>
                 </div>
               </div>
               <button
@@ -283,6 +389,13 @@ export function AppLayout() {
             onClick={() => setMoreOpen(false)}
           />
           <nav className="mobile-more" id="mobile-more" aria-label={t("nav.more")}>
+            <div className="mobile-more__identity">
+              <span className="avatar avatar--sm" aria-hidden="true">{initials(user?.fullName)}</span>
+              <div>
+                <strong>{user?.fullName}</strong>
+                <span className={`role-chip ${isVecino ? "role-chip--vecino" : ""}`}>{displayRoleLabel}</span>
+              </div>
+            </div>
             <div className="mobile-more__header">
               <strong>{t("nav.more")}</strong>
               <button type="button" className="text-link text-link--button" onClick={() => setMoreOpen(false)}>
@@ -290,24 +403,15 @@ export function AppLayout() {
               </button>
             </div>
             <div className="mobile-more__grid">
-              <NavLink to={`/communities/${communityId}/banking`}>{t("nav.banking")}</NavLink>
-              <NavLink to={`/communities/${communityId}/meetings`}>{t("nav.meetings")}</NavLink>
-              <NavLink to={`/communities/${communityId}/reservations`}>{t("nav.reservations")}</NavLink>
-              <NavLink to={`/communities/${communityId}/documents`}>{t("nav.documents")}</NavLink>
-              <NavLink to={`/communities/${communityId}/work-permits`}>{t("nav.workPermits")}</NavLink>
-              <NavLink to={`/communities/${communityId}/chat`}>{t("nav.chat")}</NavLink>
-              <NavLink to={`/communities/${communityId}/board`}>{t("nav.board")}</NavLink>
-              <NavLink to={`/communities/${communityId}/lost-found`}>{t("nav.lostFound")}</NavLink>
-              {canViewProviders(roles) ? (
-                <NavLink to={`/communities/${communityId}/providers`}>{t("nav.providers")}</NavLink>
-              ) : null}
-              <NavLink to={`/communities/${communityId}/votings`}>{t("nav.votings")}</NavLink>
-              <NavLink to={`/communities/${communityId}/members`}>{t("nav.members")}</NavLink>
-              <NavLink to={`/communities/${communityId}/authorizations`}>{t("nav.authorizations")}</NavLink>
-              <NavLink to={`/communities/${communityId}/directory`}>{t("nav.directory")}</NavLink>
-              <NavLink to={`/communities/${communityId}/notification-preferences`}>
-                {t("notifications.preferences")}
-              </NavLink>
+              {orderedMobileLinks.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  className={isVecino && link.community ? `nav-link--accent-${link.accent}` : undefined}
+                >
+                  {link.label}
+                </NavLink>
+              ))}
             </div>
           </nav>
         </>
