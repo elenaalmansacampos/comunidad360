@@ -17,7 +17,7 @@ import {
   useLostItems,
   useUpdateLostItem,
 } from "../features/lostfound/queries";
-import { canManageLostFound } from "../features/mvp/utils";
+import { canManageLostFound, isReadOnly } from "../features/mvp/utils";
 import type { LostItem, LostItemStatus, LostItemType } from "../types/api";
 import { formatDate } from "../utils/format";
 import { normalizeLanguage } from "../utils/language";
@@ -31,6 +31,7 @@ export function LostFoundPage() {
   const setSelectedCommunityId = useCommunityStore((state) => state.setSelectedCommunityId);
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
   const canManage = canManageLostFound(roles);
+  const readOnly = isReadOnly(roles);
   const language = normalizeLanguage(i18n.language);
   const [filter, setFilter] = useState<Filter>("ALL");
   const items = useLostItems(communityId, filter === "ALL" ? undefined : filter);
@@ -74,7 +75,7 @@ export function LostFoundPage() {
   }
 
   function canEdit(item: LostItem): boolean {
-    return canManage || item.createdByUserId === user?.id;
+    return !readOnly && (canManage || item.createdByUserId === user?.id);
   }
 
   async function setStatus(item: LostItem, status: LostItemStatus) {
@@ -96,9 +97,11 @@ export function LostFoundPage() {
           <h1>{t("lostFound.title")}</h1>
           <p className="page-subtitle">{t("lostFound.subtitle")}</p>
         </div>
-        <Button onClick={() => setShowForm((value) => !value)}>
-          <Plus size={16} aria-hidden="true" /> {t("lostFound.newItem")}
-        </Button>
+        {!readOnly ? (
+          <Button onClick={() => setShowForm((value) => !value)}>
+            <Plus size={16} aria-hidden="true" /> {t("lostFound.newItem")}
+          </Button>
+        ) : null}
       </header>
 
       {items.isError ? <Alert variant="error">{t("lostFound.error")}</Alert> : null}
@@ -121,7 +124,7 @@ export function LostFoundPage() {
         ))}
       </div>
 
-      {showForm ? (
+      {showForm && !readOnly ? (
         <form className="form-card" onSubmit={submit}>
           <h3>{t("lostFound.newItem")}</h3>
           <div className="form-grid">

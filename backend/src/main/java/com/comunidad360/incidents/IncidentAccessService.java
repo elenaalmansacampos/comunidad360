@@ -51,6 +51,11 @@ public class IncidentAccessService {
     }
 
     @Transactional(readOnly = true)
+    public void requireComment(Membership membership) {
+        permissionService.require(membership, "INCIDENT_COMMENT");
+    }
+
+    @Transactional(readOnly = true)
     public boolean canViewAll(Membership membership) {
         return permissionService.hasPermission(membership, "INCIDENT_VIEW_ALL");
     }

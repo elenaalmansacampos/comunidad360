@@ -149,6 +149,71 @@ class CommunityExtrasIntegrationTest {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    void viewerCanReadButNotWrite() throws Exception {
+        AppUser admin = createUser(uniqueEmail("viewer-admin"));
+        AppUser viewer = createUser(uniqueEmail("viewer-user"));
+        Community community = createCommunity("Viewer Community");
+        createMembership(community, admin, "COMMUNITY_ADMIN");
+        createMembership(community, viewer, "VIEWER");
+        String adminToken = accessToken(admin.getEmail());
+        String viewerToken = accessToken(viewer.getEmail());
+
+        mockMvc.perform(post(path(community.getId(), "board-notes"))
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "title", "Aviso", "body", "Contenido", "color", "YELLOW"))))
+                .andExpect(status().isCreated());
+        mockMvc.perform(post(path(community.getId(), "lost-items"))
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "title", "Objeto", "type", "LOST"))))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get(path(community.getId(), "board-notes"))
+                        .header("Authorization", "Bearer " + viewerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+        mockMvc.perform(get(path(community.getId(), "lost-items"))
+                        .header("Authorization", "Bearer " + viewerToken))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post(path(community.getId(), "board-notes"))
+                        .header("Authorization", "Bearer " + viewerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "title", "No", "body", "No", "color", "BLUE"))))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post(path(community.getId(), "lost-items"))
+                        .header("Authorization", "Bearer " + viewerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "title", "No", "type", "FOUND"))))
+                .andExpect(status().isForbidden());
+
+        MvcResult channels = mockMvc.perform(get(path(community.getId(), "chat/channels"))
+                        .header("Authorization", "Bearer " + viewerToken))
+                .andExpect(status().isOk())
+                .andReturn();
+        UUID channelId = UUID.fromString(json(channels).get(0).get("id").asText());
+        mockMvc.perform(post(path(community.getId(), "chat/channels") + "/" + channelId + "/messages")
+                        .header("Authorization", "Bearer " + viewerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("body", "Hola"))))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post(path(community.getId(), "invitations"))
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "email", uniqueEmail("viewer-invite"), "role", "VIEWER"))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.role").value("VIEWER"))
+                .andExpect(jsonPath("$.devToken").isNotEmpty());
+    }
+
     private String path(UUID communityId, String resource) {
         return "/api/v1/communities/" + communityId + "/" + resource;
     }

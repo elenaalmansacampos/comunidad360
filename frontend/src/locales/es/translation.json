@@ -22,7 +22,8 @@
     "hidePassword": "Ocultar contraseña",
     "name": "Nombre",
     "themeDark": "Activar modo oscuro",
-    "themeLight": "Activar modo claro"
+    "themeLight": "Activar modo claro",
+    "readOnly": "Modo solo lectura: puedes consultar la información, pero no modificarla."
   },
   "nav": {
     "home": "Inicio",
@@ -197,7 +198,16 @@
     "status": "Estado",
     "roles": "Roles",
     "empty": "No hay miembros visibles",
-    "forbidden": "No tienes permiso para consultar los miembros"
+    "forbidden": "No tienes permiso para consultar los miembros",
+    "invite": "Invitar a un miembro",
+    "inviteEmail": "Email",
+    "inviteRole": "Rol",
+    "inviteSubmit": "Crear invitación",
+    "inviteSent": "Invitación creada. Comparte este enlace con la persona invitada:",
+    "copyLink": "Copiar enlace",
+    "copied": "Copiado",
+    "inviteError": "No se ha podido crear la invitación",
+    "inviteRoleHint": "Solo lectura puede consultar la información, pero no modificarla."
   },
   "roles": {
     "SUPER_ADMIN": "Superadministrador",
@@ -207,7 +217,8 @@
     "TREASURER": "Tesorero/a",
     "OWNER": "Propietario/a",
     "TENANT": "Inquilino/a",
-    "PROVIDER": "Proveedor"
+    "PROVIDER": "Proveedor",
+    "VIEWER": "Solo lectura"
   },
   "statuses": {
     "ACTIVE": "Activo",

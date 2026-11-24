@@ -1983,3 +1983,59 @@ h3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* Read-only mode */
+.readonly-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  margin-bottom: 1rem;
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .readonly-banner {
+  background: #2a2410;
+  border-color: #4d3f12;
+  color: #fde68a;
+}
+
+.invite-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--color-gray-100);
+  border-radius: 12px;
+  background: var(--color-gray-50);
+}
+
+.invite-link code {
+  flex: 1 1 240px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-gray-700);
+  font-size: 0.78rem;
+}
+
+[data-theme="dark"] .invite-link {
+  background: #0b1220;
+  border-color: #1e293b;
+}
+
+[data-theme="dark"] .invite-link code {
+  color: #cbd5e1;
+}
+
+.chat-readonly {
+  padding: 1rem;
+  margin: 0;
+  text-align: center;
+}

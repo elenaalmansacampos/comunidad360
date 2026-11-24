@@ -16,6 +16,7 @@ import {
   useUploadIncidentAttachment,
 } from "../features/incidents/queries";
 import { canManageIncidents, nextIncidentStatuses } from "../features/incidents/utils";
+import { isReadOnly } from "../features/mvp/utils";
 import { downloadFile } from "../services/apiClient";
 import type { IncidentStatus } from "../types/api";
 import { formatDate } from "../utils/format";
@@ -27,6 +28,7 @@ export function IncidentDetailPage() {
   const user = useAuthStore((state) => state.user);
   const membership = user?.memberships.find((item) => item.id === communityId);
   const canManage = canManageIncidents(membership?.roles ?? []);
+  const readOnly = isReadOnly(membership?.roles ?? []);
   const language = normalizeLanguage(i18n.language);
   const incident = useIncident(communityId, incidentId);
   const members = useMembers(communityId, canManage);
@@ -223,6 +225,7 @@ export function IncidentDetailPage() {
             ))}
           </div>
         )}
+        {!readOnly ? (
         <form className="form-card" onSubmit={addCommentSubmit}>
           {addComment.isError ? <Alert variant="error">{t("incidents.error")}</Alert> : null}
           <Textarea
@@ -242,6 +245,7 @@ export function IncidentDetailPage() {
             <Button type="submit" loading={addComment.isPending}>{t("incidents.addComment")}</Button>
           </div>
         </form>
+        ) : null}
       </section>
 
       <section className="structure-section">
@@ -266,6 +270,7 @@ export function IncidentDetailPage() {
             ))}
           </div>
         )}
+        {!readOnly ? (
         <form className="form-card" onSubmit={uploadPhoto}>
           {uploadAttachment.isError ? <Alert variant="error">{t("incidents.error")}</Alert> : null}
           <div className="field">
@@ -284,6 +289,7 @@ export function IncidentDetailPage() {
             <Button type="submit" loading={uploadAttachment.isPending}>{t("incidents.uploadPhoto")}</Button>
           </div>
         </form>
+        ) : null}
       </section>
 
       <section className="structure-section">

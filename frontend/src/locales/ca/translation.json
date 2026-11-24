@@ -22,7 +22,8 @@
     "hidePassword": "Amaga la contrasenya",
     "name": "Nom",
     "themeDark": "Activa el mode fosc",
-    "themeLight": "Activa el mode clar"
+    "themeLight": "Activa el mode clar",
+    "readOnly": "Mode només lectura: pots consultar la informació, però no modificar-la."
   },
   "nav": {
     "home": "Inici",
@@ -197,7 +198,16 @@
     "status": "Estat",
     "roles": "Rols",
     "empty": "No hi ha membres visibles",
-    "forbidden": "No tens permís per consultar els membres"
+    "forbidden": "No tens permís per consultar els membres",
+    "invite": "Convida un membre",
+    "inviteEmail": "Email",
+    "inviteRole": "Rol",
+    "inviteSubmit": "Crea la invitació",
+    "inviteSent": "Invitació creada. Comparteix aquest enllaç amb la persona convidada:",
+    "copyLink": "Copia l'enllaç",
+    "copied": "Copiat",
+    "inviteError": "No s'ha pogut crear la invitació",
+    "inviteRoleHint": "Només lectura pot consultar la informació, però no modificar-la."
   },
   "roles": {
     "SUPER_ADMIN": "Superadministrador",
@@ -207,7 +217,8 @@
     "TREASURER": "Tresorer/a",
     "OWNER": "Propietari/ària",
     "TENANT": "Inquilí/ina",
-    "PROVIDER": "Proveïdor"
+    "PROVIDER": "Proveïdor",
+    "VIEWER": "Només lectura"
   },
   "statuses": {
     "ACTIVE": "Actiu",

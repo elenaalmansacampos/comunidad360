@@ -232,6 +232,7 @@ public class IncidentService {
         Membership membership = accessService.requireMembership(communityId, userId);
         Incident incident = find(communityId, incidentId);
         accessService.requireView(incident, userId, membership);
+        accessService.requireComment(membership);
         if (request.internal() && !accessService.canViewAll(membership)) {
             throw BusinessException.forbidden("PERMISSION_DENIED", "errors.permission.denied");
         }
@@ -259,6 +260,7 @@ public class IncidentService {
         Membership membership = accessService.requireMembership(communityId, userId);
         Incident incident = find(communityId, incidentId);
         accessService.requireView(incident, userId, membership);
+        accessService.requireComment(membership);
         if (file == null || file.isEmpty()) {
             throw BusinessException.unprocessable("ATTACHMENT_EMPTY", "errors.incident.attachmentInvalid");
         }

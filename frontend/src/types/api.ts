@@ -6,7 +6,8 @@ export type Role =
   | "TREASURER"
   | "OWNER"
   | "TENANT"
-  | "PROVIDER";
+  | "PROVIDER"
+  | "VIEWER";
 
 export type Language = "es" | "ca" | "en";
 
@@ -768,4 +769,14 @@ export interface BoardNote {
   createdAt: string;
   updatedAt: string;
   version: number;
+}
+
+export interface Invitation {
+  id: string;
+  email: string;
+  role: Role;
+  expiresAt: string;
+  acceptedAt?: string | null;
+  status: string;
+  devToken?: string | null;
 }

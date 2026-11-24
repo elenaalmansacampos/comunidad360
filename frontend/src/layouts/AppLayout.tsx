@@ -5,6 +5,7 @@ import {
   Building2,
   CalendarDays,
   ChevronDown,
+  Eye,
   FileText,
   Landmark,
   LayoutDashboard,
@@ -26,7 +27,7 @@ import { ThemeToggle } from "../components/ThemeToggle";
 import { useAuthStore } from "../features/auth/authStore";
 import { useCommunities } from "../features/communities/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
-import { canViewProviders } from "../features/mvp/utils";
+import { canViewProviders, isReadOnly } from "../features/mvp/utils";
 import { demoEnabled } from "../services/demoApi";
 
 function initials(name: string | undefined): string {
@@ -67,6 +68,7 @@ export function AppLayout() {
   const community = communities.data?.find((item) => item.id === communityId);
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
   const roleLabel = roles[0] ? t(`roles.${roles[0]}`, { defaultValue: roles[0] }) : "";
+  const readOnly = isReadOnly(roles);
 
   useEffect(() => {
     if (communityId) {
@@ -182,6 +184,11 @@ export function AppLayout() {
         </aside>
 
         <main className="app-content">
+          {readOnly ? (
+            <div className="readonly-banner" role="status">
+              <Eye size={16} aria-hidden="true" /> {t("common.readOnly")}
+            </div>
+          ) : null}
           <Outlet />
         </main>
       </div>

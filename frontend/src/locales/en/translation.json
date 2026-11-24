@@ -22,7 +22,8 @@
     "hidePassword": "Hide password",
     "name": "Name",
     "themeDark": "Enable dark mode",
-    "themeLight": "Enable light mode"
+    "themeLight": "Enable light mode",
+    "readOnly": "Read-only mode: you can view information but cannot change it."
   },
   "nav": {
     "home": "Home",
@@ -197,7 +198,16 @@
     "status": "Status",
     "roles": "Roles",
     "empty": "No visible members",
-    "forbidden": "You do not have permission to view members"
+    "forbidden": "You do not have permission to view members",
+    "invite": "Invite a member",
+    "inviteEmail": "Email",
+    "inviteRole": "Role",
+    "inviteSubmit": "Create invitation",
+    "inviteSent": "Invitation created. Share this link with the invited person:",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "inviteError": "The invitation could not be created",
+    "inviteRoleHint": "Read-only can view information but cannot change it."
   },
   "roles": {
     "SUPER_ADMIN": "Super administrator",
@@ -207,7 +217,8 @@
     "TREASURER": "Treasurer",
     "OWNER": "Owner",
     "TENANT": "Tenant",
-    "PROVIDER": "Provider"
+    "PROVIDER": "Provider",
+    "VIEWER": "Read-only"
   },
   "statuses": {
     "ACTIVE": "Active",

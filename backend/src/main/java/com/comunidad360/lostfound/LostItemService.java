@@ -52,7 +52,7 @@ public class LostItemService {
     public LostItemResponse create(UUID communityId, UUID userId, CreateLostItemRequest request,
                                    HttpServletRequest httpRequest) {
         Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
-        permissionService.require(membership, "LOST_ITEM_VIEW");
+        permissionService.require(membership, "LOST_ITEM_CREATE");
         Instant now = Instant.now();
         LostItem item = repository.saveAndFlush(new LostItem(UUID.randomUUID(), communityId,
                 request.title().trim(), clean(request.description()), request.type(), clean(request.location()),

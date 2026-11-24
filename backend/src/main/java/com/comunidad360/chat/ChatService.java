@@ -96,6 +96,7 @@ public class ChatService {
     public ChatMessageResponse send(UUID communityId, UUID userId, UUID channelId, String body) {
         Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
         permissionService.require(membership, "CHAT_VIEW");
+        permissionService.require(membership, "CHAT_SEND");
         ChatChannel channel = channelRepository.findByIdAndCommunityId(channelId, communityId)
                 .orElseThrow(() -> BusinessException.notFound("CHAT_CHANNEL_NOT_FOUND", "errors.resource.notFound"));
         if (!canAccess(channel, membership)) {

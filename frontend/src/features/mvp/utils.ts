@@ -31,3 +31,11 @@ export function canManageBoard(roles: Role[]): boolean {
 export function canManageLostFound(roles: Role[]): boolean {
   return roles.some((role) => ["COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY"].includes(role));
 }
+
+export function isReadOnly(roles: Role[]): boolean {
+  return roles.includes("VIEWER");
+}
+
+export function canManageStructure(roles: Role[]): boolean {
+  return roles.includes("COMMUNITY_ADMIN");
+}

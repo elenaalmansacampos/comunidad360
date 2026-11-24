@@ -19,7 +19,7 @@ import {
 import { createChatClient } from "../features/chat/socket";
 import { useMembers } from "../features/communities/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
-import { canModerateChat, formatChatTime } from "../features/mvp/utils";
+import { canModerateChat, formatChatTime, isReadOnly } from "../features/mvp/utils";
 import { demoEnabled } from "../services/demoApi";
 import type { ChatChannelType, ChatMessage } from "../types/api";
 import { normalizeLanguage } from "../utils/language";
@@ -29,7 +29,9 @@ export function ChatPage() {
   const { communityId } = useParams<{ communityId: string }>();
   const user = useAuthStore((state) => state.user);
   const setSelectedCommunityId = useCommunityStore((state) => state.setSelectedCommunityId);
-  const canModerate = canModerateChat(user?.memberships.find((item) => item.id === communityId)?.roles ?? []);
+  const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
+  const canModerate = canModerateChat(roles);
+  const readOnly = isReadOnly(roles);
   const language = normalizeLanguage(i18n.language);
   const channels = useChatChannels(communityId);
   const members = useMembers(communityId, canModerate);
@@ -179,16 +181,20 @@ export function ChatPage() {
                 ))}
                 <div ref={endRef} />
               </div>
-              <form className="chat-composer" onSubmit={send}>
-                <Input
-                  label={t("chat.message")}
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                  maxLength={4000}
-                  required
-                />
-                <Button type="submit" loading={sendMessage.isPending}>{t("chat.send")}</Button>
-              </form>
+              {readOnly ? (
+                <p className="muted chat-readonly">{t("common.readOnly")}</p>
+              ) : (
+                <form className="chat-composer" onSubmit={send}>
+                  <Input
+                    label={t("chat.message")}
+                    value={body}
+                    onChange={(e) => setBody(e.target.value)}
+                    maxLength={4000}
+                    required
+                  />
+                  <Button type="submit" loading={sendMessage.isPending}>{t("chat.send")}</Button>
+                </form>
+              )}
               {sendMessage.isError ? <Alert variant="error">{t("chat.error")}</Alert> : null}
             </>
           )}

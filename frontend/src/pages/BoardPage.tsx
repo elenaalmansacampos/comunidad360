@@ -11,7 +11,7 @@ import { Textarea } from "../components/Textarea";
 import { useAuthStore } from "../features/auth/authStore";
 import { useBoardNotes, useCreateBoardNote, useDeleteBoardNote, useUpdateBoardNote } from "../features/board/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
-import { canManageBoard } from "../features/mvp/utils";
+import { canManageBoard, isReadOnly } from "../features/mvp/utils";
 import type { BoardNote, BoardNoteColor } from "../types/api";
 import { formatDate } from "../utils/format";
 import { normalizeLanguage } from "../utils/language";
@@ -33,6 +33,7 @@ export function BoardPage() {
   const setSelectedCommunityId = useCommunityStore((state) => state.setSelectedCommunityId);
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
   const canManage = canManageBoard(roles);
+  const readOnly = isReadOnly(roles);
   const language = normalizeLanguage(i18n.language);
   const notes = useBoardNotes(communityId);
   const create = useCreateBoardNote(communityId);
@@ -97,6 +98,7 @@ export function BoardPage() {
       {notes.isError ? <Alert variant="error">{t("board.error")}</Alert> : null}
       {failed ? <Alert variant="error">{t("board.error")}</Alert> : null}
 
+      {!readOnly ? (
       <form className="board-composer" onSubmit={submit}>
         <div className="board-composer__head">
           <strong>{editingId ? t("board.editNote") : t("board.newNote")}</strong>
@@ -124,12 +126,13 @@ export function BoardPage() {
           ) : null}
         </div>
       </form>
+      ) : null}
 
       <div className="board-frame">
         <div className="board-canvas">
           {notes.data?.length ? (
             notes.data.map((note) => {
-              const canEdit = canManage || note.createdByUserId === user?.id;
+              const canEdit = !readOnly && (canManage || note.createdByUserId === user?.id);
               return (
                 <article
                   key={note.id}

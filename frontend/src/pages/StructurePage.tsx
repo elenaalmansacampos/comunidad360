@@ -8,7 +8,9 @@ import { FullPageLoader } from "../components/FullPageLoader";
 import { Input } from "../components/Input";
 import { Select } from "../components/Select";
 import { Textarea } from "../components/Textarea";
+import { useAuthStore } from "../features/auth/authStore";
 import { useCommunityStore } from "../features/communities/communityStore";
+import { canManageStructure } from "../features/mvp/utils";
 import { StructureSummaryCard } from "../features/structure/StructureSummaryCard";
 import {
   useBuildings,
@@ -30,6 +32,9 @@ export function StructurePage() {
   const { t, i18n } = useTranslation();
   const { communityId } = useParams<{ communityId: string }>();
   const setSelectedCommunityId = useCommunityStore((state) => state.setSelectedCommunityId);
+  const user = useAuthStore((state) => state.user);
+  const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
+  const canManage = canManageStructure(roles);
   const buildings = useBuildings(communityId);
   const units = useUnits(communityId);
   const commonElements = useCommonElements(communityId);
@@ -89,17 +94,19 @@ export function StructurePage() {
           <h1>{t("structure.title")}</h1>
           <p className="page-subtitle">{t("structure.subtitle")}</p>
         </div>
-        <div className="toolbar">
-          <Button variant="secondary" onClick={() => setActiveForm("building")}>
-            {t("structure.newBuilding")}
-          </Button>
-          <Button variant="secondary" onClick={() => setActiveForm("unit")}>
-            {t("structure.newUnit")}
-          </Button>
-          <Button variant="secondary" onClick={() => setActiveForm("common")}>
-            {t("structure.newCommonElement")}
-          </Button>
-        </div>
+        {canManage ? (
+          <div className="toolbar">
+            <Button variant="secondary" onClick={() => setActiveForm("building")}>
+              {t("structure.newBuilding")}
+            </Button>
+            <Button variant="secondary" onClick={() => setActiveForm("unit")}>
+              {t("structure.newUnit")}
+            </Button>
+            <Button variant="secondary" onClick={() => setActiveForm("common")}>
+              {t("structure.newCommonElement")}
+            </Button>
+          </div>
+        ) : null}
       </header>
 
       {summary.data ? <StructureSummaryCard summary={summary.data} /> : null}

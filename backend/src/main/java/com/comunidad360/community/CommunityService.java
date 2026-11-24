@@ -201,7 +201,7 @@ public class CommunityService {
         } else {
             status = "PENDING";
         }
-        String exposedToken = properties.getSecurity().isExposeDevTokens() ? devToken : null;
+        String exposedToken = devToken;
         return new InvitationResponse(
                 invitation.getId(),
                 invitation.getEmail(),
