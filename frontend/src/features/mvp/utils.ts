@@ -23,3 +23,11 @@ export function formatChatTime(value: string, language: Language): string {
     minute: "2-digit",
   }).format(new Date(value));
 }
+
+export function canManageBoard(roles: Role[]): boolean {
+  return roles.some((role) => ["COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY"].includes(role));
+}
+
+export function canManageLostFound(roles: Role[]): boolean {
+  return roles.some((role) => ["COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY"].includes(role));
+}

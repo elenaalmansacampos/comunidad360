@@ -11,6 +11,8 @@ import {
   LogOut,
   Menu,
   MessageCircle,
+  PackageSearch,
+  StickyNote,
   Users,
   Vote,
   Wallet,
@@ -149,6 +151,8 @@ export function AppLayout() {
             <NavItem to={`/communities/${communityId}/documents`} icon={<FileText size={18} />} label={t("nav.documents")} />
             <p className="nav-group">{t("nav.groups.community")}</p>
             <NavItem to={`/communities/${communityId}/chat`} icon={<MessageCircle size={18} />} label={t("nav.chat")} />
+            <NavItem to={`/communities/${communityId}/board`} icon={<StickyNote size={18} />} label={t("nav.board")} />
+            <NavItem to={`/communities/${communityId}/lost-found`} icon={<PackageSearch size={18} />} label={t("nav.lostFound")} />
             {canViewProviders(roles) ? (
               <NavItem to={`/communities/${communityId}/providers`} icon={<Wrench size={18} />} label={t("nav.providers")} />
             ) : null}
@@ -202,6 +206,8 @@ export function AppLayout() {
               <NavLink to={`/communities/${communityId}/meetings`}>{t("nav.meetings")}</NavLink>
               <NavLink to={`/communities/${communityId}/documents`}>{t("nav.documents")}</NavLink>
               <NavLink to={`/communities/${communityId}/chat`}>{t("nav.chat")}</NavLink>
+              <NavLink to={`/communities/${communityId}/board`}>{t("nav.board")}</NavLink>
+              <NavLink to={`/communities/${communityId}/lost-found`}>{t("nav.lostFound")}</NavLink>
               {canViewProviders(roles) ? (
                 <NavLink to={`/communities/${communityId}/providers`}>{t("nav.providers")}</NavLink>
               ) : null}

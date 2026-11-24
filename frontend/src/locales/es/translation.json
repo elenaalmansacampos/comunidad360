@@ -43,7 +43,9 @@
       "general": "General",
       "management": "Gestión",
       "community": "Comunidad"
-    }
+    },
+    "board": "Tablón",
+    "lostFound": "Objetos perdidos"
   },
   "auth": {
     "login": {
@@ -891,5 +893,58 @@
       "CANCELLED": "Cancelada"
     },
     "photoHint": "JPEG, PNG o WebP · máximo 5 MB"
+  },
+  "board": {
+    "title": "Tablón de anuncios",
+    "subtitle": "Notas rápidas de la comunidad, como en un tablón de corcho",
+    "count": "{{count}} anuncios",
+    "newNote": "Nuevo post-it",
+    "editNote": "Editar post-it",
+    "noteTitle": "Título",
+    "noteBody": "Mensaje",
+    "color": "Color",
+    "post": "Pegar",
+    "pin": "Fijar",
+    "unpin": "Desfijar",
+    "pinned": "Fijado",
+    "delete": "Eliminar",
+    "empty": "El tablón está vacío. Pega el primer post-it.",
+    "error": "No se ha podido completar la operación del tablón",
+    "colors": {
+      "YELLOW": "Amarillo",
+      "PINK": "Rosa",
+      "BLUE": "Azul",
+      "GREEN": "Verde",
+      "ORANGE": "Naranja"
+    }
+  },
+  "lostFound": {
+    "title": "Objetos perdidos",
+    "subtitle": "Objetos perdidos y encontrados en la comunidad",
+    "newItem": "Nuevo objeto",
+    "itemTitle": "Título",
+    "type": "Tipo",
+    "description": "Descripción",
+    "location": "Lugar",
+    "eventDate": "Fecha",
+    "contact": "Contacto",
+    "resolve": "Marcar resuelto",
+    "archive": "Archivar",
+    "reopen": "Reabrir",
+    "delete": "Eliminar",
+    "empty": "No hay objetos registrados",
+    "error": "No se ha podido completar la operación",
+    "filters": {
+      "all": "Todos"
+    },
+    "types": {
+      "LOST": "Perdido",
+      "FOUND": "Encontrado"
+    },
+    "statuses": {
+      "OPEN": "Abierto",
+      "RESOLVED": "Resuelto",
+      "ARCHIVED": "Archivado"
+    }
   }
 }

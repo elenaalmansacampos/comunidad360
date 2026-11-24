@@ -43,7 +43,9 @@
       "general": "General",
       "management": "Gestió",
       "community": "Comunitat"
-    }
+    },
+    "board": "Tabló",
+    "lostFound": "Objectes perduts"
   },
   "auth": {
     "login": {
@@ -891,5 +893,58 @@
       "CANCELLED": "Cancel·lada"
     },
     "photoHint": "JPEG, PNG o WebP · màxim 5 MB"
+  },
+  "board": {
+    "title": "Taulell d'anuncis",
+    "subtitle": "Notes ràpides de la comunitat, com en un taulell de suro",
+    "count": "{{count}} anuncis",
+    "newNote": "Nou post-it",
+    "editNote": "Edita el post-it",
+    "noteTitle": "Títol",
+    "noteBody": "Missatge",
+    "color": "Color",
+    "post": "Enganxa",
+    "pin": "Fixa",
+    "unpin": "Desfixa",
+    "pinned": "Fixat",
+    "delete": "Elimina",
+    "empty": "El taulell és buit. Enganxa el primer post-it.",
+    "error": "No s'ha pogut completar l'operació del taulell",
+    "colors": {
+      "YELLOW": "Groc",
+      "PINK": "Rosa",
+      "BLUE": "Blau",
+      "GREEN": "Verd",
+      "ORANGE": "Taronja"
+    }
+  },
+  "lostFound": {
+    "title": "Objectes perduts",
+    "subtitle": "Objectes perduts i trobats a la comunitat",
+    "newItem": "Nou objecte",
+    "itemTitle": "Títol",
+    "type": "Tipus",
+    "description": "Descripció",
+    "location": "Lloc",
+    "eventDate": "Data",
+    "contact": "Contacte",
+    "resolve": "Marca com a resolt",
+    "archive": "Arxiva",
+    "reopen": "Reobre",
+    "delete": "Elimina",
+    "empty": "No hi ha objectes registrats",
+    "error": "No s'ha pogut completar l'operació",
+    "filters": {
+      "all": "Tots"
+    },
+    "types": {
+      "LOST": "Perdut",
+      "FOUND": "Trobat"
+    },
+    "statuses": {
+      "OPEN": "Obert",
+      "RESOLVED": "Resolt",
+      "ARCHIVED": "Arxivat"
+    }
   }
 }

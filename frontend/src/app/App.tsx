@@ -39,6 +39,8 @@ const VotingsPage = lazy(() => import("../pages/VotingsPage").then((m) => ({ def
 const VotingDetailPage = lazy(() =>
   import("../pages/VotingDetailPage").then((m) => ({ default: m.VotingDetailPage })));
 const ChatPage = lazy(() => import("../pages/ChatPage").then((m) => ({ default: m.ChatPage })));
+const BoardPage = lazy(() => import("../pages/BoardPage").then((m) => ({ default: m.BoardPage })));
+const LostFoundPage = lazy(() => import("../pages/LostFoundPage").then((m) => ({ default: m.LostFoundPage })));
 const MembersPage = lazy(() => import("../pages/MembersPage").then((m) => ({ default: m.MembersPage })));
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })));
 
@@ -99,6 +101,8 @@ export function App() {
                 <Route path="votings" element={<VotingsPage />} />
                 <Route path="votings/:votingId" element={<VotingDetailPage />} />
                 <Route path="chat" element={<ChatPage />} />
+                <Route path="board" element={<BoardPage />} />
+                <Route path="lost-found" element={<LostFoundPage />} />
                 <Route path="members" element={<MembersPage />} />
               </Route>
             </Route>

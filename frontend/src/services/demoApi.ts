@@ -96,6 +96,117 @@ const dashboard = {
   canViewReports: false,
 };
 
+const boardNotes = [
+  {
+    id: "demo-note-1",
+    title: "Reunión de vecinos",
+    body: "Jueves a las 19:00 en el salón de actos. ¡Os esperamos!",
+    color: "YELLOW",
+    pinned: true,
+    createdByUserId: "demo-admin",
+    createdByName: "Administradora Demo",
+    createdAt: incidentCreated,
+    updatedAt: incidentCreated,
+    version: 0,
+  },
+  {
+    id: "demo-note-2",
+    title: "Limpieza de cristales",
+    body: "El martes por la mañana se limpiarán los cristales del portal. Procurad no dejar objetos en las zonas comunes.",
+    color: "BLUE",
+    pinned: false,
+    createdByUserId: "demo-admin",
+    createdByName: "Administradora Demo",
+    createdAt: incidentCreated,
+    updatedAt: incidentCreated,
+    version: 0,
+  },
+  {
+    id: "demo-note-3",
+    title: "Objeto encontrado",
+    body: "Han aparecido unas gafas de sol en la piscina. Están en conserjería.",
+    color: "PINK",
+    pinned: false,
+    createdByUserId: "demo-owner",
+    createdByName: "Propietario Demo",
+    createdAt: incidentCreated,
+    updatedAt: incidentCreated,
+    version: 0,
+  },
+  {
+    id: "demo-note-4",
+    title: "Recordatorio",
+    body: "La cuota de noviembre vence el día 30. Gracias por vuestra colaboración.",
+    color: "GREEN",
+    pinned: false,
+    createdByUserId: "demo-admin",
+    createdByName: "Administradora Demo",
+    createdAt: incidentCreated,
+    updatedAt: incidentCreated,
+    version: 0,
+  },
+  {
+    id: "demo-note-5",
+    title: "Mercadillo solidario",
+    body: "Este sábado organizamos un mercadillo en el patio. ¡Animaos a participar!",
+    color: "ORANGE",
+    pinned: false,
+    createdByUserId: "demo-tenant",
+    createdByName: "Inquilino Demo",
+    createdAt: incidentCreated,
+    updatedAt: incidentCreated,
+    version: 0,
+  },
+];
+
+const lostItems = [
+  {
+    id: "demo-lost-1",
+    title: "Llavero con llaves",
+    description: "Llavero con una llave y un mando de garaje.",
+    type: "LOST",
+    location: "Portal, junto a los buzones",
+    eventDate: "2026-11-18",
+    contact: "admin@comunidad360.local",
+    status: "OPEN",
+    createdByUserId: "demo-admin",
+    createdByName: "Administradora Demo",
+    createdAt: incidentCreated,
+    updatedAt: incidentCreated,
+    version: 0,
+  },
+  {
+    id: "demo-lost-2",
+    title: "Bufanda azul",
+    type: "FOUND",
+    description: "Bufanda de lana azul encontrada en la escalera.",
+    location: "Escalera B, planta 3",
+    eventDate: "2026-11-17",
+    contact: "Conserjería",
+    status: "OPEN",
+    createdByUserId: "demo-owner",
+    createdByName: "Propietario Demo",
+    createdAt: incidentCreated,
+    updatedAt: incidentCreated,
+    version: 0,
+  },
+  {
+    id: "demo-lost-3",
+    title: "Mando de garaje",
+    type: "FOUND",
+    description: "Mando encontrado en el aparcamiento. Ya devuelto a su propietario.",
+    location: "Garaje, planta -1",
+    eventDate: "2026-11-15",
+    contact: "Conserjería",
+    status: "RESOLVED",
+    createdByUserId: "demo-admin",
+    createdByName: "Administradora Demo",
+    createdAt: incidentCreated,
+    updatedAt: incidentCreated,
+    version: 0,
+  },
+];
+
 const chatChannel = {
   id: "demo-general",
   type: "GENERAL",
@@ -173,6 +284,8 @@ export async function demoRequest<T>(path: string, method = "GET"): Promise<T> {
       },
     } as T);
   }
+  if (clean.endsWith("/board-notes")) return json(boardNotes as T);
+  if (clean.endsWith("/lost-items")) return json(lostItems as T);
   if (clean.endsWith("/chat/channels")) return json([chatChannel] as T);
   if (clean.endsWith("/chat/channels/demo-general/messages")) {
     return json([

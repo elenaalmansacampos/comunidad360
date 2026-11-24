@@ -735,3 +735,37 @@ export interface ChatMessage {
   body: string;
   createdAt: string;
 }
+
+export type LostItemType = "LOST" | "FOUND";
+export type LostItemStatus = "OPEN" | "RESOLVED" | "ARCHIVED";
+
+export interface LostItem {
+  id: string;
+  title: string;
+  description?: string | null;
+  type: LostItemType;
+  location?: string | null;
+  eventDate?: string | null;
+  contact?: string | null;
+  status: LostItemStatus;
+  createdByUserId?: string | null;
+  createdByName?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+export type BoardNoteColor = "YELLOW" | "PINK" | "BLUE" | "GREEN" | "ORANGE";
+
+export interface BoardNote {
+  id: string;
+  title: string;
+  body: string;
+  color: BoardNoteColor;
+  pinned: boolean;
+  createdByUserId?: string | null;
+  createdByName?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}

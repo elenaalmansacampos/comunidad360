@@ -43,7 +43,9 @@
       "general": "General",
       "management": "Management",
       "community": "Community"
-    }
+    },
+    "board": "Notice board",
+    "lostFound": "Lost & found"
   },
   "auth": {
     "login": {
@@ -891,5 +893,58 @@
       "CANCELLED": "Cancelled"
     },
     "photoHint": "JPEG, PNG or WebP · maximum 5 MB"
+  },
+  "board": {
+    "title": "Notice board",
+    "subtitle": "Quick community notes, just like a cork board",
+    "count": "{{count}} notes",
+    "newNote": "New post-it",
+    "editNote": "Edit post-it",
+    "noteTitle": "Title",
+    "noteBody": "Message",
+    "color": "Color",
+    "post": "Post it",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "pinned": "Pinned",
+    "delete": "Delete",
+    "empty": "The board is empty. Post the first note.",
+    "error": "The board operation could not be completed",
+    "colors": {
+      "YELLOW": "Yellow",
+      "PINK": "Pink",
+      "BLUE": "Blue",
+      "GREEN": "Green",
+      "ORANGE": "Orange"
+    }
+  },
+  "lostFound": {
+    "title": "Lost & found",
+    "subtitle": "Lost and found items in the community",
+    "newItem": "New item",
+    "itemTitle": "Title",
+    "type": "Type",
+    "description": "Description",
+    "location": "Location",
+    "eventDate": "Date",
+    "contact": "Contact",
+    "resolve": "Mark resolved",
+    "archive": "Archive",
+    "reopen": "Reopen",
+    "delete": "Delete",
+    "empty": "No items registered",
+    "error": "The operation could not be completed",
+    "filters": {
+      "all": "All"
+    },
+    "types": {
+      "LOST": "Lost",
+      "FOUND": "Found"
+    },
+    "statuses": {
+      "OPEN": "Open",
+      "RESOLVED": "Resolved",
+      "ARCHIVED": "Archived"
+    }
   }
 }
