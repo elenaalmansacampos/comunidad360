@@ -289,9 +289,13 @@ h3 {
   padding: 1.75rem 2rem;
   margin-bottom: 1.5rem;
   border-radius: 20px;
-  background:
-    radial-gradient(1100px 280px at 8% -20%, rgba(20, 184, 166, 0.35), transparent 60%),
-    linear-gradient(135deg, #0b1f3a 0%, #12305a 60%, #0f766e 140%);
+  background-color: #0b1220;
+  background-image:
+    linear-gradient(90deg, rgba(6, 12, 24, 0.94) 0%, rgba(6, 12, 24, 0.82) 38%, rgba(6, 12, 24, 0.6) 68%, rgba(6, 12, 24, 0.45) 100%),
+    url("../assets/skyscrapers.svg");
+  background-size: cover, cover;
+  background-position: center, center right;
+  background-repeat: no-repeat, no-repeat;
   color: #fff;
   box-shadow: var(--shadow-md);
 }
