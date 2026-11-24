@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties, FormEvent } from "react";
-import { Pencil, Pin, Plus, Trash2 } from "lucide-react";
+import { MessageSquare, Pencil, Pin, Plus, Send, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Alert } from "../components/Alert";
@@ -9,7 +9,14 @@ import { FullPageLoader } from "../components/FullPageLoader";
 import { Input } from "../components/Input";
 import { Textarea } from "../components/Textarea";
 import { useAuthStore } from "../features/auth/authStore";
-import { useBoardNotes, useCreateBoardNote, useDeleteBoardNote, useUpdateBoardNote } from "../features/board/queries";
+import {
+  useAddBoardNoteComment,
+  useBoardNoteComments,
+  useBoardNotes,
+  useCreateBoardNote,
+  useDeleteBoardNote,
+  useUpdateBoardNote,
+} from "../features/board/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
 import { canManageBoard, isReadOnly } from "../features/mvp/utils";
 import type { BoardNote, BoardNoteColor } from "../types/api";
@@ -24,6 +31,74 @@ function rotationFor(id: string): string {
     hash = (hash * 31 + id.charCodeAt(index)) % 1000;
   }
   return `${((hash % 7) - 3) * 0.6}deg`;
+}
+
+function PostitComments({ communityId, noteId, readOnly }: {
+  communityId: string;
+  noteId: string;
+  readOnly: boolean;
+}) {
+  const { t, i18n } = useTranslation();
+  const language = normalizeLanguage(i18n.language);
+  const comments = useBoardNoteComments(communityId, noteId);
+  const add = useAddBoardNoteComment(communityId, noteId);
+  const [body, setBody] = useState("");
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!body.trim()) {
+      return;
+    }
+    try {
+      await add.mutateAsync(body.trim());
+      setBody("");
+    } catch {
+      // estado de la mutación
+    }
+  }
+
+  return (
+    <div className="postit__comments">
+      {comments.isLoading ? (
+        <p className="postit__comments-empty">{t("common.loading")}</p>
+      ) : comments.data?.length ? (
+        <ul>
+          {comments.data.map((comment) => (
+            <li key={comment.id}>
+              <div className="postit__comment-meta">
+                <strong>{comment.authorName ?? "—"}</strong>
+                <small>{formatDate(comment.createdAt, language)}</small>
+              </div>
+              <p>{comment.body}</p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="postit__comments-empty">{t("board.noComments")}</p>
+      )}
+      {add.isError ? <p className="postit__comments-error">{t("board.error")}</p> : null}
+      {!readOnly ? (
+        <form className="postit__comment-form" onSubmit={submit}>
+          <input
+            className="field__input"
+            value={body}
+            onChange={(event) => setBody(event.target.value)}
+            placeholder={t("board.commentPlaceholder")}
+            aria-label={t("board.commentPlaceholder")}
+            maxLength={1000}
+          />
+          <button
+            type="submit"
+            className="postit__comment-send"
+            aria-label={t("board.commentSubmit")}
+            disabled={add.isPending}
+          >
+            <Send size={14} aria-hidden="true" />
+          </button>
+        </form>
+      ) : null}
+    </div>
+  );
 }
 
 export function BoardPage() {
@@ -43,6 +118,7 @@ export function BoardPage() {
   const [body, setBody] = useState("");
   const [color, setColor] = useState<BoardNoteColor>("YELLOW");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [commentsNoteId, setCommentsNoteId] = useState<string | null>(null);
 
   useEffect(() => {
     if (communityId) {
@@ -147,6 +223,22 @@ export function BoardPage() {
                     <span>{note.createdByName ?? "—"}</span>
                     <small>{formatDate(note.createdAt, language)}</small>
                   </footer>
+                  <button
+                    type="button"
+                    className="postit__comments-toggle"
+                    aria-expanded={commentsNoteId === note.id}
+                    onClick={() => setCommentsNoteId(commentsNoteId === note.id ? null : note.id)}
+                  >
+                    <MessageSquare size={14} aria-hidden="true" />
+                    <span>{t("board.comments")} ({note.commentCount})</span>
+                  </button>
+                  {commentsNoteId === note.id ? (
+                    <PostitComments
+                      communityId={communityId ?? ""}
+                      noteId={note.id}
+                      readOnly={readOnly}
+                    />
+                  ) : null}
                   {canEdit ? (
                     <div className="postit__actions">
                       <button type="button" aria-label={t("common.edit")} title={t("common.edit")} onClick={() => startEdit(note)}>

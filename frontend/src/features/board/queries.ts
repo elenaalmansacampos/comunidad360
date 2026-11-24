@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../services/apiClient";
-import type { BoardNote, BoardNoteColor } from "../../types/api";
+import type { BoardNote, BoardNoteColor, BoardNoteComment } from "../../types/api";
 
 function key(communityId: string | undefined) {
   return ["board-notes", communityId] as const;
@@ -39,5 +39,26 @@ export function useDeleteBoardNote(communityId: string | undefined) {
   return useMutation({
     mutationFn: (noteId: string) => api.delete<void>(`/communities/${communityId}/board-notes/${noteId}`),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
+  });
+}
+
+export function useBoardNoteComments(communityId: string | undefined, noteId: string | null) {
+  return useQuery({
+    queryKey: ["board-note-comments", communityId, noteId],
+    queryFn: () => api.get<BoardNoteComment[]>(
+      `/communities/${communityId}/board-notes/${noteId}/comments`),
+    enabled: Boolean(communityId) && Boolean(noteId),
+  });
+}
+
+export function useAddBoardNoteComment(communityId: string | undefined, noteId: string | null) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: string) => api.post<BoardNoteComment>(
+      `/communities/${communityId}/board-notes/${noteId}/comments`, { body }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["board-note-comments", communityId, noteId] });
+      void queryClient.invalidateQueries({ queryKey: key(communityId) });
+    },
   });
 }

@@ -45,3 +45,15 @@ export function useDeleteLostItem(communityId: string | undefined) {
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
   });
 }
+
+export function useUploadLostItemPhoto(communityId: string | undefined) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, file }: { itemId: string; file: File }) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      return api.post<LostItem>(`/communities/${communityId}/lost-items/${itemId}/photo`, formData);
+    },
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
+  });
+}

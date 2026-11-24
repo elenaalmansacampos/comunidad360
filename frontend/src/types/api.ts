@@ -751,6 +751,7 @@ export interface LostItem {
   status: LostItemStatus;
   createdByUserId?: string | null;
   createdByName?: string | null;
+  photoUrl?: string | null;
   createdAt: string;
   updatedAt: string;
   version: number;
@@ -764,11 +765,21 @@ export interface BoardNote {
   body: string;
   color: BoardNoteColor;
   pinned: boolean;
+  commentCount: number;
   createdByUserId?: string | null;
   createdByName?: string | null;
   createdAt: string;
   updatedAt: string;
   version: number;
+}
+
+export interface BoardNoteComment {
+  id: string;
+  noteId: string;
+  body: string;
+  authorUserId?: string | null;
+  authorName?: string | null;
+  createdAt: string;
 }
 
 export interface Invitation {

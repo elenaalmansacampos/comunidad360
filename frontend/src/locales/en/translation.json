@@ -927,7 +927,11 @@
       "BLUE": "Blue",
       "GREEN": "Green",
       "ORANGE": "Orange"
-    }
+    },
+    "comments": "Comments",
+    "noComments": "No comments",
+    "commentPlaceholder": "Write a comment...",
+    "commentSubmit": "Send comment"
   },
   "lostFound": {
     "title": "Lost & found",
@@ -956,6 +960,9 @@
       "OPEN": "Open",
       "RESOLVED": "Resolved",
       "ARCHIVED": "Archived"
-    }
+    },
+    "photo": "Photo",
+    "photoHint": "JPEG, PNG or WebP · maximum 5 MB",
+    "changePhoto": "Change photo"
   }
 }

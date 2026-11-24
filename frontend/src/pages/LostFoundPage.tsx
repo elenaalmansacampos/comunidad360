@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { PackageSearch, Plus } from "lucide-react";
+import { ImagePlus, PackageSearch, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Alert } from "../components/Alert";
@@ -16,13 +16,54 @@ import {
   useDeleteLostItem,
   useLostItems,
   useUpdateLostItem,
+  useUploadLostItemPhoto,
 } from "../features/lostfound/queries";
+import { downloadFile } from "../services/apiClient";
 import { canManageLostFound, isReadOnly } from "../features/mvp/utils";
 import type { LostItem, LostItemStatus, LostItemType } from "../types/api";
 import { formatDate } from "../utils/format";
 import { normalizeLanguage } from "../utils/language";
 
 type Filter = "ALL" | LostItemType;
+
+function LostItemPhoto({ photoUrl }: { photoUrl?: string | null }) {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    let objectUrl: string | null = null;
+    setUrl(null);
+    if (photoUrl) {
+      downloadFile(photoUrl)
+        .then((blob) => {
+          objectUrl = URL.createObjectURL(blob);
+          if (active) {
+            setUrl(objectUrl);
+          }
+        })
+        .catch(() => {
+          if (active) {
+            setUrl(null);
+          }
+        });
+    }
+    return () => {
+      active = false;
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [photoUrl]);
+
+  if (url) {
+    return <img className="lost-card__photo" src={url} alt="" />;
+  }
+  return (
+    <div className="lost-card__photo lost-card__photo--empty" aria-hidden="true">
+      <PackageSearch size={22} />
+    </div>
+  );
+}
 
 export function LostFoundPage() {
   const { t, i18n } = useTranslation();
@@ -38,6 +79,7 @@ export function LostFoundPage() {
   const create = useCreateLostItem(communityId);
   const update = useUpdateLostItem(communityId);
   const remove = useDeleteLostItem(communityId);
+  const upload = useUploadLostItemPhoto(communityId);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [type, setType] = useState<LostItemType>("LOST");
@@ -45,6 +87,7 @@ export function LostFoundPage() {
   const [location, setLocation] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [contact, setContact] = useState("");
+  const [photo, setPhoto] = useState<File | null>(null);
 
   useEffect(() => {
     if (communityId) {
@@ -55,7 +98,7 @@ export function LostFoundPage() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     try {
-      await create.mutateAsync({
+      const created = await create.mutateAsync({
         title,
         description: description || undefined,
         type,
@@ -63,11 +106,15 @@ export function LostFoundPage() {
         eventDate: eventDate || undefined,
         contact: contact || undefined,
       });
+      if (photo) {
+        await upload.mutateAsync({ itemId: created.id, file: photo });
+      }
       setTitle("");
       setDescription("");
       setLocation("");
       setEventDate("");
       setContact("");
+      setPhoto(null);
       setShowForm(false);
     } catch {
       // estado de la mutación
@@ -105,7 +152,7 @@ export function LostFoundPage() {
       </header>
 
       {items.isError ? <Alert variant="error">{t("lostFound.error")}</Alert> : null}
-      {create.isError || update.isError || remove.isError ? (
+      {create.isError || update.isError || remove.isError || upload.isError ? (
         <Alert variant="error">{t("lostFound.error")}</Alert>
       ) : null}
 
@@ -136,10 +183,21 @@ export function LostFoundPage() {
             <Input label={t("lostFound.location")} value={location} onChange={(event) => setLocation(event.target.value)} />
             <Input label={t("lostFound.eventDate")} type="date" value={eventDate} onChange={(event) => setEventDate(event.target.value)} />
             <Input label={t("lostFound.contact")} value={contact} onChange={(event) => setContact(event.target.value)} />
+            <div className="field">
+              <label className="field__label" htmlFor="lost-photo">{t("lostFound.photo")}</label>
+              <input
+                id="lost-photo"
+                className="field__input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) => setPhoto(event.target.files?.[0] ?? null)}
+              />
+              <p className="field__hint">{t("lostFound.photoHint")}</p>
+            </div>
           </div>
           <Textarea label={t("lostFound.description")} value={description} onChange={(event) => setDescription(event.target.value)} rows={3} />
           <div className="form-actions">
-            <Button type="submit" loading={create.isPending}>{t("common.save")}</Button>
+            <Button type="submit" loading={create.isPending || upload.isPending}>{t("common.save")}</Button>
             <Button type="button" variant="secondary" onClick={() => setShowForm(false)}>{t("common.cancel")}</Button>
           </div>
         </form>
@@ -149,6 +207,7 @@ export function LostFoundPage() {
         <div className="lost-grid">
           {items.data.map((item) => (
             <article className={`lost-card lost-card--${item.type.toLowerCase()}`} key={item.id}>
+              <LostItemPhoto photoUrl={item.photoUrl} />
               <header className="lost-card__head">
                 <span className={`lost-card__type lost-card__type--${item.type.toLowerCase()}`}>
                   {t(`lostFound.types.${item.type}`)}
@@ -186,6 +245,22 @@ export function LostFoundPage() {
                         {t("lostFound.reopen")}
                       </Button>
                     )}
+                    <label className="btn btn--ghost btn--small lost-photo-upload">
+                      <ImagePlus size={14} aria-hidden="true" /> {t("lostFound.changePhoto")}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        hidden
+                        onChange={(event) => {
+                          const input = event.currentTarget;
+                          const file = input.files?.[0];
+                          if (file) {
+                            void upload.mutateAsync({ itemId: item.id, file });
+                          }
+                          input.value = "";
+                        }}
+                      />
+                    </label>
                     <Button variant="ghost" onClick={() => void remove.mutateAsync(item.id)}>
                       {t("lostFound.delete")}
                     </Button>

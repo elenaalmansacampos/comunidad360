@@ -1,7 +1,9 @@
 package com.comunidad360.board;
 
 import com.comunidad360.audit.AuditService;
+import com.comunidad360.board.dto.BoardNoteCommentResponse;
 import com.comunidad360.board.dto.BoardNoteResponse;
+import com.comunidad360.board.dto.CreateBoardNoteCommentRequest;
 import com.comunidad360.board.dto.CreateBoardNoteRequest;
 import com.comunidad360.board.dto.UpdateBoardNoteRequest;
 import com.comunidad360.common.exception.BusinessException;
@@ -22,15 +24,17 @@ import java.util.UUID;
 public class BoardNoteService {
 
     private final BoardNoteRepository repository;
+    private final BoardNoteCommentRepository commentRepository;
     private final TenantAccessService tenantAccessService;
     private final PermissionService permissionService;
     private final AuditService auditService;
     private final AppUserRepository userRepository;
 
-    public BoardNoteService(BoardNoteRepository repository, TenantAccessService tenantAccessService,
-                            PermissionService permissionService, AuditService auditService,
-                            AppUserRepository userRepository) {
+    public BoardNoteService(BoardNoteRepository repository, BoardNoteCommentRepository commentRepository,
+                            TenantAccessService tenantAccessService, PermissionService permissionService,
+                            AuditService auditService, AppUserRepository userRepository) {
         this.repository = repository;
+        this.commentRepository = commentRepository;
         this.tenantAccessService = tenantAccessService;
         this.permissionService = permissionService;
         this.auditService = auditService;
@@ -42,7 +46,8 @@ public class BoardNoteService {
         Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
         permissionService.require(membership, "BOARD_VIEW");
         return repository.findByCommunityIdOrderByPinnedDescCreatedAtDesc(communityId).stream()
-                .map(note -> BoardNoteResponse.from(note, userName(note.getCreatedByUserId())))
+                .map(note -> BoardNoteResponse.from(note, userName(note.getCreatedByUserId()),
+                        commentRepository.countByCommunityIdAndNoteId(communityId, note.getId())))
                 .toList();
     }
 
@@ -54,7 +59,7 @@ public class BoardNoteService {
         Instant now = Instant.now();
         BoardNote note = repository.saveAndFlush(new BoardNote(UUID.randomUUID(), communityId,
                 request.title().trim(), request.body().trim(), request.color(), false, userId, now, now));
-        BoardNoteResponse response = BoardNoteResponse.from(note, userName(userId));
+        BoardNoteResponse response = BoardNoteResponse.from(note, userName(userId), 0);
         auditService.record(communityId, userId, "USER", "BOARD_NOTE_CREATED", "BOARD_NOTE",
                 note.getId(), null, response, httpRequest);
         return response;
@@ -72,7 +77,8 @@ public class BoardNoteService {
         if (request.version() != null && request.version() != note.getVersion()) {
             throw BusinessException.conflict("VERSION_CONFLICT", "errors.conflict");
         }
-        BoardNoteResponse before = BoardNoteResponse.from(note, userName(note.getCreatedByUserId()));
+        BoardNoteResponse before = BoardNoteResponse.from(note, userName(note.getCreatedByUserId()),
+                commentRepository.countByCommunityIdAndNoteId(communityId, noteId));
         if (request.title() != null) {
             if (request.title().isBlank()) {
                 throw BusinessException.unprocessable("VALIDATION_ERROR", "errors.validation");
@@ -89,7 +95,8 @@ public class BoardNoteService {
         if (request.pinned() != null) note.setPinned(request.pinned());
         note.setUpdatedAt(Instant.now());
         BoardNote saved = repository.saveAndFlush(note);
-        BoardNoteResponse response = BoardNoteResponse.from(saved, userName(saved.getCreatedByUserId()));
+        BoardNoteResponse response = BoardNoteResponse.from(saved, userName(saved.getCreatedByUserId()),
+                commentRepository.countByCommunityIdAndNoteId(communityId, noteId));
         auditService.record(communityId, userId, "USER", "BOARD_NOTE_UPDATED", "BOARD_NOTE",
                 noteId, before, response, httpRequest);
         return response;
@@ -103,10 +110,37 @@ public class BoardNoteService {
         if (!canManage(membership, note, userId)) {
             throw BusinessException.forbidden("PERMISSION_DENIED", "errors.permission.denied");
         }
-        BoardNoteResponse before = BoardNoteResponse.from(note, userName(note.getCreatedByUserId()));
+        BoardNoteResponse before = BoardNoteResponse.from(note, userName(note.getCreatedByUserId()),
+                commentRepository.countByCommunityIdAndNoteId(communityId, noteId));
         repository.delete(note);
         auditService.record(communityId, userId, "USER", "BOARD_NOTE_DELETED", "BOARD_NOTE",
                 noteId, before, null, httpRequest);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BoardNoteCommentResponse> comments(UUID communityId, UUID userId, UUID noteId) {
+        Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
+        permissionService.require(membership, "BOARD_VIEW");
+        find(communityId, noteId);
+        return commentRepository.findByCommunityIdAndNoteIdOrderByCreatedAtAsc(communityId, noteId).stream()
+                .map(comment -> BoardNoteCommentResponse.from(comment, userName(comment.getAuthorUserId())))
+                .toList();
+    }
+
+    @Transactional
+    public BoardNoteCommentResponse addComment(UUID communityId, UUID userId, UUID noteId,
+                                               CreateBoardNoteCommentRequest request,
+                                               HttpServletRequest httpRequest) {
+        Membership membership = tenantAccessService.requireActiveMembership(communityId, userId);
+        permissionService.require(membership, "BOARD_VIEW");
+        permissionService.require(membership, "BOARD_CREATE");
+        find(communityId, noteId);
+        BoardNoteComment comment = commentRepository.saveAndFlush(new BoardNoteComment(UUID.randomUUID(),
+                communityId, noteId, userId, request.body().trim(), Instant.now()));
+        BoardNoteCommentResponse response = BoardNoteCommentResponse.from(comment, userName(userId));
+        auditService.record(communityId, userId, "USER", "BOARD_NOTE_COMMENT_CREATED", "BOARD_NOTE",
+                noteId, null, response, httpRequest);
+        return response;
     }
 
     private BoardNote find(UUID communityId, UUID noteId) {

@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,6 +35,7 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -94,6 +96,18 @@ class CommunityExtrasIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("RESOLVED"));
 
+        MockMultipartFile photo = new MockMultipartFile("file", "foto.png", "image/png",
+                new byte[]{(byte) 0x89, 'P', 'N', 'G', 1, 2, 3, 4});
+        mockMvc.perform(multipart(path(community.getId(), "lost-items") + "/" + itemId + "/photo")
+                        .file(photo)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.photoUrl").isNotEmpty());
+
+        mockMvc.perform(get(path(community.getId(), "lost-items") + "/" + itemId + "/photo")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
         AppUser other = createUser(uniqueEmail("lost-other"));
         Community otherCommunity = createCommunity("Lost Other");
         createMembership(otherCommunity, other, "COMMUNITY_ADMIN");
@@ -144,6 +158,22 @@ class CommunityExtrasIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.pinned").value(true));
 
+        mockMvc.perform(post(path(community.getId(), "board-notes") + "/" + noteId + "/comments")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("body", "Primer comentario"))))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get(path(community.getId(), "board-notes") + "/" + noteId + "/comments")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+
+        mockMvc.perform(get(path(community.getId(), "board-notes"))
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].commentCount").value(1));
+
         mockMvc.perform(delete(path(community.getId(), "board-notes") + "/" + noteId)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNoContent());
@@ -159,12 +189,14 @@ class CommunityExtrasIntegrationTest {
         String adminToken = accessToken(admin.getEmail());
         String viewerToken = accessToken(viewer.getEmail());
 
-        mockMvc.perform(post(path(community.getId(), "board-notes"))
+        MvcResult adminNote = mockMvc.perform(post(path(community.getId(), "board-notes"))
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "title", "Aviso", "body", "Contenido", "color", "YELLOW"))))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andReturn();
+        UUID adminNoteId = UUID.fromString(json(adminNote).get("id").asText());
         mockMvc.perform(post(path(community.getId(), "lost-items"))
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -191,6 +223,12 @@ class CommunityExtrasIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "title", "No", "type", "FOUND"))))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post(path(community.getId(), "board-notes") + "/" + adminNoteId + "/comments")
+                        .header("Authorization", "Bearer " + viewerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("body", "No"))))
                 .andExpect(status().isForbidden());
 
         MvcResult channels = mockMvc.perform(get(path(community.getId(), "chat/channels"))

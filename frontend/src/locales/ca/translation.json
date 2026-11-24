@@ -927,7 +927,11 @@
       "BLUE": "Blau",
       "GREEN": "Verd",
       "ORANGE": "Taronja"
-    }
+    },
+    "comments": "Comentaris",
+    "noComments": "Sense comentaris",
+    "commentPlaceholder": "Escriu un comentari...",
+    "commentSubmit": "Envia el comentari"
   },
   "lostFound": {
     "title": "Objectes perduts",
@@ -956,6 +960,9 @@
       "OPEN": "Obert",
       "RESOLVED": "Resolt",
       "ARCHIVED": "Arxivat"
-    }
+    },
+    "photo": "Fotografia",
+    "photoHint": "JPEG, PNG o WebP · màxim 5 MB",
+    "changePhoto": "Canvia la foto"
   }
 }

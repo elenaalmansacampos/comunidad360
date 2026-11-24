@@ -2039,3 +2039,147 @@ h3 {
   margin: 0;
   text-align: center;
 }
+
+/* Lost item photos */
+.lost-card__photo {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--color-gray-100);
+  display: block;
+}
+
+.lost-card__photo--empty {
+  display: grid;
+  place-items: center;
+  background: var(--color-gray-50);
+  color: var(--color-gray-300);
+}
+
+[data-theme="dark"] .lost-card__photo--empty {
+  background: #0b1220;
+  color: #475569;
+}
+
+.lost-photo-upload {
+  cursor: pointer;
+}
+
+.lost-photo-upload input {
+  display: none;
+}
+
+/* Post-it comments */
+.postit__comments-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: flex-start;
+  padding: 0.1rem 0;
+  border: 0;
+  background: transparent;
+  color: #57534e;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.postit__comments-toggle:hover {
+  color: #27272a;
+  text-decoration: underline;
+}
+
+.postit__comments {
+  max-height: 14rem;
+  overflow-y: auto;
+  padding: 0.5rem 0.55rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.55);
+  color: #3f3f46;
+  font-size: 0.72rem;
+}
+
+.postit__comments ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.postit__comments li {
+  padding-bottom: 0.4rem;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+}
+
+.postit__comments li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.postit__comment-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.postit__comment-meta strong {
+  font-size: 0.72rem;
+}
+
+.postit__comment-meta small {
+  color: #57534e;
+  font-size: 0.62rem;
+}
+
+.postit__comments p {
+  margin: 0.15rem 0 0;
+  color: #3f3f46;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.postit__comments-empty {
+  margin: 0;
+  color: #57534e;
+}
+
+.postit__comments-error {
+  margin: 0.3rem 0 0;
+  color: #9f1239;
+}
+
+.postit__comment-form {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+}
+
+.postit__comment-form .field__input {
+  height: 30px;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.75);
+  color: #27272a;
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.postit__comment-send {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: #1d4ed8;
+  color: #fff;
+  cursor: pointer;
+}
+
+.postit__comment-send:disabled {
+  opacity: 0.5;
+}

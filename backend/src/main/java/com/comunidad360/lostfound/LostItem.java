@@ -48,6 +48,15 @@ public class LostItem {
     @Column(name = "created_by_user_id")
     private UUID createdByUserId;
 
+    @Column(name = "photo_key", length = 500)
+    private String photoKey;
+
+    @Column(name = "photo_content_type", length = 100)
+    private String photoContentType;
+
+    @Column(name = "photo_file_name", length = 255)
+    private String photoFileName;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -156,6 +165,30 @@ public class LostItem {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getPhotoKey() {
+        return photoKey;
+    }
+
+    public void setPhotoKey(String photoKey) {
+        this.photoKey = photoKey;
+    }
+
+    public String getPhotoContentType() {
+        return photoContentType;
+    }
+
+    public void setPhotoContentType(String photoContentType) {
+        this.photoContentType = photoContentType;
+    }
+
+    public String getPhotoFileName() {
+        return photoFileName;
+    }
+
+    public void setPhotoFileName(String photoFileName) {
+        this.photoFileName = photoFileName;
     }
 
     public long getVersion() {
