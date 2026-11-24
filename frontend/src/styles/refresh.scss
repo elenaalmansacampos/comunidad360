@@ -3083,7 +3083,7 @@ h3 {
 .sidebar__role {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 0.5rem;
   padding: 0.4rem 0.6rem;
   margin-bottom: 0.35rem;
@@ -3092,12 +3092,6 @@ h3 {
   color: #475569;
   font-size: 0.72rem;
   font-weight: 600;
-}
-
-.sidebar__role span {
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 0.62rem;
 }
 
 .sidebar__role strong {
@@ -3230,4 +3224,20 @@ h3 {
 [data-theme="dark"] .mobile-more__grid a[class*="nav-link--accent-"] {
   background: #111c31;
   color: #cbd5e1;
+}
+
+.btn.btn--danger {
+  color: var(--color-danger);
+}
+
+.btn.btn--danger:hover {
+  background: #fef2f2;
+}
+
+[data-theme="dark"] .btn.btn--danger {
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .btn.btn--danger:hover {
+  background: #3f1d1d;
 }

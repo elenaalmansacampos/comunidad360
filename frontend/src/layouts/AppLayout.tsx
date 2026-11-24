@@ -197,7 +197,6 @@ export function AppLayout() {
             </div>
           </div>
           <div className={`sidebar__role ${isVecino ? "sidebar__role--vecino" : ""}`}>
-            <span>{t("common.role")}</span>
             <strong>{displayRoleLabel}</strong>
           </div>
           <nav className={`sidebar__nav ${isVecino ? "sidebar__nav--vecino" : ""}`}>
