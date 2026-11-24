@@ -46,7 +46,8 @@
       "community": "Community"
     },
     "board": "Notice board",
-    "lostFound": "Lost & found"
+    "lostFound": "Lost & found",
+    "workPermits": "Works permits"
   },
   "auth": {
     "login": {
@@ -964,5 +965,32 @@
     "photo": "Photo",
     "photoHint": "JPEG, PNG or WebP · maximum 5 MB",
     "changePhoto": "Change photo"
+  },
+  "workPermits": {
+    "title": "Works permits",
+    "subtitle": "Community works requests and approvals",
+    "newPermit": "New permit",
+    "permitTitle": "Title",
+    "description": "Description",
+    "location": "Location",
+    "startDate": "Start",
+    "endDate": "End",
+    "file": "Permit document",
+    "fileHint": "PDF, JPG, PNG or WebP · maximum 25 MB",
+    "download": "Download",
+    "attachFile": "Attach file",
+    "approve": "Approve",
+    "reject": "Reject",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "empty": "No works permits registered",
+    "error": "The operation could not be completed",
+    "reviewedBy": "Reviewed by {{name}}",
+    "statuses": {
+      "REQUESTED": "Requested",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "CANCELLED": "Cancelled"
+    }
   }
 }

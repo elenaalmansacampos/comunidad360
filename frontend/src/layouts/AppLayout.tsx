@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Eye,
   FileText,
+  HardHat,
   Landmark,
   LayoutDashboard,
   LogOut,
@@ -151,6 +152,7 @@ export function AppLayout() {
             <NavItem to={`/communities/${communityId}/incidents`} icon={<AlertTriangle size={18} />} label={t("nav.incidents")} />
             <NavItem to={`/communities/${communityId}/meetings`} icon={<CalendarDays size={18} />} label={t("nav.meetings")} />
             <NavItem to={`/communities/${communityId}/documents`} icon={<FileText size={18} />} label={t("nav.documents")} />
+            <NavItem to={`/communities/${communityId}/work-permits`} icon={<HardHat size={18} />} label={t("nav.workPermits")} />
             <p className="nav-group">{t("nav.groups.community")}</p>
             <NavItem to={`/communities/${communityId}/chat`} icon={<MessageCircle size={18} />} label={t("nav.chat")} />
             <NavItem to={`/communities/${communityId}/board`} icon={<StickyNote size={18} />} label={t("nav.board")} />
@@ -212,6 +214,7 @@ export function AppLayout() {
               <NavLink to={`/communities/${communityId}/banking`}>{t("nav.banking")}</NavLink>
               <NavLink to={`/communities/${communityId}/meetings`}>{t("nav.meetings")}</NavLink>
               <NavLink to={`/communities/${communityId}/documents`}>{t("nav.documents")}</NavLink>
+              <NavLink to={`/communities/${communityId}/work-permits`}>{t("nav.workPermits")}</NavLink>
               <NavLink to={`/communities/${communityId}/chat`}>{t("nav.chat")}</NavLink>
               <NavLink to={`/communities/${communityId}/board`}>{t("nav.board")}</NavLink>
               <NavLink to={`/communities/${communityId}/lost-found`}>{t("nav.lostFound")}</NavLink>

@@ -46,7 +46,8 @@
       "community": "Comunitat"
     },
     "board": "Tabló",
-    "lostFound": "Objectes perduts"
+    "lostFound": "Objectes perduts",
+    "workPermits": "Permisos d'obra"
   },
   "auth": {
     "login": {
@@ -964,5 +965,32 @@
     "photo": "Fotografia",
     "photoHint": "JPEG, PNG o WebP · màxim 5 MB",
     "changePhoto": "Canvia la foto"
+  },
+  "workPermits": {
+    "title": "Permisos d'obra",
+    "subtitle": "Sol·licituds i autoritzacions d'obres a la comunitat",
+    "newPermit": "Nou permís",
+    "permitTitle": "Títol",
+    "description": "Descripció",
+    "location": "Ubicació",
+    "startDate": "Inici",
+    "endDate": "Fi",
+    "file": "Document del permís",
+    "fileHint": "PDF, JPG, PNG o WebP · màxim 25 MB",
+    "download": "Descarrega",
+    "attachFile": "Adjunta un fitxer",
+    "approve": "Aprova",
+    "reject": "Rebutja",
+    "cancel": "Cancel·la",
+    "delete": "Elimina",
+    "empty": "No hi ha permisos d'obra registrats",
+    "error": "No s'ha pogut completar l'operació",
+    "reviewedBy": "Revisat per {{name}}",
+    "statuses": {
+      "REQUESTED": "Sol·licitat",
+      "APPROVED": "Aprovat",
+      "REJECTED": "Rebutjat",
+      "CANCELLED": "Cancel·lat"
+    }
   }
 }

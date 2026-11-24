@@ -2183,3 +2183,165 @@ h3 {
 .postit__comment-send:disabled {
   opacity: 0.5;
 }
+
+/* Works permits */
+.permits-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.permit-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--color-gray-100);
+  border-left: 4px solid var(--color-gray-300);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.permit-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.permit-card--requested { border-left-color: #b45309; }
+.permit-card--approved { border-left-color: #0f766e; }
+.permit-card--rejected { border-left-color: #b91c1c; }
+.permit-card--cancelled { border-left-color: #64748b; }
+
+.permit-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.permit-status {
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.permit-status--requested { background: #fef3c7; color: #92400e; }
+.permit-status--approved { background: #ccfbf1; color: #115e59; }
+.permit-status--rejected { background: #ffe4e6; color: #9f1239; }
+.permit-status--cancelled { background: #e2e8f0; color: #475569; }
+
+.permit-card h2 {
+  margin: 0.2rem 0 0;
+  font-size: 1.08rem;
+  letter-spacing: -0.01em;
+}
+
+.permit-card > p {
+  margin: 0;
+  color: var(--color-gray-700);
+  font-size: 0.9rem;
+}
+
+.permit-card__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.4rem 0.75rem;
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+}
+
+.permit-card__meta dt {
+  color: #475569;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.permit-card__meta dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.permit-card__review {
+  margin: 0;
+  color: #475569;
+  font-size: 0.78rem;
+}
+
+.permit-card__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--color-gray-100);
+}
+
+.permit-card__foot small {
+  color: #475569;
+  font-size: 0.75rem;
+}
+
+.permit-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.permit-file-upload {
+  cursor: pointer;
+}
+
+.permit-file-upload input {
+  display: none;
+}
+
+[data-theme="dark"] .permit-card {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+
+[data-theme="dark"] .permit-card--requested { border-left-color: #fbbf24; }
+[data-theme="dark"] .permit-card--approved { border-left-color: #2dd4bf; }
+[data-theme="dark"] .permit-card--rejected { border-left-color: #fb7185; }
+[data-theme="dark"] .permit-card--cancelled { border-left-color: #94a3b8; }
+
+[data-theme="dark"] .permit-status--requested {
+  background: rgba(180, 83, 9, 0.25);
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .permit-status--approved {
+  background: rgba(15, 118, 110, 0.25);
+  color: #5eead4;
+}
+
+[data-theme="dark"] .permit-status--rejected {
+  background: rgba(185, 28, 28, 0.2);
+  color: #fda4af;
+}
+
+[data-theme="dark"] .permit-status--cancelled {
+  background: #1e293b;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .permit-card__meta dt,
+[data-theme="dark"] .permit-card__review,
+[data-theme="dark"] .permit-card__foot small {
+  color: #94a3b8;
+}
+
+@media (min-width: 900px) {
+  .permits-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

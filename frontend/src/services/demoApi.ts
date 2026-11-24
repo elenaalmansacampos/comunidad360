@@ -212,6 +212,49 @@ const lostItems = [
   },
 ];
 
+const workPermits = [
+  {
+    id: "demo-permit-1",
+    title: "Reforma de cocina",
+    description: "Sustitución de mobiliario y revisión de instalación.",
+    location: "Vivienda 3B",
+    startDate: "2026-11-25",
+    endDate: "2026-12-15",
+    status: "REQUESTED",
+    createdByUserId: "demo-owner",
+    createdByName: "Propietario Demo",
+    reviewedByUserId: null,
+    reviewedByName: null,
+    reviewedAt: null,
+    reviewNotes: null,
+    fileUrl: "/demo/permiso-obra.pdf",
+    fileName: "permiso-obra.pdf",
+    createdAt: incidentCreated,
+    updatedAt: incidentCreated,
+    version: 0,
+  },
+  {
+    id: "demo-permit-2",
+    title: "Cambio de ventanas del portal",
+    description: "Instalación de doble cristal en la escalera.",
+    location: "Portal",
+    startDate: "2026-10-01",
+    endDate: "2026-10-10",
+    status: "APPROVED",
+    createdByUserId: "demo-admin",
+    createdByName: "Administradora Demo",
+    reviewedByUserId: "demo-admin",
+    reviewedByName: "Administradora Demo",
+    reviewedAt: incidentCreated,
+    reviewNotes: "Aprobado por la junta.",
+    fileUrl: "/demo/permiso-ventanas.pdf",
+    fileName: "permiso-ventanas.pdf",
+    createdAt: incidentCreated,
+    updatedAt: incidentCreated,
+    version: 1,
+  },
+];
+
 const chatChannel = {
   id: "demo-general",
   type: "GENERAL",
@@ -289,6 +332,7 @@ export async function demoRequest<T>(path: string, method = "GET"): Promise<T> {
       },
     } as T);
   }
+  if (clean.endsWith("/work-permits")) return json(workPermits as T);
   if (clean.endsWith("/board-notes")) return json(boardNotes as T);
   if (clean.endsWith("/lost-items")) return json(lostItems as T);
   if (clean.endsWith("/chat/channels")) return json([chatChannel] as T);

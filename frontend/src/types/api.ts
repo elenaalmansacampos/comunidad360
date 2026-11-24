@@ -791,3 +791,26 @@ export interface Invitation {
   status: string;
   devToken?: string | null;
 }
+
+export type WorkPermitStatus = "REQUESTED" | "APPROVED" | "REJECTED" | "CANCELLED";
+
+export interface WorkPermit {
+  id: string;
+  title: string;
+  description?: string | null;
+  location?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  status: WorkPermitStatus;
+  createdByUserId?: string | null;
+  createdByName?: string | null;
+  reviewedByUserId?: string | null;
+  reviewedByName?: string | null;
+  reviewedAt?: string | null;
+  reviewNotes?: string | null;
+  fileUrl?: string | null;
+  fileName?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}

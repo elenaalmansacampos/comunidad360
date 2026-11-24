@@ -46,7 +46,8 @@
       "community": "Comunidad"
     },
     "board": "Tablón",
-    "lostFound": "Objetos perdidos"
+    "lostFound": "Objetos perdidos",
+    "workPermits": "Permisos de obra"
   },
   "auth": {
     "login": {
@@ -964,5 +965,32 @@
     "photo": "Fotografía",
     "photoHint": "JPEG, PNG o WebP · máximo 5 MB",
     "changePhoto": "Cambiar foto"
+  },
+  "workPermits": {
+    "title": "Permisos de obra",
+    "subtitle": "Solicitudes y autorizaciones de obras en la comunidad",
+    "newPermit": "Nuevo permiso",
+    "permitTitle": "Título",
+    "description": "Descripción",
+    "location": "Ubicación",
+    "startDate": "Inicio",
+    "endDate": "Fin",
+    "file": "Documento del permiso",
+    "fileHint": "PDF, JPG, PNG o WebP · máximo 25 MB",
+    "download": "Descargar",
+    "attachFile": "Adjuntar archivo",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "empty": "No hay permisos de obra registrados",
+    "error": "No se ha podido completar la operación",
+    "reviewedBy": "Revisado por {{name}}",
+    "statuses": {
+      "REQUESTED": "Solicitado",
+      "APPROVED": "Aprobado",
+      "REJECTED": "Rechazado",
+      "CANCELLED": "Cancelado"
+    }
   }
 }

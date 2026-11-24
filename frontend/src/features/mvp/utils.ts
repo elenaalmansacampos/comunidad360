@@ -39,3 +39,12 @@ export function isReadOnly(roles: Role[]): boolean {
 export function canManageStructure(roles: Role[]): boolean {
   return roles.includes("COMMUNITY_ADMIN");
 }
+
+export function canManageWorkPermits(roles: Role[]): boolean {
+  return roles.some((role) => ["COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY"].includes(role));
+}
+
+export function canCreateWorkPermits(roles: Role[]): boolean {
+  return roles.some((role) =>
+    ["COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY", "TREASURER", "OWNER", "TENANT"].includes(role));
+}
