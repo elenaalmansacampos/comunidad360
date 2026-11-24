@@ -882,3 +882,49 @@ export interface CreateAuthorizationPayload {
   validUntil?: string;
   notes?: string;
 }
+
+export interface CommonArea {
+  id: string;
+  name: string;
+  description?: string | null;
+  location?: string | null;
+  capacity?: number | null;
+  requiresApproval: boolean;
+  active: boolean;
+  createdAt: string;
+  version: number;
+}
+
+export type ReservationStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+
+export interface Reservation {
+  id: string;
+  areaId: string;
+  areaName?: string | null;
+  membershipId: string;
+  userId: string;
+  userName?: string | null;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: ReservationStatus;
+  notes?: string | null;
+  reviewedByName?: string | null;
+  reviewedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  mine: boolean;
+}
+
+export interface DirectoryEntry {
+  membershipId: string;
+  userId: string;
+  fullName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  roles: Role[];
+  unitCodes: string[];
+  showEmail: boolean;
+  showPhone: boolean;
+  self: boolean;
+}

@@ -64,3 +64,16 @@ export function canManageAuthorizations(roles: Role[]): boolean {
   return roles.some((role) =>
     ["SUPER_ADMIN", "COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY"].includes(role));
 }
+
+export function canCreateReservations(roles: Role[]): boolean {
+  return roles.some((role) =>
+    ["COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY", "TREASURER", "OWNER", "TENANT", "VECINO"].includes(role));
+}
+
+export function canManageReservations(roles: Role[]): boolean {
+  return roles.some((role) => ["COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY"].includes(role));
+}
+
+export function canManageAreas(roles: Role[]): boolean {
+  return canManageReservations(roles);
+}

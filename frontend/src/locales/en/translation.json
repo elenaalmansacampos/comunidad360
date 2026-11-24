@@ -49,7 +49,9 @@
     "board": "Notice board",
     "lostFound": "Lost & found",
     "workPermits": "Works permits",
-    "authorizations": "Authorizations"
+    "authorizations": "Authorizations",
+    "reservations": "Bookings",
+    "directory": "Directory"
   },
   "auth": {
     "login": {
@@ -918,7 +920,13 @@
       "CLOSED": "Closed",
       "CANCELLED": "Cancelled"
     },
-    "photoHint": "JPEG, PNG or WebP · maximum 5 MB"
+    "photoHint": "JPEG, PNG or WebP · maximum 5 MB",
+    "kpiOpen": "Open",
+    "kpiInProgress": "In progress",
+    "kpiResolved": "Resolved",
+    "kpiUrgent": "Urgent",
+    "search": "Search",
+    "searchPlaceholder": "Title, category or home"
   },
   "board": {
     "title": "Notice board",
@@ -1061,5 +1069,73 @@
     "selectDelegation": "Select a vote authorization in “Act on behalf of” to vote for another neighbor.",
     "scopeHint": "Only scopes you can perform yourself are shown.",
     "chooseHint": "Select an authorization to act on behalf of another neighbor."
+  },
+  "reservations": {
+    "title": "Common area bookings",
+    "subtitle": "Book the hall, the court or any shared area of the community.",
+    "newReservation": "New booking",
+    "newArea": "New area",
+    "areaName": "Area name",
+    "description": "Description",
+    "location": "Location",
+    "capacity": "Capacity",
+    "capacityValue": "{{count}} people",
+    "requiresApproval": "Requires management approval",
+    "date": "Date",
+    "time": "Time",
+    "startTime": "Start time",
+    "endTime": "End time",
+    "notes": "Notes",
+    "area": "Area",
+    "selectArea": "Select an area",
+    "reserve": "Book",
+    "areas": "Available areas",
+    "inactive": "Inactive",
+    "approvalRequired": "Approval required",
+    "autoApproved": "Instant confirmation",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "neighbor": "Neighbor",
+    "status": "Status",
+    "actions": "Actions",
+    "approve": "Approve",
+    "reject": "Reject",
+    "cancel": "Cancel booking",
+    "you": "You",
+    "noReservations": "No bookings to show.",
+    "noAreas": "No areas have been configured yet.",
+    "error": "The booking could not be completed.",
+    "kpiAreas": "Active areas",
+    "kpiUpcoming": "Upcoming bookings",
+    "kpiMine": "My bookings",
+    "kpiPending": "Pending",
+    "tabs": {
+      "UPCOMING": "Upcoming",
+      "MINE": "Mine",
+      "ALL": "All"
+    },
+    "statuses": {
+      "PENDING": "Pending",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "CANCELLED": "Cancelled"
+    }
+  },
+  "directory": {
+    "title": "Neighbor directory",
+    "subtitle": "Find your neighbors, their homes and their contact details.",
+    "error": "The directory could not be loaded.",
+    "myData": "My contact details",
+    "myDataHint": "Choose which details you want to share with the rest of the community.",
+    "phone": "Phone",
+    "showEmail": "Show my email",
+    "showPhone": "Show my phone",
+    "saved": "Details updated.",
+    "search": "Search",
+    "searchPlaceholder": "Name, home or role",
+    "noResults": "No neighbors match the search.",
+    "you": "You",
+    "units": "Homes",
+    "contactPrivate": "Private contact"
   }
 }

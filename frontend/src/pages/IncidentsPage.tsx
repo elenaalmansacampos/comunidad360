@@ -47,6 +47,8 @@ export function IncidentsPage() {
     priority || undefined,
     assignedToMe,
   );
+  const summary = useIncidents(communityId);
+  const [search, setSearch] = useState("");
   const units = useUnits(communityId);
 
   useEffect(() => {
@@ -55,11 +57,11 @@ export function IncidentsPage() {
     }
   }, [communityId, setSelectedCommunityId]);
 
-  if (incidents.isLoading) {
+  if (incidents.isLoading || summary.isLoading) {
     return <FullPageLoader />;
   }
 
-  if (incidents.isError) {
+  if (incidents.isError || summary.isError) {
     return (
       <div className="page">
         <Alert variant="error">{t("incidents.error")}</Alert>
@@ -67,19 +69,54 @@ export function IncidentsPage() {
     );
   }
 
+  const allIncidents = summary.data ?? [];
+  const openCount = allIncidents.filter((incident) => incident.status === "OPEN").length;
+  const progressCount = allIncidents.filter((incident) =>
+    incident.status === "IN_PROGRESS" || incident.status === "WAITING_PROVIDER").length;
+  const resolvedCount = allIncidents.filter((incident) =>
+    incident.status === "RESOLVED" || incident.status === "CLOSED").length;
+  const urgentCount = allIncidents.filter((incident) =>
+    incident.priority === "URGENT" && incident.status !== "CLOSED" && incident.status !== "CANCELLED").length;
+  const visibleIncidents = (incidents.data ?? []).filter((incident) => {
+    const term = search.trim().toLowerCase();
+    return !term
+      || incident.title.toLowerCase().includes(term)
+      || incident.category.toLowerCase().includes(term)
+      || (incident.unitCode ?? "").toLowerCase().includes(term);
+  });
+
   return (
-    <div className="page">
+    <div className="page incidents-page">
       <header className="page-header">
         <div>
           <h1>{t("incidents.title")}</h1>
           <p className="page-subtitle">{t("incidents.subtitle")}</p>
         </div>
         {canCreate ? (
-          <Button variant="secondary" onClick={() => setShowForm((value) => !value)}>
+          <Button onClick={() => setShowForm((value) => !value)}>
             {t("incidents.newIncident")}
           </Button>
         ) : null}
       </header>
+
+      <div className="incident-kpis">
+        <button type="button" className="incident-kpi incident-kpi--open" onClick={() => { setStatus("OPEN"); setPriority(""); }}>
+          <span>{t("incidents.kpiOpen")}</span>
+          <strong>{openCount}</strong>
+        </button>
+        <button type="button" className="incident-kpi incident-kpi--progress" onClick={() => { setStatus("IN_PROGRESS"); setPriority(""); }}>
+          <span>{t("incidents.kpiInProgress")}</span>
+          <strong>{progressCount}</strong>
+        </button>
+        <button type="button" className="incident-kpi incident-kpi--resolved" onClick={() => { setStatus("RESOLVED"); setPriority(""); }}>
+          <span>{t("incidents.kpiResolved")}</span>
+          <strong>{resolvedCount}</strong>
+        </button>
+        <button type="button" className="incident-kpi incident-kpi--urgent" onClick={() => { setStatus(""); setPriority("URGENT"); }}>
+          <span>{t("incidents.kpiUrgent")}</span>
+          <strong>{urgentCount}</strong>
+        </button>
+      </div>
 
       {showForm && communityId ? (
         <IncidentForm
@@ -90,6 +127,12 @@ export function IncidentsPage() {
       ) : null}
 
       <div className="filter-bar">
+        <Input
+          label={t("incidents.search")}
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder={t("incidents.searchPlaceholder")}
+        />
         <Select label={t("incidents.status")} value={status} onChange={(e) => setStatus(e.target.value as IncidentStatus | "")}>
           <option value="">{t("incidents.all")}</option>
           {(["OPEN", "IN_PROGRESS", "WAITING_PROVIDER", "RESOLVED", "CLOSED", "CANCELLED"] as IncidentStatus[]).map((value) => (
@@ -108,14 +151,20 @@ export function IncidentsPage() {
         </label>
       </div>
 
-      {incidents.data?.length === 0 ? (
-        <div className="empty-state">{t("incidents.noIncidents")}</div>
+      {visibleIncidents.length === 0 ? (
+        <div className="empty-state">
+          <span>{t("incidents.noIncidents")}</span>
+          {canCreate ? (
+            <Button variant="secondary" onClick={() => setShowForm(true)}>{t("incidents.newIncident")}</Button>
+          ) : null}
+        </div>
       ) : (
         <div className="table-wrapper">
           <table className="table">
             <thead>
               <tr>
                 <th>{t("incidents.incidentTitle")}</th>
+                <th>{t("incidents.category")}</th>
                 <th>{t("incidents.unit")}</th>
                 <th>{t("incidents.priority")}</th>
                 <th>{t("incidents.status")}</th>
@@ -124,17 +173,22 @@ export function IncidentsPage() {
               </tr>
             </thead>
             <tbody>
-              {incidents.data?.map((incident) => (
+              {visibleIncidents.map((incident) => (
                 <tr key={incident.id}>
                   <td data-label={t("incidents.incidentTitle")}>
                     <Link to={`/communities/${communityId}/incidents/${incident.id}`}>{incident.title}</Link>
                   </td>
+                  <td data-label={t("incidents.category")}>{incident.category}</td>
                   <td data-label={t("incidents.unit")}>{incident.unitCode ?? t("incidents.noUnit")}</td>
                   <td data-label={t("incidents.priority")}>
-                    <span className="badge">{t(`incidents.priorities.${incident.priority}`)}</span>
+                    <span className={`badge incident-priority incident-priority--${incident.priority.toLowerCase()}`}>
+                      {t(`incidents.priorities.${incident.priority}`)}
+                    </span>
                   </td>
                   <td data-label={t("incidents.status")}>
-                    <span className="badge">{t(`incidents.statuses.${incident.status}`)}</span>
+                    <span className={`badge incident-status incident-status--${incident.status.toLowerCase()}`}>
+                      {t(`incidents.statuses.${incident.status}`)}
+                    </span>
                   </td>
                   <td data-label={t("incidents.assignedTo")}>{incident.assignedToName ?? t("incidents.unassigned")}</td>
                   <td data-label={t("incidents.created")}>{formatDate(incident.createdAt, language)}</td>

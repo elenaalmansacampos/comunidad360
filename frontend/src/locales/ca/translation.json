@@ -49,7 +49,9 @@
     "board": "Tabló",
     "lostFound": "Objectes perduts",
     "workPermits": "Permisos d'obra",
-    "authorizations": "Autoritzacions"
+    "authorizations": "Autoritzacions",
+    "reservations": "Reserves",
+    "directory": "Directori"
   },
   "auth": {
     "login": {
@@ -918,7 +920,13 @@
       "CLOSED": "Tancada",
       "CANCELLED": "Cancel·lada"
     },
-    "photoHint": "JPEG, PNG o WebP · màxim 5 MB"
+    "photoHint": "JPEG, PNG o WebP · màxim 5 MB",
+    "kpiOpen": "Obertes",
+    "kpiInProgress": "En curs",
+    "kpiResolved": "Resoltes",
+    "kpiUrgent": "Urgents",
+    "search": "Cerca",
+    "searchPlaceholder": "Títol, categoria o habitatge"
   },
   "board": {
     "title": "Taulell d'anuncis",
@@ -1061,5 +1069,73 @@
     "selectDelegation": "Selecciona una autorització de vot a «Actuar en nom de» per votar per un altre veí.",
     "scopeHint": "Només apareixen els àmbits que tu mateix pots realitzar.",
     "chooseHint": "Selecciona una autorització per actuar en nom d'un altre veí."
+  },
+  "reservations": {
+    "title": "Reserves de zones comunes",
+    "subtitle": "Reserva la sala, la pista o qualsevol zona compartida de la comunitat.",
+    "newReservation": "Nova reserva",
+    "newArea": "Nova zona",
+    "areaName": "Nom de la zona",
+    "description": "Descripció",
+    "location": "Ubicació",
+    "capacity": "Aforament",
+    "capacityValue": "{{count}} persones",
+    "requiresApproval": "Requereix aprovació de l'administració",
+    "date": "Data",
+    "time": "Horari",
+    "startTime": "Hora d'inici",
+    "endTime": "Hora de fi",
+    "notes": "Notes",
+    "area": "Zona",
+    "selectArea": "Selecciona una zona",
+    "reserve": "Reserva",
+    "areas": "Zones disponibles",
+    "inactive": "Inactiva",
+    "approvalRequired": "Amb aprovació",
+    "autoApproved": "Confirmació immediata",
+    "deactivate": "Desactiva",
+    "activate": "Activa",
+    "neighbor": "Veí",
+    "status": "Estat",
+    "actions": "Accions",
+    "approve": "Aprova",
+    "reject": "Rebutja",
+    "cancel": "Cancel·la la reserva",
+    "you": "Tu",
+    "noReservations": "No hi ha reserves per mostrar.",
+    "noAreas": "Encara no hi ha zones configurades.",
+    "error": "No s'ha pogut completar la reserva.",
+    "kpiAreas": "Zones actives",
+    "kpiUpcoming": "Properes reserves",
+    "kpiMine": "Les meves reserves",
+    "kpiPending": "Pendents",
+    "tabs": {
+      "UPCOMING": "Properes",
+      "MINE": "Les meves",
+      "ALL": "Totes"
+    },
+    "statuses": {
+      "PENDING": "Pendent",
+      "APPROVED": "Aprovada",
+      "REJECTED": "Rebutjada",
+      "CANCELLED": "Cancel·lada"
+    }
+  },
+  "directory": {
+    "title": "Directori de veïns",
+    "subtitle": "Troba els teus veïns, els seus habitatges i les seves dades de contacte.",
+    "error": "No s'ha pogut carregar el directori.",
+    "myData": "Les meves dades de contacte",
+    "myDataHint": "Decideix quines dades vols compartir amb la resta de la comunitat.",
+    "phone": "Telèfon",
+    "showEmail": "Mostra el meu email",
+    "showPhone": "Mostra el meu telèfon",
+    "saved": "Dades actualitzades.",
+    "search": "Cerca",
+    "searchPlaceholder": "Nom, habitatge o rol",
+    "noResults": "No hi ha veïns que coincideixin amb la cerca.",
+    "you": "Tu",
+    "units": "Habitatges",
+    "contactPrivate": "Contacte privat"
   }
 }

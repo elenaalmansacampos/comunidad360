@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import {
   AlertTriangle,
+  BookUser,
   Building2,
+  CalendarCheck,
   CalendarDays,
   ChevronDown,
   Eye,
@@ -178,6 +180,7 @@ export function AppLayout() {
             <NavItem to={`/communities/${communityId}/banking`} icon={<Landmark size={18} />} label={t("nav.banking")} />
             <NavItem to={`/communities/${communityId}/incidents`} icon={<AlertTriangle size={18} />} label={t("nav.incidents")} />
             <NavItem to={`/communities/${communityId}/meetings`} icon={<CalendarDays size={18} />} label={t("nav.meetings")} />
+            <NavItem to={`/communities/${communityId}/reservations`} icon={<CalendarCheck size={18} />} label={t("nav.reservations")} />
             <NavItem to={`/communities/${communityId}/documents`} icon={<FileText size={18} />} label={t("nav.documents")} />
             <NavItem to={`/communities/${communityId}/work-permits`} icon={<HardHat size={18} />} label={t("nav.workPermits")} />
             <p className="nav-group">{t("nav.groups.community")}</p>
@@ -190,6 +193,7 @@ export function AppLayout() {
             <NavItem to={`/communities/${communityId}/votings`} icon={<Vote size={18} />} label={t("nav.votings")} />
             <NavItem to={`/communities/${communityId}/members`} icon={<Users size={18} />} label={t("nav.members")} />
             <NavItem to={`/communities/${communityId}/authorizations`} icon={<UserCheck size={18} />} label={t("nav.authorizations")} />
+            <NavItem to={`/communities/${communityId}/directory`} icon={<BookUser size={18} />} label={t("nav.directory")} />
           </nav>
           {user ? (
             <div className="sidebar__footer">
@@ -288,6 +292,7 @@ export function AppLayout() {
             <div className="mobile-more__grid">
               <NavLink to={`/communities/${communityId}/banking`}>{t("nav.banking")}</NavLink>
               <NavLink to={`/communities/${communityId}/meetings`}>{t("nav.meetings")}</NavLink>
+              <NavLink to={`/communities/${communityId}/reservations`}>{t("nav.reservations")}</NavLink>
               <NavLink to={`/communities/${communityId}/documents`}>{t("nav.documents")}</NavLink>
               <NavLink to={`/communities/${communityId}/work-permits`}>{t("nav.workPermits")}</NavLink>
               <NavLink to={`/communities/${communityId}/chat`}>{t("nav.chat")}</NavLink>
@@ -299,6 +304,7 @@ export function AppLayout() {
               <NavLink to={`/communities/${communityId}/votings`}>{t("nav.votings")}</NavLink>
               <NavLink to={`/communities/${communityId}/members`}>{t("nav.members")}</NavLink>
               <NavLink to={`/communities/${communityId}/authorizations`}>{t("nav.authorizations")}</NavLink>
+              <NavLink to={`/communities/${communityId}/directory`}>{t("nav.directory")}</NavLink>
               <NavLink to={`/communities/${communityId}/notification-preferences`}>
                 {t("notifications.preferences")}
               </NavLink>

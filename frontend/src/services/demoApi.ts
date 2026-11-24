@@ -321,6 +321,110 @@ function json<T>(value: T): T {
   return value;
 }
 
+
+const commonAreas = [
+  {
+    id: "demo-area-1",
+    name: "Salón de actos",
+    description: "Espacio para reuniones, celebraciones y actividades comunitarias.",
+    location: "Planta baja",
+    capacity: 60,
+    requiresApproval: true,
+    active: true,
+    createdAt: incidentCreated,
+    version: 0,
+  },
+  {
+    id: "demo-area-2",
+    name: "Pista de pádel",
+    description: "Pista exterior con iluminación. Reserva por franjas de 90 minutos.",
+    location: "Zona deportiva",
+    capacity: 4,
+    requiresApproval: false,
+    active: true,
+    createdAt: incidentCreated,
+    version: 0,
+  },
+];
+
+const reservations = [
+  {
+    id: "demo-reservation-1",
+    areaId: "demo-area-1",
+    areaName: "Salón de actos",
+    membershipId: "demo-membership-admin",
+    userId: "demo-admin",
+    userName: "Administradora Demo",
+    date: "2026-12-05",
+    startTime: "18:00:00",
+    endTime: "21:00:00",
+    status: "APPROVED",
+    notes: "Charla vecinal sobre eficiencia energética.",
+    reviewedByName: "Administradora Demo",
+    reviewedAt: incidentCreated,
+    createdAt: incidentCreated,
+    updatedAt: incidentCreated,
+    mine: true,
+  },
+  {
+    id: "demo-reservation-2",
+    areaId: "demo-area-2",
+    areaName: "Pista de pádel",
+    membershipId: "demo-membership-owner",
+    userId: "demo-owner",
+    userName: "Propietario Demo",
+    date: "2026-12-06",
+    startTime: "10:00:00",
+    endTime: "11:30:00",
+    status: "PENDING",
+    notes: null,
+    reviewedByName: null,
+    reviewedAt: null,
+    createdAt: incidentCreated,
+    updatedAt: incidentCreated,
+    mine: false,
+  },
+];
+
+const directory = [
+  {
+    membershipId: "demo-membership-admin",
+    userId: "demo-admin",
+    fullName: "Administradora Demo",
+    email: "admin@comunidad360.local",
+    phone: "+34 600 000 000",
+    roles: ["COMMUNITY_ADMIN"],
+    unitCodes: ["1ºA"],
+    showEmail: true,
+    showPhone: true,
+    self: true,
+  },
+  {
+    membershipId: "demo-membership-owner",
+    userId: "demo-owner",
+    fullName: "Propietario Demo",
+    email: "propietario@example.com",
+    phone: "+34 600 111 111",
+    roles: ["OWNER"],
+    unitCodes: ["2ºB"],
+    showEmail: true,
+    showPhone: false,
+    self: false,
+  },
+  {
+    membershipId: "demo-membership-tenant",
+    userId: "demo-tenant",
+    fullName: "Inquilino Demo",
+    email: null,
+    phone: null,
+    roles: ["TENANT"],
+    unitCodes: ["3ºC"],
+    showEmail: false,
+    showPhone: false,
+    self: false,
+  },
+];
+
 export async function demoRequest<T>(path: string, method = "GET"): Promise<T> {
   const clean = path.split("?")[0];
   if (clean === "/auth/login" || clean === "/auth/refresh") {
@@ -334,6 +438,9 @@ export async function demoRequest<T>(path: string, method = "GET"): Promise<T> {
   if (clean === "/me/notification-preferences") return json(notificationPreferences as T);
   if (clean.endsWith("/dashboard")) return json(dashboard as T);
   if (clean.endsWith("/members")) return json(members as T);
+  if (clean.endsWith("/common-areas")) return json(commonAreas as T);
+  if (clean.endsWith("/reservations")) return json(reservations as T);
+  if (clean.endsWith("/directory")) return json(directory as T);
   if (clean.endsWith("/authorizations")) return json([] as T);
   if (clean.endsWith("/structure/summary")) {
     return json({ coefficientSum: "100.000000", tolerance: "0.010000", valid: true, totalUnits: 24, activeUnits: 24, buildings: 2, commonElements: 4 } as T);

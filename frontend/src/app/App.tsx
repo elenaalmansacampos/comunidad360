@@ -45,6 +45,10 @@ const WorkPermitsPage = lazy(() => import("../pages/WorkPermitsPage").then((m) =
 const MembersPage = lazy(() => import("../pages/MembersPage").then((m) => ({ default: m.MembersPage })));
 const AuthorizationsPage = lazy(() =>
   import("../pages/AuthorizationsPage").then((m) => ({ default: m.AuthorizationsPage })));
+const ReservationsPage = lazy(() =>
+  import("../pages/ReservationsPage").then((m) => ({ default: m.ReservationsPage })));
+const DirectoryPage = lazy(() =>
+  import("../pages/DirectoryPage").then((m) => ({ default: m.DirectoryPage })));
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })));
 
 const queryClient = new QueryClient({
@@ -109,6 +113,8 @@ export function App() {
                 <Route path="work-permits" element={<WorkPermitsPage />} />
                 <Route path="members" element={<MembersPage />} />
                 <Route path="authorizations" element={<AuthorizationsPage />} />
+                <Route path="reservations" element={<ReservationsPage />} />
+                <Route path="directory" element={<DirectoryPage />} />
               </Route>
             </Route>
 

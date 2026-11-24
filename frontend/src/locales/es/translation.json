@@ -49,7 +49,9 @@
     "board": "Tablón",
     "lostFound": "Objetos perdidos",
     "workPermits": "Permisos de obra",
-    "authorizations": "Autorizaciones"
+    "authorizations": "Autorizaciones",
+    "reservations": "Reservas",
+    "directory": "Directorio"
   },
   "auth": {
     "login": {
@@ -918,7 +920,13 @@
       "CLOSED": "Cerrada",
       "CANCELLED": "Cancelada"
     },
-    "photoHint": "JPEG, PNG o WebP · máximo 5 MB"
+    "photoHint": "JPEG, PNG o WebP · máximo 5 MB",
+    "kpiOpen": "Abiertas",
+    "kpiInProgress": "En curso",
+    "kpiResolved": "Resueltas",
+    "kpiUrgent": "Urgentes",
+    "search": "Buscar",
+    "searchPlaceholder": "Título, categoría o vivienda"
   },
   "board": {
     "title": "Tablón de anuncios",
@@ -1061,5 +1069,73 @@
     "selectDelegation": "Selecciona una autorización de voto en «Actuar en nombre de» para votar por otro vecino.",
     "scopeHint": "Solo aparecen los ámbitos que tú mismo puedes realizar.",
     "chooseHint": "Selecciona una autorización para actuar en nombre de otro vecino."
+  },
+  "reservations": {
+    "title": "Reservas de zonas comunes",
+    "subtitle": "Reserva el salón, la pista o cualquier zona compartida de la comunidad.",
+    "newReservation": "Nueva reserva",
+    "newArea": "Nueva zona",
+    "areaName": "Nombre de la zona",
+    "description": "Descripción",
+    "location": "Ubicación",
+    "capacity": "Aforo",
+    "capacityValue": "{{count}} personas",
+    "requiresApproval": "Requiere aprobación de la administración",
+    "date": "Fecha",
+    "time": "Horario",
+    "startTime": "Hora de inicio",
+    "endTime": "Hora de fin",
+    "notes": "Notas",
+    "area": "Zona",
+    "selectArea": "Selecciona una zona",
+    "reserve": "Reservar",
+    "areas": "Zonas disponibles",
+    "inactive": "Inactiva",
+    "approvalRequired": "Con aprobación",
+    "autoApproved": "Confirmación inmediata",
+    "deactivate": "Desactivar",
+    "activate": "Activar",
+    "neighbor": "Vecino",
+    "status": "Estado",
+    "actions": "Acciones",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "cancel": "Cancelar reserva",
+    "you": "Tú",
+    "noReservations": "No hay reservas para mostrar.",
+    "noAreas": "Todavía no hay zonas configuradas.",
+    "error": "No se ha podido completar la reserva.",
+    "kpiAreas": "Zonas activas",
+    "kpiUpcoming": "Próximas reservas",
+    "kpiMine": "Mis reservas",
+    "kpiPending": "Pendientes",
+    "tabs": {
+      "UPCOMING": "Próximas",
+      "MINE": "Mis reservas",
+      "ALL": "Todas"
+    },
+    "statuses": {
+      "PENDING": "Pendiente",
+      "APPROVED": "Aprobada",
+      "REJECTED": "Rechazada",
+      "CANCELLED": "Cancelada"
+    }
+  },
+  "directory": {
+    "title": "Directorio de vecinos",
+    "subtitle": "Encuentra a tus vecinos, sus viviendas y sus datos de contacto.",
+    "error": "No se ha podido cargar el directorio.",
+    "myData": "Mis datos de contacto",
+    "myDataHint": "Decide qué datos quieres compartir con el resto de la comunidad.",
+    "phone": "Teléfono",
+    "showEmail": "Mostrar mi email",
+    "showPhone": "Mostrar mi teléfono",
+    "saved": "Datos actualizados.",
+    "search": "Buscar",
+    "searchPlaceholder": "Nombre, vivienda o rol",
+    "noResults": "No hay vecinos que coincidan con la búsqueda.",
+    "you": "Tú",
+    "units": "Viviendas",
+    "contactPrivate": "Contacto privado"
   }
 }
