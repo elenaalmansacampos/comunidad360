@@ -819,7 +819,11 @@
       "RECEIVED": "Rebut",
       "ACCEPTED": "Acceptat",
       "REJECTED": "Rebutjat"
-    }
+    },
+    "primeBadge": "Prime",
+    "primeTitle": "Serveis de proveïdors Prime",
+    "primeMessage": "La gestió de proveïdors, contractes i pressupostos formarà part de la versió Prime de Comunidad 360. Encara està en desenvolupament; properament estarà disponible la contractació.",
+    "primeSoon": "Properament"
   },
   "votings": {
     "title": "Votacions",

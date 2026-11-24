@@ -3325,3 +3325,110 @@ h3 {
 [data-theme="dark"] .document-viewer__body {
   background: #0b1424;
 }
+
+/* Prime provider notice */
+.prime-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #fcd34d;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%);
+  color: #78350f;
+}
+
+.prime-notice--compact {
+  padding: 0.8rem 1rem;
+}
+
+.prime-notice__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  flex: 0 0 2.2rem;
+  border-radius: 12px;
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.prime-notice__content {
+  min-width: 0;
+}
+
+.prime-notice__eyebrow {
+  display: block;
+  margin-bottom: 0.1rem;
+  color: #b45309;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.prime-notice__content strong {
+  display: block;
+  color: #78350f;
+  font-size: 0.95rem;
+}
+
+.prime-notice__content p {
+  margin: 0.2rem 0 0;
+  color: #92400e;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.prime-notice__soon {
+  margin-left: auto;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #f59e0b;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.nav-badge-prime {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+[data-theme="dark"] .prime-notice {
+  border-color: #4d3f12;
+  background: linear-gradient(135deg, #2a2410 0%, #241d0b 100%);
+  color: #fde68a;
+}
+
+[data-theme="dark"] .prime-notice__icon {
+  background: #3f3414;
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .prime-notice__content strong {
+  color: #fde68a;
+}
+
+[data-theme="dark"] .prime-notice__content p {
+  color: #fcd34d;
+}
+
+[data-theme="dark"] .nav-badge-prime {
+  background: #3f3414;
+  color: #fcd34d;
+}

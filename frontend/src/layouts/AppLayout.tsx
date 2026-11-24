@@ -48,12 +48,13 @@ function initials(name: string | undefined): string {
     .join("");
 }
 
-function NavItem({ to, icon, label, end, accent }: {
+function NavItem({ to, icon, label, end, accent, badge }: {
   to: string;
   icon: ReactNode;
   label: string;
   end?: boolean;
   accent?: string;
+  badge?: string;
 }) {
   return (
     <NavLink
@@ -63,7 +64,7 @@ function NavItem({ to, icon, label, end, accent }: {
         `nav-link ${isActive ? "nav-link--active" : ""} ${accent ? `nav-link--accent-${accent}` : ""}`}
     >
       <span className="nav-link__icon" aria-hidden="true">{icon}</span>
-      <span>{label}</span>
+      <span>{label}{badge ? <span className="nav-badge-prime">{badge}</span> : null}</span>
     </NavLink>
   );
 }
@@ -124,7 +125,7 @@ export function AppLayout() {
     navigate("/login", { replace: true });
   }
 
-  const communityMoreLinks = [
+  const communityMoreLinks: { to: string; label: string; community: boolean; accent: string; badge?: string }[] = [
     { to: `/communities/${communityId}/incidents`, label: t("nav.incidents"), community: true, accent: "rose" },
     { to: `/communities/${communityId}/reservations`, label: t("nav.reservations"), community: true, accent: "violet" },
     { to: `/communities/${communityId}/chat`, label: t("nav.chat"), community: true, accent: "blue" },
@@ -135,9 +136,9 @@ export function AppLayout() {
     { to: `/communities/${communityId}/authorizations`, label: t("nav.authorizations"), community: true, accent: "cyan" },
     { to: `/communities/${communityId}/directory`, label: t("nav.directory"), community: true, accent: "green" },
   ];
-  const managementMoreLinks = [
+  const managementMoreLinks: { to: string; label: string; community: boolean; accent: string; badge?: string }[] = [
     ...(canViewProviders(roles)
-      ? [{ to: `/communities/${communityId}/providers`, label: t("nav.providers"), community: false, accent: "" }]
+      ? [{ to: `/communities/${communityId}/providers`, label: t("nav.providers"), community: false, accent: "", badge: t("providers.primeBadge") }]
       : []),
     { to: `/communities/${communityId}/banking`, label: t("nav.banking"), community: false, accent: "" },
     { to: `/communities/${communityId}/meetings`, label: t("nav.meetings"), community: false, accent: "" },
@@ -272,6 +273,7 @@ export function AppLayout() {
                   icon={<Wrench size={18} />}
                   label={t("nav.providers")}
                   accent={isVecino ? "orange" : undefined}
+                  badge={t("providers.primeBadge")}
                 />
               ) : null}
               <NavItem
@@ -409,6 +411,7 @@ export function AppLayout() {
                   className={isVecino && link.community ? `nav-link--accent-${link.accent}` : undefined}
                 >
                   {link.label}
+                  {link.badge ? <span className="nav-badge-prime">{link.badge}</span> : null}
                 </NavLink>
               ))}
             </div>

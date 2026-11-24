@@ -819,7 +819,11 @@
       "RECEIVED": "Received",
       "ACCEPTED": "Accepted",
       "REJECTED": "Rejected"
-    }
+    },
+    "primeBadge": "Prime",
+    "primeTitle": "Prime provider services",
+    "primeMessage": "Provider, contract and budget management will be part of the Prime version of Comunidad 360. It is still in development; contracting will be available soon.",
+    "primeSoon": "Coming soon"
   },
   "votings": {
     "title": "Votings",

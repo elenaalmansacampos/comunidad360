@@ -819,7 +819,11 @@
       "RECEIVED": "Recibido",
       "ACCEPTED": "Aceptado",
       "REJECTED": "Rechazado"
-    }
+    },
+    "primeBadge": "Prime",
+    "primeTitle": "Servicios de proveedores Prime",
+    "primeMessage": "La gestión de proveedores, contratos y presupuestos formará parte de la versión Prime de Comunidad 360. Aún está en desarrollo; próximamente estará disponible la contratación.",
+    "primeSoon": "Próximamente"
   },
   "votings": {
     "title": "Votaciones",

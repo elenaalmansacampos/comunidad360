@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
 import { FullPageLoader } from "../components/FullPageLoader";
+import { PrimeNotice } from "../components/PrimeNotice";
 import { Input } from "../components/Input";
 import { useAuthStore } from "../features/auth/authStore";
 import { useCommunityStore } from "../features/communities/communityStore";
@@ -40,6 +41,7 @@ export function ProvidersPage() {
           </Button>
         ) : null}
       </header>
+      <PrimeNotice />
       {showForm && communityId ? <ProviderForm communityId={communityId} onDone={() => setShowForm(false)} /> : null}
       {providers.data?.length === 0 ? (
         <div className="empty-state">{t("providers.noProviders")}</div>

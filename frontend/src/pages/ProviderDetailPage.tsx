@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
 import { FullPageLoader } from "../components/FullPageLoader";
+import { PrimeNotice } from "../components/PrimeNotice";
 import { Input } from "../components/Input";
 import { useAuthStore } from "../features/auth/authStore";
 import { canManageProviders } from "../features/mvp/utils";
@@ -69,6 +70,7 @@ export function ProviderDetailPage() {
           </Button>
         ) : null}
       </header>
+      <PrimeNotice compact />
       {updateProvider.isError ? <Alert variant="error">{t("providers.error")}</Alert> : null}
       <section className="detail-grid">
         <article className="detail-card">
