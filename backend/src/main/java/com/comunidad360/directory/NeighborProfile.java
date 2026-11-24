@@ -25,6 +25,12 @@ public class NeighborProfile {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(name = "display_name", length = 200)
+    private String displayName;
+
+    @Column(name = "unit_label", length = 100)
+    private String unitLabel;
+
     @Column(length = 40)
     private String phone;
 
@@ -47,12 +53,15 @@ public class NeighborProfile {
     protected NeighborProfile() {
     }
 
-    public NeighborProfile(UUID id, UUID communityId, UUID membershipId, UUID userId, String phone,
-                           boolean showEmail, boolean showPhone, Instant createdAt, Instant updatedAt) {
+    public NeighborProfile(UUID id, UUID communityId, UUID membershipId, UUID userId, String displayName,
+                           String unitLabel, String phone, boolean showEmail, boolean showPhone,
+                           Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.communityId = communityId;
         this.membershipId = membershipId;
         this.userId = userId;
+        this.displayName = displayName;
+        this.unitLabel = unitLabel;
         this.phone = phone;
         this.showEmail = showEmail;
         this.showPhone = showPhone;
@@ -74,6 +83,22 @@ public class NeighborProfile {
 
     public UUID getUserId() {
         return userId;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getUnitLabel() {
+        return unitLabel;
+    }
+
+    public void setUnitLabel(String unitLabel) {
+        this.unitLabel = unitLabel;
     }
 
     public String getPhone() {

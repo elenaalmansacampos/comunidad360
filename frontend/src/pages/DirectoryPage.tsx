@@ -26,6 +26,8 @@ export function DirectoryPage() {
   const directory = useDirectory(communityId);
   const update = useUpdateDirectoryProfile(communityId);
   const [search, setSearch] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [unitLabel, setUnitLabel] = useState("");
   const [phone, setPhone] = useState("");
   const [showEmail, setShowEmail] = useState(true);
   const [showPhone, setShowPhone] = useState(false);
@@ -39,11 +41,14 @@ export function DirectoryPage() {
   const self = directory.data?.find((entry) => entry.self);
   useEffect(() => {
     if (self) {
+      setDisplayName(self.displayName ?? self.fullName ?? "");
+      setUnitLabel(self.unitLabel ?? self.unitCodes.join(", "));
       setPhone(self.phone ?? "");
       setShowEmail(self.showEmail);
       setShowPhone(self.showPhone);
     }
-  }, [self?.membershipId, self?.phone, self?.showEmail, self?.showPhone]);
+  }, [self?.membershipId, self?.displayName, self?.unitLabel, self?.fullName,
+      self?.phone, self?.showEmail, self?.showPhone, self?.unitCodes]);
 
   const entries = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -52,7 +57,8 @@ export function DirectoryPage() {
       return list;
     }
     return list.filter((entry) =>
-      (entry.fullName ?? "").toLowerCase().includes(term)
+      (entry.displayName ?? entry.fullName ?? "").toLowerCase().includes(term)
+      || (entry.unitLabel ?? "").toLowerCase().includes(term)
       || entry.unitCodes.some((code) => code.toLowerCase().includes(term))
       || entry.roles.some((role) => t(`roles.${role}`, { defaultValue: role }).toLowerCase().includes(term)));
   }, [directory.data, search, t]);
@@ -60,7 +66,13 @@ export function DirectoryPage() {
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     try {
-      await update.mutateAsync({ phone: phone || undefined, showEmail, showPhone });
+      await update.mutateAsync({
+        displayName: displayName || undefined,
+        unitLabel: unitLabel || undefined,
+        phone: phone || undefined,
+        showEmail,
+        showPhone,
+      });
     } catch {
       // error mostrado en el aviso
     }
@@ -89,6 +101,18 @@ export function DirectoryPage() {
           <h3>{t("directory.myData")}</h3>
           <p className="page-subtitle">{t("directory.myDataHint")}</p>
           <div className="form-grid">
+            <Input
+              label={t("directory.displayName")}
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+              placeholder={t("directory.displayNamePlaceholder")}
+            />
+            <Input
+              label={t("directory.unitLabel")}
+              value={unitLabel}
+              onChange={(event) => setUnitLabel(event.target.value)}
+              placeholder={t("directory.unitLabelPlaceholder")}
+            />
             <Input label={t("directory.phone")} type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} />
             <label className="inline-check">
               <input type="checkbox" checked={showEmail} onChange={(event) => setShowEmail(event.target.checked)} />
@@ -138,7 +162,7 @@ function DirectoryCard({ entry }: { entry: DirectoryEntry }) {
       <header className="directory-card__head">
         <span className="avatar directory-card__avatar" aria-hidden="true">{initials(entry.fullName)}</span>
         <div>
-          <h2>{entry.fullName ?? "—"}</h2>
+          <h2>{entry.displayName ?? entry.fullName ?? "—"}</h2>
           <div className="chips">
             {entry.roles.map((role) => (
               <span className="badge" key={role}>{t(`roles.${role}`, { defaultValue: role })}</span>
@@ -147,8 +171,10 @@ function DirectoryCard({ entry }: { entry: DirectoryEntry }) {
           </div>
         </div>
       </header>
-      {entry.unitCodes.length ? (
-        <p className="directory-card__units">{t("directory.units")}: {entry.unitCodes.join(", ")}</p>
+      {entry.unitLabel || entry.unitCodes.length ? (
+        <p className="directory-card__units">
+          {t("directory.units")}: {entry.unitLabel ?? entry.unitCodes.join(", ")}
+        </p>
       ) : null}
       <div className="directory-card__contact">
         {entry.email ? (

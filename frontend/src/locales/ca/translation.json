@@ -1136,6 +1136,10 @@
     "noResults": "No hi ha veïns que coincideixin amb la cerca.",
     "you": "Tu",
     "units": "Habitatges",
-    "contactPrivate": "Contacte privat"
+    "contactPrivate": "Contacte privat",
+    "displayName": "Nom visible",
+    "displayNamePlaceholder": "Com vols aparèixer al directori",
+    "unitLabel": "Pis / habitatge",
+    "unitLabelPlaceholder": "Ex. 3rB"
   }
 }

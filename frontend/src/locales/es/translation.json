@@ -1136,6 +1136,10 @@
     "noResults": "No hay vecinos que coincidan con la búsqueda.",
     "you": "Tú",
     "units": "Viviendas",
-    "contactPrivate": "Contacto privado"
+    "contactPrivate": "Contacto privado",
+    "displayName": "Nombre visible",
+    "displayNamePlaceholder": "Cómo quieres aparecer en el directorio",
+    "unitLabel": "Piso / vivienda",
+    "unitLabelPlaceholder": "Ej. 3ºB"
   }
 }

@@ -920,10 +920,12 @@ export interface DirectoryEntry {
   membershipId: string;
   userId: string;
   fullName?: string | null;
+  displayName?: string | null;
   email?: string | null;
   phone?: string | null;
   roles: Role[];
   unitCodes: string[];
+  unitLabel?: string | null;
   showEmail: boolean;
   showPhone: boolean;
   self: boolean;

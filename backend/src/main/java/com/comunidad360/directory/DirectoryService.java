@@ -95,9 +95,12 @@ public class DirectoryService {
         Instant now = Instant.now();
         if (profile == null) {
             profile = new NeighborProfile(UUID.randomUUID(), communityId, membership.getId(), userId,
-                    clean(request.phone()), request.showEmail() == null || request.showEmail(),
+                    clean(request.displayName()), clean(request.unitLabel()), clean(request.phone()),
+                    request.showEmail() == null || request.showEmail(),
                     request.showPhone() != null && request.showPhone(), now, now);
         } else {
+            profile.setDisplayName(clean(request.displayName()));
+            profile.setUnitLabel(clean(request.unitLabel()));
             profile.setPhone(clean(request.phone()));
             if (request.showEmail() != null) profile.setShowEmail(request.showEmail());
             if (request.showPhone() != null) profile.setShowPhone(request.showPhone());
@@ -122,8 +125,12 @@ public class DirectoryService {
         String phone = profile == null ? null : (self || showPhone ? profile.getPhone() : null);
         String name = user == null ? null
                 : (user.getFullName() == null || user.getFullName().isBlank() ? user.getEmail() : user.getFullName());
-        return new DirectoryEntryResponse(membership.getId(), membership.getUserId(), name, email, phone,
-                roles, units, showEmail, showPhone, self);
+        String displayName = profile == null || profile.getDisplayName() == null
+                ? null : profile.getDisplayName();
+        String unitLabel = profile == null || profile.getUnitLabel() == null
+                ? null : profile.getUnitLabel();
+        return new DirectoryEntryResponse(membership.getId(), membership.getUserId(), name, displayName,
+                email, phone, roles, units, unitLabel, showEmail, showPhone, self);
     }
 
     private List<String> unitCodes(UUID communityId, UUID userId) {

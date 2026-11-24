@@ -17,7 +17,10 @@ export function useDirectory(communityId: string | undefined) {
 export function useUpdateDirectoryProfile(communityId: string | undefined) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { phone?: string; showEmail?: boolean; showPhone?: boolean }) =>
+    mutationFn: (payload: {
+      displayName?: string; unitLabel?: string; phone?: string;
+      showEmail?: boolean; showPhone?: boolean;
+    }) =>
       api.put<DirectoryEntry>(`/communities/${communityId}/directory/me`, payload),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: key(communityId) }); },
   });

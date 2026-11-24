@@ -1136,6 +1136,10 @@
     "noResults": "No neighbors match the search.",
     "you": "You",
     "units": "Homes",
-    "contactPrivate": "Private contact"
+    "contactPrivate": "Private contact",
+    "displayName": "Display name",
+    "displayNamePlaceholder": "How you want to appear in the directory",
+    "unitLabel": "Floor / home",
+    "unitLabelPlaceholder": "E.g. 3B"
   }
 }

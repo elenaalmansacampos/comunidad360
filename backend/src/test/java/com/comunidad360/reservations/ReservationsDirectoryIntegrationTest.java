@@ -130,8 +130,11 @@ class ReservationsDirectoryIntegrationTest {
                         .header("Authorization", "Bearer " + ownerToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
+                                "displayName", "Ana Propietaria", "unitLabel", "2ºB",
                                 "phone", "+34 600 111 111", "showEmail", false, "showPhone", true))))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.displayName").value("Ana Propietaria"))
+                .andExpect(jsonPath("$.unitLabel").value("2ºB"))
                 .andExpect(jsonPath("$.phone").value("+34 600 111 111"));
         mockMvc.perform(put(base + "/directory/me")
                         .header("Authorization", "Bearer " + tenantToken)
@@ -146,6 +149,8 @@ class ReservationsDirectoryIntegrationTest {
                 .andReturn();
         JsonNode ownerEntry = entry(directory, owner.getId());
         assertEquals("+34 600 111 111", ownerEntry.get("phone").asText());
+        assertEquals("Ana Propietaria", ownerEntry.get("displayName").asText());
+        assertEquals("2ºB", ownerEntry.get("unitLabel").asText());
         assertTrue(ownerEntry.get("email").isNull());
         assertFalse(ownerEntry.get("self").asBoolean());
 
