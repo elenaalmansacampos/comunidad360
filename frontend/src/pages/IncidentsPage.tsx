@@ -23,6 +23,7 @@ const CREATE_ROLES: Role[] = [
   "TREASURER",
   "OWNER",
   "TENANT",
+  "VECINO",
 ];
 
 export function IncidentsPage() {

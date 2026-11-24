@@ -208,7 +208,16 @@
     "copyLink": "Copiar enlace",
     "copied": "Copiado",
     "inviteError": "No se ha podido crear la invitación",
-    "inviteRoleHint": "Solo lectura puede consultar la información, pero no modificarla."
+    "inviteRoleHint": "Solo lectura puede consultar la información, pero no modificarla.",
+    "vecinoAccess": "Acceso de vecino",
+    "vecinoAccessHint": "Genera un usuario y contraseña generales para el perfil Vecino. Puede consultar todo y escribir solo en tablón, chat, incidencias y objetos perdidos.",
+    "generateVecino": "Generar acceso de vecino",
+    "vecinoAccessWarning": "Credencial compartida. Si la vuelves a generar, la contraseña anterior dejará de funcionar.",
+    "vecinoEmail": "Usuario (email)",
+    "vecinoPassword": "Contraseña",
+    "copyCredentials": "Copiar credenciales",
+    "vecinoAccessError": "No se ha podido generar el acceso de vecino",
+    "vecinoAuditNote": "Todas las acciones del usuario compartido quedan registradas en la auditoría."
   },
   "roles": {
     "SUPER_ADMIN": "Superadministrador",
@@ -219,7 +228,8 @@
     "OWNER": "Propietario/a",
     "TENANT": "Inquilino/a",
     "PROVIDER": "Proveedor",
-    "VIEWER": "Solo lectura"
+    "VIEWER": "Solo lectura",
+    "VECINO": "Vecino"
   },
   "statuses": {
     "ACTIVE": "Activo",

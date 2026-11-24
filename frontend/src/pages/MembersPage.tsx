@@ -11,9 +11,9 @@ import { Select } from "../components/Select";
 import { useAuthStore } from "../features/auth/authStore";
 import { useMembers } from "../features/communities/queries";
 import { useCommunityStore } from "../features/communities/communityStore";
-import { useInviteMember } from "../features/members/queries";
+import { useGenerateVecinoAccess, useInviteMember } from "../features/members/queries";
 import { ApiError } from "../services/apiClient";
-import type { Role } from "../types/api";
+import type { Role, VecinoAccess } from "../types/api";
 
 const INVITE_ROLES: Role[] = [
   "VIEWER",
@@ -38,11 +38,15 @@ export function MembersPage() {
   const invite = useInviteMember(communityId);
   const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
   const canInvite = roles.some((role) => ["COMMUNITY_ADMIN", "SECRETARY"].includes(role));
+  const isAdmin = roles.includes("COMMUNITY_ADMIN");
+  const vecino = useGenerateVecinoAccess(communityId);
   const [showInvite, setShowInvite] = useState(false);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("VIEWER");
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [vecinoAccess, setVecinoAccess] = useState<VecinoAccess | null>(null);
+  const [vecinoCopied, setVecinoCopied] = useState(false);
 
   useEffect(() => {
     if (communityId) {
@@ -66,6 +70,29 @@ export function MembersPage() {
       setEmail("");
     } catch {
       // estado de la mutación
+    }
+  }
+
+  async function generateVecino() {
+    setVecinoCopied(false);
+    try {
+      const result = await vecino.mutateAsync();
+      setVecinoAccess(result);
+    } catch {
+      // estado de la mutación
+    }
+  }
+
+  async function copyVecino() {
+    if (!vecinoAccess) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(`${vecinoAccess.email}\n${vecinoAccess.password}`);
+      setVecinoCopied(true);
+      window.setTimeout(() => setVecinoCopied(false), 1500);
+    } catch {
+      setVecinoCopied(false);
     }
   }
 
@@ -156,6 +183,32 @@ export function MembersPage() {
             <Button type="submit" loading={invite.isPending}>{t("members.inviteSubmit")}</Button>
           </div>
         </form>
+      ) : null}
+
+      {isAdmin ? (
+        <section className="form-card vecino-access-card">
+          <h3>{t("members.vecinoAccess")}</h3>
+          <p className="page-subtitle">{t("members.vecinoAccessHint")}</p>
+          <p className="muted">{t("members.vecinoAuditNote")}</p>
+          {vecino.isError ? <Alert variant="error">{t("members.vecinoAccessError")}</Alert> : null}
+          <div className="form-actions">
+            <Button onClick={() => void generateVecino()} loading={vecino.isPending}>
+              {t("members.generateVecino")}
+            </Button>
+          </div>
+          {vecinoAccess ? (
+            <>
+              <Alert variant="info">{t("members.vecinoAccessWarning")}</Alert>
+              <div className="invite-link">
+                <code>{t("members.vecinoEmail")}: {vecinoAccess.email}</code>
+                <code>{t("members.vecinoPassword")}: {vecinoAccess.password}</code>
+                <Button type="button" variant="secondary" onClick={() => void copyVecino()}>
+                  {vecinoCopied ? t("members.copied") : t("members.copyCredentials")}
+                </Button>
+              </div>
+            </>
+          ) : null}
+        </section>
       ) : null}
 
       {members.data?.length === 0 ? (

@@ -5,7 +5,7 @@ import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
 import { FullPageLoader } from "../components/FullPageLoader";
 import { useAuthStore } from "../features/auth/authStore";
-import { canManageVotings } from "../features/mvp/utils";
+import { canCastVotes, canManageVotings } from "../features/mvp/utils";
 import {
   useCastVote,
   useCloseVoting,
@@ -19,7 +19,9 @@ export function VotingDetailPage() {
   const { t, i18n } = useTranslation();
   const { communityId, votingId } = useParams<{ communityId: string; votingId: string }>();
   const user = useAuthStore((state) => state.user);
-  const canManage = canManageVotings(user?.memberships.find((item) => item.id === communityId)?.roles ?? []);
+  const roles = user?.memberships.find((item) => item.id === communityId)?.roles ?? [];
+  const canManage = canManageVotings(roles);
+  const canCast = canCastVotes(roles);
   const language = normalizeLanguage(i18n.language);
   const voting = useVoting(communityId, votingId);
   const openVoting = useOpenVoting(communityId, votingId);
@@ -33,7 +35,7 @@ export function VotingDetailPage() {
   }
   const data = voting.data;
   const item = data.voting;
-  const canVote = item.status === "OPEN" && !item.hasVoted;
+  const canVote = item.status === "OPEN" && !item.hasVoted && canCast;
 
   async function vote() {
     if (!optionId) return;

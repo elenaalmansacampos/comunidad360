@@ -208,7 +208,16 @@
     "copyLink": "Copy link",
     "copied": "Copied",
     "inviteError": "The invitation could not be created",
-    "inviteRoleHint": "Read-only can view information but cannot change it."
+    "inviteRoleHint": "Read-only can view information but cannot change it.",
+    "vecinoAccess": "Neighbor access",
+    "vecinoAccessHint": "Generate a shared username and password for the Neighbor profile. They can view everything and write only on the board, chat, incidents and lost & found.",
+    "generateVecino": "Generate neighbor access",
+    "vecinoAccessWarning": "Shared credential. If you regenerate it, the previous password will stop working.",
+    "vecinoEmail": "Username (email)",
+    "vecinoPassword": "Password",
+    "copyCredentials": "Copy credentials",
+    "vecinoAccessError": "The neighbor access could not be generated",
+    "vecinoAuditNote": "All actions of the shared user are recorded in the audit log."
   },
   "roles": {
     "SUPER_ADMIN": "Super administrator",
@@ -219,7 +228,8 @@
     "OWNER": "Owner",
     "TENANT": "Tenant",
     "PROVIDER": "Provider",
-    "VIEWER": "Read-only"
+    "VIEWER": "Read-only",
+    "VECINO": "Neighbor"
   },
   "statuses": {
     "ACTIVE": "Active",

@@ -116,7 +116,7 @@ class ChatWebSocketAuthInterceptorTest {
         private UUID channelId;
 
         private RecordingChatService(boolean forbidden) {
-            super(null, null, null, null, null, null, null);
+            super(null, null, null, null, null, null, null, null);
             this.forbidden = forbidden;
         }
 

@@ -48,3 +48,8 @@ export function canCreateWorkPermits(roles: Role[]): boolean {
   return roles.some((role) =>
     ["COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY", "TREASURER", "OWNER", "TENANT"].includes(role));
 }
+
+export function canCastVotes(roles: Role[]): boolean {
+  return roles.some((role) =>
+    ["COMMUNITY_ADMIN", "PRESIDENT", "SECRETARY", "TREASURER", "OWNER", "TENANT"].includes(role));
+}

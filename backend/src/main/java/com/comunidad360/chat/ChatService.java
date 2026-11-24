@@ -1,5 +1,6 @@
 package com.comunidad360.chat;
 
+import com.comunidad360.audit.AuditService;
 import com.comunidad360.common.exception.BusinessException;
 import com.comunidad360.chat.dto.*;
 import com.comunidad360.membership.Membership;
@@ -24,11 +25,12 @@ public class ChatService {
     private final TenantAccessService tenantAccessService;
     private final PermissionService permissionService;
     private final AppUserRepository userRepository;
+    private final AuditService auditService;
 
     public ChatService(ChatChannelRepository channelRepository, ChatChannelMemberRepository memberRepository,
                        ChatMessageRepository messageRepository, MembershipRepository membershipRepository,
                        TenantAccessService tenantAccessService, PermissionService permissionService,
-                       AppUserRepository userRepository) {
+                       AppUserRepository userRepository, AuditService auditService) {
         this.channelRepository = channelRepository;
         this.memberRepository = memberRepository;
         this.messageRepository = messageRepository;
@@ -36,6 +38,7 @@ public class ChatService {
         this.tenantAccessService = tenantAccessService;
         this.permissionService = permissionService;
         this.userRepository = userRepository;
+        this.auditService = auditService;
     }
 
     @Transactional
@@ -74,6 +77,8 @@ public class ChatService {
             }
             memberRepository.flush();
         }
+        auditService.record(communityId, userId, "USER", "CHAT_CHANNEL_CREATED", "CHAT_CHANNEL",
+                channel.getId(), null, Map.of("type", channel.getType().name()), null);
         return ChatChannelResponse.from(channel);
     }
 
@@ -104,7 +109,10 @@ public class ChatService {
         }
         ChatMessage message = messageRepository.saveAndFlush(new ChatMessage(
                 UUID.randomUUID(), communityId, channelId, userId, body.trim(), Instant.now()));
-        return ChatMessageResponse.from(message, userName(userId));
+        ChatMessageResponse response = ChatMessageResponse.from(message, userName(userId));
+        auditService.record(communityId, userId, "USER", "CHAT_MESSAGE_SENT", "CHAT_MESSAGE",
+                message.getId(), null, Map.of("channelId", channelId), null);
+        return response;
     }
 
     @Transactional(readOnly = true)

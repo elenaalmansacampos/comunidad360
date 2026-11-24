@@ -208,7 +208,16 @@
     "copyLink": "Copia l'enllaç",
     "copied": "Copiat",
     "inviteError": "No s'ha pogut crear la invitació",
-    "inviteRoleHint": "Només lectura pot consultar la informació, però no modificar-la."
+    "inviteRoleHint": "Només lectura pot consultar la informació, però no modificar-la.",
+    "vecinoAccess": "Accés de veí",
+    "vecinoAccessHint": "Genera un usuari i contrasenya generals per al perfil Veí. Pot consultar-ho tot i escriure només al taulell, xat, incidències i objectes perduts.",
+    "generateVecino": "Genera l'accés de veí",
+    "vecinoAccessWarning": "Credencial compartida. Si la tornes a generar, la contrasenya anterior deixarà de funcionar.",
+    "vecinoEmail": "Usuari (email)",
+    "vecinoPassword": "Contrasenya",
+    "copyCredentials": "Copia les credencials",
+    "vecinoAccessError": "No s'ha pogut generar l'accés de veí",
+    "vecinoAuditNote": "Totes les accions de l'usuari compartit queden registrades a l'auditoria."
   },
   "roles": {
     "SUPER_ADMIN": "Superadministrador",
@@ -219,7 +228,8 @@
     "OWNER": "Propietari/ària",
     "TENANT": "Inquilí/ina",
     "PROVIDER": "Proveïdor",
-    "VIEWER": "Només lectura"
+    "VIEWER": "Només lectura",
+    "VECINO": "Veí"
   },
   "statuses": {
     "ACTIVE": "Actiu",

@@ -7,7 +7,8 @@ export type Role =
   | "OWNER"
   | "TENANT"
   | "PROVIDER"
-  | "VIEWER";
+  | "VIEWER"
+  | "VECINO";
 
 export type Language = "es" | "ca" | "en";
 
@@ -813,4 +814,10 @@ export interface WorkPermit {
   createdAt: string;
   updatedAt: string;
   version: number;
+}
+
+export interface VecinoAccess {
+  email: string;
+  password: string;
+  role: string;
 }

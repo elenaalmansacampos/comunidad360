@@ -2349,3 +2349,12 @@ h3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.vecino-access-card .invite-link {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.vecino-access-card .invite-link code {
+  flex: none;
+}
