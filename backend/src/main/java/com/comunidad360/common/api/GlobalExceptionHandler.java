@@ -2,6 +2,7 @@ package com.comunidad360.common.api;
 
 import com.comunidad360.common.exception.BusinessException;
 import com.comunidad360.common.i18n.MessageService;
+import com.comunidad360.storage.StorageFileNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException exception) {
         return build(HttpStatus.FORBIDDEN, "PERMISSION_DENIED", "errors.permission.denied", Map.of());
+    }
+
+    @ExceptionHandler(StorageFileNotFoundException.class)
+    public ResponseEntity<ApiError> handleStorageMissing(StorageFileNotFoundException exception) {
+        return build(HttpStatus.NOT_FOUND, "FILE_NOT_FOUND", "errors.file.notFound", Map.of());
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

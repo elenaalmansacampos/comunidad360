@@ -82,7 +82,7 @@ services:
       - key: APP_MAIL_FROM_NAME
         value: Comunidad 360
       - key: APP_STORAGE_TYPE
-        value: local
+        value: database
       - key: APP_STORAGE_LOCAL_PATH
         value: /app/data/uploads
       - key: APP_STORAGE_S3_ENDPOINT

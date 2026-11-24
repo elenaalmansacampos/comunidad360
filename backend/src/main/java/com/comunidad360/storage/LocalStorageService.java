@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Duration;
@@ -41,6 +42,8 @@ public class LocalStorageService implements StorageService {
     public byte[] read(String key) {
         try {
             return Files.readAllBytes(resolve(key));
+        } catch (NoSuchFileException exception) {
+            throw new StorageFileNotFoundException(key);
         } catch (IOException exception) {
             throw new IllegalStateException("Cannot read file", exception);
         }
